@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { demos } from "#/lib/demos";
 import Link from "next/link";
 

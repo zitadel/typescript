@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import VerifyEmailForm from "#/ui/VerifyEmailForm";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 

@@ -1,4 +1,4 @@
-import { CallOptions, ClientMiddlewareCall, Metadata, MethodDescriptor } from "nice-grpc";
+import { CallOptions, ClientMiddlewareCall, Metadata, MethodDescriptor } from "nice-grpc-web";
 import { authMiddleware } from "./middleware";
 
 describe('authMiddleware', () => {

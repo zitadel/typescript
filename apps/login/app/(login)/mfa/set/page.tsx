@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 "use client";
 import { Button, ButtonVariants } from "#/ui/Button";
 import { TextInput } from "#/ui/Input";

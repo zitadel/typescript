@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { getSession, server } from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
 import RegisterPasskey from "#/ui/RegisterPasskey";

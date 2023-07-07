@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { getSession, server } from "#/lib/zitadel";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";

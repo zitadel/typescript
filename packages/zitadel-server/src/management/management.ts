@@ -1,6 +1,6 @@
-import { CompatServiceDefinition } from "nice-grpc/lib/service-definitions";
+import { CompatServiceDefinition } from "nice-grpc-web/lib/service-definitions";
 
-import { createChannel, createClientFactory } from "nice-grpc";
+import { createChannel, createClientFactory } from "nice-grpc-web";
 import {
   ManagementServiceClient,
   ManagementServiceDefinition,
@@ -18,7 +18,7 @@ const createClient = <Client>(
     throw Error("ZITADEL_API_URL not set");
   }
 
-  const channel = createChannel(process.env.ZITADEL_API_URL ?? "");
+  const channel = createChannel("https://invarum-8bucih.zitadel.app");
   return createClientFactory()
     .use(authMiddleware(token))
     .create(definition, channel) as Client;

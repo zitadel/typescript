@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { BrandingSettings } from "@zitadel/server";
 import React from "react";
 import { getBrandingSettings, server } from "#/lib/zitadel";

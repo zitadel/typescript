@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { Session } from "@zitadel/server";
 import { listSessions, server } from "#/lib/zitadel";
 import { getAllSessionIds } from "#/utils/cookies";

@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { getLoginSettings, server } from "#/lib/zitadel";
 import UsernameForm from "#/ui/UsernameForm";
 

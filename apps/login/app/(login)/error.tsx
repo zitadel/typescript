@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 "use client";
 
 import { Boundary } from "#/ui/Boundary";

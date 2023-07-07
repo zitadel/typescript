@@ -9,9 +9,10 @@ plugins:
     out: src/proto/server
     opt:
       - esModuleInterop=true
-      - env=node
+      - env=browser
       - outputServices=nice-grpc
       - outputServices=generic-definitions
+      - outputJsonMethods=false
       - useExactTypes=false
   # - plugin: buf.build/protocolbuffers/js
   #   out: src/app/proto/generated
