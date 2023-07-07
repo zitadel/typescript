@@ -1,4 +1,4 @@
-import { CompatServiceDefinition } from "nice-grpc/lib/service-definitions";
+import { CompatServiceDefinition } from "nice-grpc-web/lib/service-definitions";
 
 import {
   SettingsServiceClient,

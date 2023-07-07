@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { setEmail, server } from "#/lib/zitadel";
 import { NextRequest, NextResponse } from "next/server";
 

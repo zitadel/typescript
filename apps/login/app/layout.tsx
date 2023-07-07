@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import "#/styles/globals.scss";
 import { AddressBar } from "#/ui/AddressBar";
 import { GlobalNav } from "#/ui/GlobalNav";

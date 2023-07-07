@@ -1,4 +1,4 @@
-import { CallOptions, ClientMiddleware, ClientMiddlewareCall, Metadata } from "nice-grpc";
+import { CallOptions, ClientMiddleware, ClientMiddlewareCall, Metadata } from "nice-grpc-web";
 
 export function authMiddleware (token: string): ClientMiddleware {
   return async function* <Request, Response>(

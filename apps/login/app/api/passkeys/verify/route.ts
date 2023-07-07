@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { getSession, server, verifyPasskeyRegistration } from "#/lib/zitadel";
 import { getSessionCookieById } from "#/utils/cookies";
 import { NextRequest, NextResponse, userAgent } from "next/server";

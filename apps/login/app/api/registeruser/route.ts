@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { addHumanUser, server } from "#/lib/zitadel";
 import { NextRequest, NextResponse } from "next/server";
 

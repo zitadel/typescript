@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { server, deleteSession } from "#/lib/zitadel";
 import {
   SessionCookie,

@@ -29,8 +29,8 @@ import {
 
 export const zitadelConfig: ZitadelServerOptions = {
   name: "zitadel login",
-  apiUrl: process.env.ZITADEL_API_URL ?? "",
-  token: process.env.ZITADEL_SERVICE_USER_TOKEN ?? "",
+  apiUrl: "https://invarum-8bucih.zitadel.app",
+  token: "0b6h3rzcFQYufL1tyJzR5rWjQF_v2UIIMwrnZYT5Zlr2ZBGfOTWhLdEIulQt1NInuNFh2IU",
 };
 
 let server: ZitadelServer;
