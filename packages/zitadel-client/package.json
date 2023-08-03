@@ -39,6 +39,6 @@
   "dependencies": {
     "jose": "^4.13.1",
     "nice-grpc-web": "^3.2.3",
-    "protobufjs": "^7.2.3"
+    "protobufjs": "^7.2.4"
   }
 }
