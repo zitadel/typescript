@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-zitadel-login-client", SERVICE_USER_ID);
 
-  console.log(JSON.stringify(request.nextUrl));
+  console.log(JSON.stringify("host: " + request.nextUrl.host));
   requestHeaders.set("Forwarded", `host="${request.nextUrl.host}"`);
 
   const responseHeaders = new Headers();
