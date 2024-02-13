@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
   requestHeaders.set("x-zitadel-login-client", SERVICE_USER_ID);
 
   requestHeaders.set("x-zitadel-forwarded", `host="${request.nextUrl.host}"`);
-  requestHeaders.delete("forwarded");
+  // requestHeaders.delete("forwarded");
 
   const responseHeaders = new Headers();
   responseHeaders.set("Access-Control-Allow-Origin", "*");
