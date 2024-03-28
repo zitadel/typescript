@@ -94,16 +94,22 @@ export async function getLegalAndSupportSettings(
 }
 
 export async function getPasswordComplexitySettings(
-  server: ZitadelServer
+  server: ZitadelServer,
+  organization?: string
 ): Promise<PasswordComplexitySettings | undefined> {
   const settingsService = settings.getSettings(server);
 
   return settingsService
-    .getPasswordComplexitySettings({}, {})
+    .getPasswordComplexitySettings(
+      organization
+        ? { ctx: { orgId: organization } }
+        : { ctx: { instance: true } },
+      {}
+    )
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 
-export async function createSession(
+export async function createSessionForLoginname(
   server: ZitadelServer,
   loginName: string,
   password: string | undefined,
@@ -115,14 +121,78 @@ export async function createSession(
         {
           checks: { user: { loginName }, password: { password } },
           challenges,
+          // lifetime: {
+          //   seconds: 300,
+          //   nanos: 0,
+          // },
         },
         {}
       )
     : sessionService.createSession(
-        { checks: { user: { loginName } }, challenges },
-
+        {
+          checks: { user: { loginName } },
+          challenges,
+          // lifetime: {
+          //   seconds: 300,
+          //   nanos: 0,
+          // },
+        },
         {}
       );
+}
+
+export async function createSessionForUserId(
+  server: ZitadelServer,
+  userId: string,
+  password: string | undefined,
+  challenges: RequestChallenges | undefined
+): Promise<CreateSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+  return password
+    ? sessionService.createSession(
+        {
+          checks: { user: { userId }, password: { password } },
+          challenges,
+          // lifetime: {
+          //   seconds: 300,
+          //   nanos: 0,
+          // },
+        },
+        {}
+      )
+    : sessionService.createSession(
+        {
+          checks: { user: { userId } },
+          challenges,
+          // lifetime: {
+          //   seconds: 300,
+          //   nanos: 0,
+          // },
+        },
+        {}
+      );
+}
+
+export async function createSessionForUserIdAndIdpIntent(
+  server: ZitadelServer,
+  userId: string,
+  idpIntent: {
+    idpIntentId?: string | undefined;
+    idpIntentToken?: string | undefined;
+  }
+): Promise<CreateSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+
+  return sessionService.createSession(
+    {
+      checks: { user: { userId }, idpIntent },
+      // lifetime: {
+      //   seconds: 300,
+      //   nanos: 0,
+      // },
+    },
+    {}
+  );
 }
 
 export async function setSession(
@@ -215,20 +285,37 @@ export async function addHumanUser(
     });
 }
 
-export async function listUsers(userName: string): Promise<ListUsersResponse> {
-  // TODO limit for organization
+export async function listUsers(
+  userName: string,
+  organizationId: string
+): Promise<ListUsersResponse> {
   const userService = user.getUser(server);
 
+  console.log("listUsers", userName, organizationId);
   return userService.listUsers(
     {
-      queries: [
-        {
-          userNameQuery: {
-            userName,
-            method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
-          },
-        },
-      ],
+      queries: organizationId
+        ? [
+            {
+              userNameQuery: {
+                userName,
+                method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
+              },
+            },
+            {
+              organizationIdQuery: {
+                organizationId,
+              },
+            },
+          ]
+        : [
+            {
+              userNameQuery: {
+                userName,
+                method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
+              },
+            },
+          ],
     },
     {}
   );

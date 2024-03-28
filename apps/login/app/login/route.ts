@@ -13,6 +13,7 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
     server,
     ids.filter((id: string | undefined) => !!id)
   );
+
   return response?.sessions ?? [];
 }
 
@@ -37,6 +38,7 @@ function findSession(
   }
   return undefined;
 }
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const authRequestId = searchParams.get("authRequest");
@@ -44,6 +46,7 @@ export async function GET(request: NextRequest) {
 
   const sessionCookies: SessionCookie[] = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
+  console.log("sessionIds", ids);
   let sessions: Session[] = [];
   if (ids && ids.length) {
     sessions = await loadSessions(ids);

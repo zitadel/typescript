@@ -9,11 +9,15 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, promptPasswordless, authRequestId, alt } = searchParams;
-  const sessionFactors = await loadSession(loginName);
+  const { loginName, organization, promptPasswordless, authRequestId, alt } =
+    searchParams;
+  const sessionFactors = await loadSession(loginName, organization);
 
-  async function loadSession(loginName?: string) {
-    const recent = await getMostRecentCookieWithLoginname(loginName);
+  async function loadSession(loginName?: string, organization?: string) {
+    const recent = await getMostRecentCookieWithLoginname(
+      loginName,
+      organization
+    );
 
     return getSession(server, recent.id, recent.token).then((response) => {
       if (response?.session) {
@@ -47,6 +51,7 @@ export default async function Page({
       <PasswordForm
         loginName={loginName}
         authRequestId={authRequestId}
+        organization={organization}
         promptPasswordless={promptPasswordless === "true"}
         isAlternative={alt === "true"}
       />

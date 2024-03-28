@@ -1,4 +1,13 @@
-import { createSession, getSession, server, setSession } from "#/lib/zitadel";
+"use server";
+
+import {
+  createSessionForLoginname,
+  createSessionForUserId,
+  createSessionForUserIdAndIdpIntent,
+  getSession,
+  server,
+  setSession,
+} from "#/lib/zitadel";
 import {
   SessionCookie,
   addSessionToCookie,
@@ -10,9 +19,10 @@ export async function createSessionAndUpdateCookie(
   loginName: string,
   password: string | undefined,
   challenges: RequestChallenges | undefined,
-  authRequestId: string | undefined
+  organization?: string,
+  authRequestId?: string
 ): Promise<Session> {
-  const createdSession = await createSession(
+  const createdSession = await createSessionForLoginname(
     server,
     loginName,
     password,
@@ -29,12 +39,121 @@ export async function createSessionAndUpdateCookie(
         const sessionCookie: SessionCookie = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
+          creationDate: response.session.creationDate?.toString() ?? "",
+          expirationDate: (response.session.expirationDate ?? "")?.toString(),
           changeDate: response.session.changeDate?.toString() ?? "",
-          loginName: response.session?.factors?.user?.loginName ?? "",
+          loginName: response.session.factors.user.loginName ?? "",
+          organization: response.session.factors.user.organizationId ?? "",
         };
 
         if (authRequestId) {
           sessionCookie.authRequestId = authRequestId;
+        }
+
+        if (organization) {
+          sessionCookie.organization = organization;
+        }
+
+        return addSessionToCookie(sessionCookie).then(() => {
+          return response.session as Session;
+        });
+      } else {
+        throw "could not get session or session does not have loginName";
+      }
+    });
+  } else {
+    throw "Could not create session";
+  }
+}
+
+export async function createSessionForUserIdAndUpdateCookie(
+  userId: string,
+  password: string | undefined,
+  challenges: RequestChallenges | undefined,
+  authRequestId: string | undefined
+): Promise<Session> {
+  const createdSession = await createSessionForUserId(
+    server,
+    userId,
+    password,
+    challenges
+  );
+
+  if (createdSession) {
+    return getSession(
+      server,
+      createdSession.sessionId,
+      createdSession.sessionToken
+    ).then((response) => {
+      if (response?.session && response.session?.factors?.user?.loginName) {
+        const sessionCookie: SessionCookie = {
+          id: createdSession.sessionId,
+          token: createdSession.sessionToken,
+          creationDate: response.session.creationDate?.toString() ?? "",
+          expirationDate: (response.session.expirationDate ?? "")?.toString(),
+          changeDate: response.session.changeDate?.toString() ?? "",
+          loginName: response.session.factors.user.loginName ?? "",
+        };
+
+        if (authRequestId) {
+          sessionCookie.authRequestId = authRequestId;
+        }
+
+        if (response.session.factors.user.organizationId) {
+          sessionCookie.organization =
+            response.session.factors.user.organizationId;
+        }
+
+        return addSessionToCookie(sessionCookie).then(() => {
+          return response.session as Session;
+        });
+      } else {
+        throw "could not get session or session does not have loginName";
+      }
+    });
+  } else {
+    throw "Could not create session";
+  }
+}
+
+export async function createSessionForIdpAndUpdateCookie(
+  userId: string,
+  idpIntent: {
+    idpIntentId?: string | undefined;
+    idpIntentToken?: string | undefined;
+  },
+  organization: string | undefined,
+  authRequestId: string | undefined
+): Promise<Session> {
+  const createdSession = await createSessionForUserIdAndIdpIntent(
+    server,
+    userId,
+    idpIntent
+  );
+
+  if (createdSession) {
+    return getSession(
+      server,
+      createdSession.sessionId,
+      createdSession.sessionToken
+    ).then((response) => {
+      if (response?.session && response.session?.factors?.user?.loginName) {
+        const sessionCookie: SessionCookie = {
+          id: createdSession.sessionId,
+          token: createdSession.sessionToken,
+          creationDate: response.session.creationDate?.toString() ?? "",
+          expirationDate: (response.session.expirationDate ?? "")?.toString(),
+          changeDate: response.session.changeDate?.toString() ?? "",
+          loginName: response.session.factors.user.loginName ?? "",
+          organization: response.session.factors.user.organizationId ?? "",
+        };
+
+        if (authRequestId) {
+          sessionCookie.authRequestId = authRequestId;
+        }
+
+        if (organization) {
+          sessionCookie.organization = organization;
         }
 
         return addSessionToCookie(sessionCookie).then(() => {
@@ -54,9 +173,7 @@ export type SessionWithChallenges = Session & {
 };
 
 export async function setSessionAndUpdateCookie(
-  sessionId: string,
-  sessionToken: string,
-  loginName: string,
+  recentCookie: SessionCookie,
   password: string | undefined,
   webAuthN: { credentialAssertionData: any } | undefined,
   challenges: RequestChallenges | undefined,
@@ -64,18 +181,21 @@ export async function setSessionAndUpdateCookie(
 ): Promise<SessionWithChallenges> {
   return setSession(
     server,
-    sessionId,
-    sessionToken,
+    recentCookie.id,
+    recentCookie.token,
     password,
     webAuthN,
     challenges
   ).then((updatedSession) => {
     if (updatedSession) {
       const sessionCookie: SessionCookie = {
-        id: sessionId,
+        id: recentCookie.id,
         token: updatedSession.sessionToken,
+        creationDate: recentCookie.creationDate,
+        expirationDate: recentCookie.expirationDate,
         changeDate: updatedSession.details?.changeDate?.toString() ?? "",
-        loginName: loginName,
+        loginName: recentCookie.loginName,
+        organization: recentCookie.organization,
       };
 
       if (authRequestId) {
@@ -94,8 +214,11 @@ export async function setSessionAndUpdateCookie(
               const newCookie: SessionCookie = {
                 id: sessionCookie.id,
                 token: updatedSession.sessionToken,
+                creationDate: sessionCookie.creationDate,
+                expirationDate: sessionCookie.expirationDate,
                 changeDate: session.changeDate?.toString() ?? "",
                 loginName: session.factors?.user?.loginName ?? "",
+                organization: session.factors?.user?.organizationId ?? "",
               };
 
               if (sessionCookie.authRequestId) {

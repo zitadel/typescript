@@ -1,13 +1,17 @@
 import { ProviderSlug } from "#/lib/demos";
 import { server } from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
+import IdpSignin from "#/ui/IdpSignin";
+import { createSessionForIdpAndUpdateCookie } from "#/utils/session";
 import {
   AddHumanUserRequest,
   IDPInformation,
   RetrieveIdentityProviderIntentResponse,
   user,
   IDPLink,
+  Session,
 } from "@zitadel/server";
+import { ClientError } from "nice-grpc";
 
 const PROVIDER_MAPPING: {
   [provider: string]: (rI: IDPInformation) => Partial<AddHumanUserRequest>;
@@ -58,19 +62,15 @@ const PROVIDER_MAPPING: {
   },
 };
 
-function retrieveIDP(
+function retrieveIDPIntent(
   id: string,
   token: string
-): Promise<IDPInformation | undefined> {
+): Promise<RetrieveIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
-  return userService
-    .retrieveIdentityProviderIntent(
-      { idpIntentId: id, idpIntentToken: token },
-      {}
-    )
-    .then((resp: RetrieveIdentityProviderIntentResponse) => {
-      return resp.idpInformation;
-    });
+  return userService.retrieveIdentityProviderIntent(
+    { idpIntentId: id, idpIntentToken: token },
+    {}
+  );
 }
 
 function createUser(
@@ -89,32 +89,62 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: { provider: ProviderSlug };
 }) {
-  const { id, token } = searchParams;
+  const { id, token, authRequestId } = searchParams;
   const { provider } = params;
 
   if (provider && id && token) {
-    return retrieveIDP(id, token)
-      .then((information) => {
-        if (information) {
-          return createUser(provider, information).catch((error) => {
-            throw new Error(error.details);
-          });
+    return retrieveIDPIntent(id, token)
+      .then((resp) => {
+        const { idpInformation, userId } = resp;
+        if (idpInformation) {
+          // handle login
+          if (userId) {
+            return (
+              <div className="flex flex-col items-center space-y-4">
+                <h1>Login successful</h1>
+                <div>You have successfully been loggedIn!</div>
+
+                <IdpSignin
+                  userId={userId}
+                  idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+                  authRequestId={authRequestId}
+                />
+              </div>
+            );
+          } else {
+            // handle register
+            return createUser(provider, idpInformation)
+              .then((userId) => {
+                return (
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Register successful</h1>
+                    <div>You have successfully been registered!</div>
+                  </div>
+                );
+              })
+              .catch((error: ClientError) => {
+                return (
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Register failed</h1>
+                    <div className="w-full">
+                      {
+                        <Alert type={AlertType.ALERT}>
+                          {JSON.stringify(error.message)}
+                        </Alert>
+                      }
+                    </div>
+                  </div>
+                );
+              });
+          }
         } else {
           throw new Error("Could not get user information.");
         }
       })
-      .then((userId) => {
+      .catch((error) => {
         return (
           <div className="flex flex-col items-center space-y-4">
-            <h1>Register successful</h1>
-            <div>You have successfully been registered!</div>
-          </div>
-        );
-      })
-      .catch((error: Error) => {
-        return (
-          <div className="flex flex-col items-center space-y-4">
-            <h1>Register failed</h1>
+            <h1>An error occurred</h1>
             <div className="w-full">
               {
                 <Alert type={AlertType.ALERT}>

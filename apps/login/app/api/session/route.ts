@@ -8,6 +8,7 @@ import {
 } from "#/utils/cookies";
 import {
   createSessionAndUpdateCookie,
+  createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "#/utils/session";
 import { RequestChallenges } from "@zitadel/server";
@@ -16,16 +17,35 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { loginName, password } = body;
-
-    return createSessionAndUpdateCookie(
+    const {
+      userId,
+      idpIntent,
       loginName,
       password,
-      undefined,
-      undefined
-    ).then((session) => {
-      return NextResponse.json(session);
-    });
+      organization,
+      authRequestId,
+    } = body;
+
+    if (userId && idpIntent) {
+      return createSessionForIdpAndUpdateCookie(
+        userId,
+        idpIntent,
+        organization,
+        authRequestId
+      ).then((session) => {
+        return NextResponse.json(session);
+      });
+    } else {
+      return createSessionAndUpdateCookie(
+        loginName,
+        password,
+        undefined,
+        organization,
+        authRequestId
+      ).then((session) => {
+        return NextResponse.json(session);
+      });
+    }
   } else {
     return NextResponse.json(
       { details: "Session could not be created" },
@@ -43,11 +63,11 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, password, webAuthN, authRequestId } = body;
+    const { loginName, organization, password, webAuthN, authRequestId } = body;
     const challenges: RequestChallenges = body.challenges;
 
     const recentPromise: Promise<SessionCookie> = loginName
-      ? getSessionCookieByLoginName(loginName).catch((error) => {
+      ? getSessionCookieByLoginName(loginName, organization).catch((error) => {
           return Promise.reject(error);
         })
       : getMostRecentSessionCookie().catch((error) => {
@@ -62,11 +82,8 @@ export async function PUT(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
-        console.log("setsession", webAuthN);
         return setSessionAndUpdateCookie(
-          recent.id,
-          recent.token,
-          recent.loginName,
+          recent,
           password,
           webAuthN,
           challenges,
