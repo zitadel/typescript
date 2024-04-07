@@ -2,10 +2,9 @@
   "extends": "@zitadel/tsconfig/nextjs.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "#/*": ["./*"]
+      "@/*": ["./src/*"]
     },
     "plugins": [
       {

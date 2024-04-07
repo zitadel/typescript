@@ -25,12 +25,10 @@ types.forEach((type) => {
   themes.forEach((theme) => {
     shades.forEach((shade) => {
       colors[type][theme][shade] = `var(--theme-${theme}-${type}-${shade})`;
-      colors[type][theme][
-        `contrast-${shade}`
-      ] = `var(--theme-${theme}-${type}-contrast-${shade})`;
-      colors[type][theme][
-        `secondary-${shade}`
-      ] = `var(--theme-${theme}-${type}-secondary-${shade})`;
+      colors[type][theme][`contrast-${shade}`] =
+        `var(--theme-${theme}-${type}-contrast-${shade})`;
+      colors[type][theme][`secondary-${shade}`] =
+        `var(--theme-${theme}-${type}-secondary-${shade})`;
     });
   });
 });
@@ -39,11 +37,7 @@ types.forEach((type) => {
 module.exports = {
   presets: [sharedConfig],
   darkMode: "class",
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./page/**/*.{js,ts,jsx,tsx}",
-    "./ui/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
   future: {
     hoverOnlyWhenSupported: true,
   },
