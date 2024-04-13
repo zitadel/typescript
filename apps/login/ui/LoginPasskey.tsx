@@ -116,16 +116,16 @@ export default function LoginPasskey({
   }
 
   async function submitLoginAndContinue(
-    publicKey: any
+    publicKey: any,
   ): Promise<boolean | void> {
     publicKey.challenge = coerceToArrayBuffer(
       publicKey.challenge,
-      "publicKey.challenge"
+      "publicKey.challenge",
     );
     publicKey.allowCredentials.map((listItem: any) => {
       listItem.id = coerceToArrayBuffer(
         listItem.id,
-        "publicKey.allowCredentials.id"
+        "publicKey.allowCredentials.id",
       );
     });
 
@@ -136,15 +136,15 @@ export default function LoginPasskey({
       .then((assertedCredential: any) => {
         if (assertedCredential) {
           const authData = new Uint8Array(
-            assertedCredential.response.authenticatorData
+            assertedCredential.response.authenticatorData,
           );
           const clientDataJSON = new Uint8Array(
-            assertedCredential.response.clientDataJSON
+            assertedCredential.response.clientDataJSON,
           );
           const rawId = new Uint8Array(assertedCredential.rawId);
           const sig = new Uint8Array(assertedCredential.response.signature);
           const userHandle = new Uint8Array(
-            assertedCredential.response.userHandle
+            assertedCredential.response.userHandle,
           );
           const data = {
             id: assertedCredential.id,
@@ -154,7 +154,7 @@ export default function LoginPasskey({
               authenticatorData: coerceToBase64Url(authData, "authData"),
               clientDataJSON: coerceToBase64Url(
                 clientDataJSON,
-                "clientDataJSON"
+                "clientDataJSON",
               ),
               signature: coerceToBase64Url(sig, "sig"),
               userHandle: coerceToBase64Url(userHandle, "userHandle"),
@@ -167,7 +167,7 @@ export default function LoginPasskey({
                   new URLSearchParams({
                     sessionId: resp.sessionId,
                     authRequest: authRequestId,
-                  })
+                  }),
               );
             } else {
               return router.push(
@@ -180,8 +180,8 @@ export default function LoginPasskey({
                         }
                       : {
                           loginName: resp.factors.user.loginName,
-                        }
-                  )
+                        },
+                  ),
               );
             }
           });
@@ -231,7 +231,7 @@ export default function LoginPasskey({
               }
 
               return router.push(
-                "/password?" + new URLSearchParams(params) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
+                "/password?" + new URLSearchParams(params), // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
               );
             }}
           >

@@ -10,7 +10,7 @@ import { authMiddleware } from "../middleware";
 
 const createClient = <Client>(
   definition: CompatServiceDefinition,
-  accessToken: string
+  accessToken: string,
 ) => {
   const channel = createChannel(process.env.ZITADEL_API_URL ?? "");
   return createClientFactory()
@@ -21,7 +21,7 @@ const createClient = <Client>(
 export async function getAuth(app?: ZitadelServer): Promise<AuthServiceClient> {
   return createClient<AuthServiceClient>(
     AuthServiceDefinition as CompatServiceDefinition,
-    ""
+    "",
   );
 }
 

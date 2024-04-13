@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         userId,
         idpIntent,
         organization,
-        authRequestId
+        authRequestId,
       ).then((session) => {
         return NextResponse.json(session);
       });
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         password,
         undefined,
         organization,
-        authRequestId
+        authRequestId,
       ).then((session) => {
         return NextResponse.json(session);
       });
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   } else {
     return NextResponse.json(
       { details: "Session could not be created" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,12 +78,14 @@ export async function PUT(request: NextRequest) {
           return Promise.reject(error);
         })
       : loginName
-      ? getSessionCookieByLoginName(loginName, organization).catch((error) => {
-          return Promise.reject(error);
-        })
-      : getMostRecentSessionCookie().catch((error) => {
-          return Promise.reject(error);
-        });
+        ? getSessionCookieByLoginName(loginName, organization).catch(
+            (error) => {
+              return Promise.reject(error);
+            },
+          )
+        : getMostRecentSessionCookie().catch((error) => {
+            return Promise.reject(error);
+          });
 
     const domain: string = request.nextUrl.hostname;
 
@@ -98,7 +100,7 @@ export async function PUT(request: NextRequest) {
           password,
           webAuthN,
           challenges,
-          authRequestId
+          authRequestId,
         ).then((session) => {
           return NextResponse.json({
             sessionId: session.id,
@@ -113,7 +115,7 @@ export async function PUT(request: NextRequest) {
   } else {
     return NextResponse.json(
       { details: "Request body is missing" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }
@@ -137,14 +139,14 @@ export async function DELETE(request: NextRequest) {
           .catch((error) => {
             return NextResponse.json(
               { details: "could not set cookie" },
-              { status: 500 }
+              { status: 500 },
             );
           });
       })
       .catch((error) => {
         return NextResponse.json(
           { details: "could not delete session" },
-          { status: 500 }
+          { status: 500 },
         );
       });
   } else {

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
           user.userId,
           password,
           undefined,
-          authRequestId
+          authRequestId,
         ).then((session) => {
           return NextResponse.json({
             userId: user.userId,

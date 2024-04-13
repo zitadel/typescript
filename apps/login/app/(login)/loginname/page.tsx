@@ -16,13 +16,13 @@ import {
 
 function getIdentityProviders(
   server: ZitadelServer,
-  orgId?: string
+  orgId?: string,
 ): Promise<IdentityProvider[] | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
     .getActiveIdentityProviders(
       orgId ? { ctx: { orgId } } : { ctx: { instance: true } },
-      {}
+      {},
     )
     .then((resp: GetActiveIdentityProvidersResponse) => {
       return resp.identityProviders;

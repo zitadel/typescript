@@ -108,16 +108,16 @@ function setColorShades(
   map: Color[],
   type: string,
   theme: string,
-  document: any
+  document: any,
 ) {
   map.forEach((color) => {
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-${color.name}`,
-      color.hex
+      color.hex,
     );
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-contrast-${color.name}`,
-      color.contrastColor
+      color.contrastColor,
     );
   });
 }
@@ -126,20 +126,20 @@ function setColorAlpha(
   map: Color[],
   type: string,
   theme: string,
-  document: any
+  document: any,
 ) {
   map.forEach((color) => {
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-${color.name}`,
-      color.hex
+      color.hex,
     );
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-contrast-${color.name}`,
-      color.contrastColor
+      color.contrastColor,
     );
     document.documentElement.style.setProperty(
       `--theme-${theme}-${type}-secondary-${color.name}`,
-      `${color.hex}c7`
+      `${color.hex}c7`,
     );
   });
 }
@@ -188,19 +188,19 @@ export function computeMap(branding: BrandingColors, dark: boolean): ColorMap {
     background: computeColors(
       dark
         ? branding.darkTheme.backgroundColor
-        : branding.lightTheme.backgroundColor
+        : branding.lightTheme.backgroundColor,
     ),
     primary: computeColors(
-      dark ? branding.darkTheme.primaryColor : branding.lightTheme.primaryColor
+      dark ? branding.darkTheme.primaryColor : branding.lightTheme.primaryColor,
     ),
     warn: computeColors(
-      dark ? branding.darkTheme.warnColor : branding.lightTheme.warnColor
+      dark ? branding.darkTheme.warnColor : branding.lightTheme.warnColor,
     ),
     text: computeColors(
-      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor
+      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor,
     ),
     link: computeColors(
-      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor
+      dark ? branding.darkTheme.fontColor : branding.lightTheme.fontColor,
     ),
   };
 }

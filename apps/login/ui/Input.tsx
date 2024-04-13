@@ -52,7 +52,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       onBlur,
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <label className="flex flex-col text-12px text-input-light-label dark:text-input-dark-label">
@@ -88,5 +88,5 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         )}
       </label>
     );
-  }
+  },
 );

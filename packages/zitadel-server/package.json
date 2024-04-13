@@ -10,38 +10,39 @@
   "files": [
     "dist/**"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
-    "build": "tsup --dts",
+    "build": "tsup",
+    "build:tsc": "tsc",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
-    "dev": "tsup --dts --watch",
+    "dev": "tsup --watch",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf src/proto"
   },
-  "devDependencies": {
-    "@bufbuild/buf": "^1.14.0",
-    "@types/jest": "^29.5.1",
-    "@zitadel/tsconfig": "workspace:*",
-    "eslint": "^7.32.0",
-    "eslint-config-zitadel": "workspace:*",
-    "jest": "^29.5.0",
-    "ts-jest": "^29.1.0",
-    "ts-node": "^10.9.1",
-    "ts-proto": "^1.139.0",
-    "tsup": "^5.10.1",
-    "typescript": "^4.9.3"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {
     "jose": "^4.13.1",
-    "long": "^5.2.1",
-    "nice-grpc": "2.0.1",
+    "long": "^5.2.3",
+    "nice-grpc": "2.1.8",
     "nice-grpc-common": "^2.0.2",
-    "protobufjs": "^7.2.3"
+    "protobufjs": "^7.2.6"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.30.1",
+    "@types/jest": "^29.5.12",
+    "@zitadel/tsconfig": "workspace:*",
+    "eslint": "^8.57.0",
+    "eslint-config-zitadel": "workspace:*",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "ts-proto": "^1.171.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
   }
 }

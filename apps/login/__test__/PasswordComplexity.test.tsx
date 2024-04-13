@@ -30,14 +30,14 @@ describe("<PasswordComplexity/>", () => {
               requiresSymbol: false,
               resourceOwnerType: 0, // ResourceOwnerType.RESOURCE_OWNER_TYPE_UNSPECIFIED,
             }}
-          />
+          />,
         );
       });
       if (expectSVGTitle === false) {
         it(`should not render the feedback element`, async () => {
           await waitFor(() => {
             expect(
-              screen.queryByText(feedbackElementLabel)
+              screen.queryByText(feedbackElementLabel),
             ).not.toBeInTheDocument();
           });
         });
@@ -46,12 +46,12 @@ describe("<PasswordComplexity/>", () => {
           await waitFor(async () => {
             const svg = within(
               screen.getByText(feedbackElementLabel)
-                .parentElement as HTMLElement
+                .parentElement as HTMLElement,
             ).findByRole("img");
             expect(await svg).toHaveTextContent(expectSVGTitle);
           });
         });
       }
-    }
+    },
   );
 });

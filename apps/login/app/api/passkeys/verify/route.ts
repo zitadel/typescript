@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const session = await getSession(
       server,
       sessionCookie.id,
-      sessionCookie.token
+      sessionCookie.token,
     );
 
     const userId = session?.session?.factors?.user?.id;
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         passkeyId,
         passkeyName,
         publicKeyCredential,
-        userId
+        userId,
       )
         .then((resp) => {
           return NextResponse.json(resp);
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         { details: "could not get session" },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } else {

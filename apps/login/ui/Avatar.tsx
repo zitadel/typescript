@@ -69,10 +69,10 @@ export function Avatar({
         size === "large"
           ? "h-20 w-20 font-normal"
           : size === "base"
-          ? "w-[38px] h-[38px] font-bold"
-          : size === "small"
-          ? "w-[32px] h-[32px] font-bold text-[13px]"
-          : ""
+            ? "w-[38px] h-[38px] font-bold"
+            : size === "small"
+              ? "w-[32px] h-[32px] font-bold text-[13px]"
+              : ""
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >

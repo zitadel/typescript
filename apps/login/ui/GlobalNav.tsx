@@ -56,7 +56,7 @@ export function GlobalNav() {
             "fixed inset-x-0 bottom-0 top-14 mt-px bg-white/80 dark:bg-black/80 backdrop-blur-lg":
               isOpen,
             hidden: !isOpen,
-          }
+          },
         )}
       >
         <nav
@@ -111,7 +111,7 @@ function GlobalNavItem({
           "hover:opacity-100 hover:dark:opacity-100": !isActive,
           "text-text-light-500 dark:text-text-dark-500 opacity-100 dark:opacity-100 font-semibold":
             isActive,
-        }
+        },
       )}
     >
       {item.name}

@@ -36,7 +36,7 @@ Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### Login
 
-The login is currently in a work in progress state. 
+The login is currently in a work in progress state.
 The goal is to implement a login UI, using the session API of ZITADEL, which also implements the OIDC Standard and is ready to use for everyone.
 
 In the first phase we want to have a MVP login ready with the OIDC Standard and a basic feature set. In a second step the features will be extended.
@@ -45,7 +45,7 @@ This list should show the current implementation state, and also what is missing
 You can already use the current state, and extend it with your needs.
 
 - [x] Local User Registration (with Password)
-- [ ] User Registration and Login with external Provider 
+- [ ] User Registration and Login with external Provider
   - [ ] Google
   - [ ] GitHub
   - [ ] GitHub Enterprise
@@ -67,21 +67,21 @@ You can already use the current state, and extend it with your needs.
 - [ ] Domain Discovery
 - [ ] Branding
 - OIDC Standard
-   - [ ] Authorization Code Flow with PKCE
-   - [ ] AuthRequest `hintUserId`
-   - [ ] AuthRequest `loginHint`
-   - [ ] AuthRequest `prompt`
-     - [x] Login
-     - [x] Select Account
-     - [ ] Consent
-     - [ ] Create
-   - Scopes
-     - [ ] `openid email profile address``
-     - [ ] `offline access`
-     - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
-     - [ ] `urn:zitadel:iam:org:project:id:zitadel:aud`
-     - [ ] `urn:zitadel:iam:org:id:{orgid}`
-   - [ ] AuthRequest UI locales
+  - [ ] Authorization Code Flow with PKCE
+  - [ ] AuthRequest `hintUserId`
+  - [ ] AuthRequest `loginHint`
+  - [ ] AuthRequest `prompt`
+    - [x] Login
+    - [x] Select Account
+    - [ ] Consent
+    - [ ] Create
+  - Scopes
+    - [ ] `openid email profile address``
+    - [ ] `offline access`
+    - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+    - [ ] `urn:zitadel:iam:org:project:id:zitadel:aud`
+    - [ ] `urn:zitadel:iam:org:id:{orgid}`
+  - [ ] AuthRequest UI locales
 
 ## Tooling
 

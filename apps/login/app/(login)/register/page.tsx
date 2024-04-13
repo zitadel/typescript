@@ -21,7 +21,7 @@ export default async function Page({
   const legal = await getLegalAndSupportSettings(server, organization);
   const passwordComplexitySettings = await getPasswordComplexitySettings(
     server,
-    organization
+    organization,
   );
 
   const branding = await getBrandingSettings(server, organization);

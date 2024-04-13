@@ -29,7 +29,7 @@ export default function Alert({ children, type = AlertType.ALERT }: Props) {
         {
           [yellow]: type === AlertType.ALERT,
           [neutral]: type === AlertType.INFO,
-        }
+        },
       )}
     >
       {type === AlertType.ALERT && (

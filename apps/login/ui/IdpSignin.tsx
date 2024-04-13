@@ -53,7 +53,7 @@ export default function IdpSignin(props: Props) {
               new URLSearchParams({
                 sessionId: session.sessionId,
                 authRequest: props.authRequestId,
-              })
+              }),
           );
         } else {
           return router.push(
@@ -66,8 +66,8 @@ export default function IdpSignin(props: Props) {
                     }
                   : {
                       loginName: session.factors.user.loginName,
-                    }
-              )
+                    },
+              ),
           );
         }
       })

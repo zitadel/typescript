@@ -12,7 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
     server,
-    ids.filter((id: string | undefined) => !!id)
+    ids.filter((id: string | undefined) => !!id),
   );
 
   return response?.sessions ?? [];
@@ -23,7 +23,7 @@ const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TOD
 
 function findSession(
   sessions: Session[],
-  authRequest: AuthRequest
+  authRequest: AuthRequest,
 ): Session | undefined {
   if (authRequest.hintUserId) {
     console.log(`find session for hintUserId: ${authRequest.hintUserId}`);
@@ -32,7 +32,7 @@ function findSession(
   if (authRequest.loginHint) {
     console.log(`find session for loginHint: ${authRequest.loginHint}`);
     return sessions.find(
-      (s) => s.factors?.user?.loginName === authRequest.loginHint
+      (s) => s.factors?.user?.loginName === authRequest.loginHint,
     );
   }
   if (sessions.length) {
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
   if (authRequestId && sessionId) {
     console.log(
-      `Login with session: ${sessionId} and authRequest: ${authRequestId}`
+      `Login with session: ${sessionId} and authRequest: ${authRequestId}`,
     );
 
     let selectedSession = sessions.find((s) => s.id === sessionId);
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     if (selectedSession && selectedSession.id) {
       console.log(`Found session ${selectedSession.id}`);
       const cookie = sessionCookies.find(
-        (cookie) => cookie.id === selectedSession?.id
+        (cookie) => cookie.id === selectedSession?.id,
       );
 
       if (cookie && cookie.id && cookie.token) {
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
     if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
-        ORG_SCOPE_REGEX.test(s)
+        ORG_SCOPE_REGEX.test(s),
       );
 
       if (orgScope) {
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
         organization = matched?.[1] ?? "";
       } else {
         const orgDomainScope = authRequest.scope.find((s: string) =>
-          ORG_DOMAIN_SCOPE_REGEX.test(s)
+          ORG_DOMAIN_SCOPE_REGEX.test(s),
         );
 
         if (orgDomainScope) {
@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
 
         if (selectedSession && selectedSession.id) {
           const cookie = sessionCookies.find(
-            (cookie) => cookie.id === selectedSession?.id
+            (cookie) => cookie.id === selectedSession?.id,
           );
 
           if (cookie && cookie.id && cookie.token) {
@@ -173,13 +173,13 @@ export async function GET(request: NextRequest) {
           } else {
             return NextResponse.json(
               { error: "No active session found" },
-              { status: 400 } // TODO: check for correct status code
+              { status: 400 }, // TODO: check for correct status code
             );
           }
         } else {
           return NextResponse.json(
             { error: "No active session found" },
-            { status: 400 } // TODO: check for correct status code
+            { status: 400 }, // TODO: check for correct status code
           );
         }
       } else {
@@ -188,7 +188,7 @@ export async function GET(request: NextRequest) {
 
         if (selectedSession && selectedSession.id) {
           const cookie = sessionCookies.find(
-            (cookie) => cookie.id === selectedSession?.id
+            (cookie) => cookie.id === selectedSession?.id,
           );
 
           if (cookie && cookie.id && cookie.token) {
@@ -236,7 +236,7 @@ export async function GET(request: NextRequest) {
   } else {
     return NextResponse.json(
       { error: "No authRequestId provided" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

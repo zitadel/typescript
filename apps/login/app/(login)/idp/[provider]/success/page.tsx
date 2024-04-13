@@ -63,18 +63,18 @@ const PROVIDER_MAPPING: {
 
 function retrieveIDPIntent(
   id: string,
-  token: string
+  token: string,
 ): Promise<RetrieveIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
   return userService.retrieveIdentityProviderIntent(
     { idpIntentId: id, idpIntentToken: token },
-    {}
+    {},
   );
 }
 
 function createUser(
   provider: ProviderSlug,
-  info: IDPInformation
+  info: IDPInformation,
 ): Promise<string> {
   const userData = PROVIDER_MAPPING[provider](info);
   const userService = user.getUser(server);

@@ -26,7 +26,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [enabled, setEnabled] = useState<boolean>(checked);
 
@@ -53,7 +53,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               "focus:border-gray-500 focus:dark:border-white focus:ring-opacity-40 focus:dark:ring-opacity-40 focus:ring-offset-0 focus:ring-2 dark:focus:ring-offset-0 dark:focus:ring-2 focus:ring-gray-500 focus:dark:ring-white",
               "h-4 w-4 rounded-sm ring-0 outline-0 checked:ring-0 checked:dark:ring-0 active:border-none active:ring-0",
               "disabled:bg-gray-500 disabled:text-gray-500 disabled:border-gray-200 disabled:cursor-not-allowed",
-              className
+              className,
             )}
             {...props}
           />
@@ -61,5 +61,5 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         {children}
       </div>
     );
-  }
+  },
 );

@@ -12,7 +12,7 @@ async function loadSessions(): Promise<Session[]> {
   if (ids && ids.length) {
     const response = await listSessions(
       server,
-      ids.filter((id: string | undefined) => !!id)
+      ids.filter((id: string | undefined) => !!id),
     );
     return response?.sessions ?? [];
   } else {

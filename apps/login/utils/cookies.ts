@@ -26,7 +26,7 @@ function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
 
 export async function addSessionToCookie(
   session: SessionCookie,
-  cleanup: boolean = false
+  cleanup: boolean = false,
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -36,7 +36,7 @@ export async function addSessionToCookie(
     : [];
 
   const index = currentSessions.findIndex(
-    (s) => s.loginName === session.loginName
+    (s) => s.loginName === session.loginName,
   );
 
   if (index > -1) {
@@ -48,7 +48,7 @@ export async function addSessionToCookie(
   if (cleanup) {
     const now = new Date();
     const filteredSessions = currentSessions.filter((session) =>
-      session.expirationDate ? new Date(session.expirationDate) > now : true
+      session.expirationDate ? new Date(session.expirationDate) > now : true,
     );
     return setSessionHttpOnlyCookie(filteredSessions);
   } else {
@@ -59,7 +59,7 @@ export async function addSessionToCookie(
 export async function updateSessionCookie(
   id: string,
   session: SessionCookie,
-  cleanup: boolean = false
+  cleanup: boolean = false,
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -75,7 +75,7 @@ export async function updateSessionCookie(
     if (cleanup) {
       const now = new Date();
       const filteredSessions = sessions.filter((session) =>
-        session.expirationDate ? new Date(session.expirationDate) > now : true
+        session.expirationDate ? new Date(session.expirationDate) > now : true,
       );
       return setSessionHttpOnlyCookie(filteredSessions);
     } else {
@@ -88,7 +88,7 @@ export async function updateSessionCookie(
 
 export async function removeSessionFromCookie(
   session: SessionCookie,
-  cleanup: boolean = false
+  cleanup: boolean = false,
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -101,7 +101,7 @@ export async function removeSessionFromCookie(
   if (cleanup) {
     const now = new Date();
     const filteredSessions = reducedSessions.filter((session) =>
-      session.expirationDate ? new Date(session.expirationDate) > now : true
+      session.expirationDate ? new Date(session.expirationDate) > now : true,
     );
     return setSessionHttpOnlyCookie(filteredSessions);
   } else {
@@ -131,7 +131,7 @@ export async function getMostRecentSessionCookie(): Promise<any> {
 
 export async function getSessionCookieById(
   id: string,
-  organization?: string
+  organization?: string,
 ): Promise<SessionCookie> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -142,7 +142,7 @@ export async function getSessionCookieById(
     const found = sessions.find((s) =>
       organization
         ? s.organization === organization && s.id === id
-        : s.id === id
+        : s.id === id,
     );
     if (found) {
       return found;
@@ -156,7 +156,7 @@ export async function getSessionCookieById(
 
 export async function getSessionCookieByLoginName(
   loginName: string,
-  organization?: string
+  organization?: string,
 ): Promise<SessionCookie> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -166,7 +166,7 @@ export async function getSessionCookieByLoginName(
     const found = sessions.find((s) =>
       organization
         ? s.organization === organization && s.loginName === loginName
-        : s.loginName === loginName
+        : s.loginName === loginName,
     );
     if (found) {
       return found;
@@ -184,7 +184,7 @@ export async function getSessionCookieByLoginName(
  * @returns Session Cookies
  */
 export async function getAllSessionCookieIds(
-  cleanup: boolean = false
+  cleanup: boolean = false,
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -196,7 +196,9 @@ export async function getAllSessionCookieIds(
       const now = new Date();
       return sessions
         .filter((session) =>
-          session.expirationDate ? new Date(session.expirationDate) > now : true
+          session.expirationDate
+            ? new Date(session.expirationDate) > now
+            : true,
         )
         .map((session) => session.id);
     } else {
@@ -213,7 +215,7 @@ export async function getAllSessionCookieIds(
  * @returns Session Cookies
  */
 export async function getAllSessions(
-  cleanup: boolean = false
+  cleanup: boolean = false,
 ): Promise<SessionCookie[]> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -224,7 +226,7 @@ export async function getAllSessions(
     if (cleanup) {
       const now = new Date();
       return sessions.filter((session) =>
-        session.expirationDate ? new Date(session.expirationDate) > now : true
+        session.expirationDate ? new Date(session.expirationDate) > now : true,
       );
     } else {
       return sessions;
@@ -241,7 +243,7 @@ export async function getAllSessions(
  */
 export async function getMostRecentCookieWithLoginname(
   loginName?: string,
-  organization?: string
+  organization?: string,
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");

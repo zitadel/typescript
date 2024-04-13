@@ -25,7 +25,7 @@ export function useMobileNavToggle() {
   const context = React.useContext(MobileNavContext);
   if (context === undefined) {
     throw new Error(
-      "useMobileNavToggle must be used within a MobileNavContextProvider"
+      "useMobileNavToggle must be used within a MobileNavContextProvider",
     );
   }
   return context;

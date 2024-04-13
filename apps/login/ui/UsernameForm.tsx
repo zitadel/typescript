@@ -75,7 +75,7 @@ export default function UsernameForm({
 
   function setLoginNameAndGetAuthMethods(
     values: Inputs,
-    organization?: string
+    organization?: string,
   ) {
     return submitLoginName(values, organization).then((response) => {
       if (response.authMethodTypes.length == 1) {
@@ -99,7 +99,7 @@ export default function UsernameForm({
             }
 
             return router.push(
-              "/password?" + new URLSearchParams(paramsPassword)
+              "/password?" + new URLSearchParams(paramsPassword),
             );
           case 2: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
             const paramsPasskey: any = { loginName: values.loginName };
@@ -111,7 +111,7 @@ export default function UsernameForm({
             }
 
             return router.push(
-              "/passkey/login?" + new URLSearchParams(paramsPasskey)
+              "/passkey/login?" + new URLSearchParams(paramsPasskey),
             );
           default:
             const paramsPasskeyDefault: any = { loginName: values.loginName };
@@ -128,7 +128,7 @@ export default function UsernameForm({
             }
 
             return router.push(
-              "/password?" + new URLSearchParams(paramsPasskeyDefault)
+              "/password?" + new URLSearchParams(paramsPasskeyDefault),
             );
         }
       } else if (
@@ -136,7 +136,7 @@ export default function UsernameForm({
         response.authMethodTypes.length === 0
       ) {
         setError(
-          "User has no available authentication methods. Contact your administrator to setup authentication for the requested user."
+          "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
         );
       } else {
         // prefer passkey in favor of other methods
@@ -155,7 +155,7 @@ export default function UsernameForm({
           }
 
           return router.push(
-            "/passkey/login?" + new URLSearchParams(passkeyParams)
+            "/passkey/login?" + new URLSearchParams(passkeyParams),
           );
         } else {
           // user has no passkey setup and login settings allow passkeys
@@ -174,7 +174,7 @@ export default function UsernameForm({
           }
 
           return router.push(
-            "/password?" + new URLSearchParams(paramsPasswordDefault)
+            "/password?" + new URLSearchParams(paramsPasswordDefault),
           );
         }
       }
@@ -215,7 +215,7 @@ export default function UsernameForm({
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
           onClick={handleSubmit((e) =>
-            setLoginNameAndGetAuthMethods(e, organization)
+            setLoginNameAndGetAuthMethods(e, organization),
           )}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}

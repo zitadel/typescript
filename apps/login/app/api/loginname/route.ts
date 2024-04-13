@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
           userId,
           undefined,
           undefined,
-          authRequestId
+          authRequestId,
         )
           .then((session) => {
             if (session.factors?.user?.id) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       } else {
         return NextResponse.json(
           { message: "Could not find user" },
-          { status: 404 }
+          { status: 404 },
         );
       }
     });

@@ -35,7 +35,7 @@ export type ButtonProps = DetailedHTMLProps<
 export const getButtonClasses = (
   size: ButtonSizes,
   variant: ButtonVariants,
-  color: ButtonColors
+  color: ButtonColors,
 ) =>
   clsx({
     "box-border font-normal leading-36px text-14px inline-flex items-center rounded-md focus:outline-none transition-colors transition-shadow duration-300":
@@ -65,7 +65,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       color = ButtonColors.Primary,
       ...props
     },
-    ref
+    ref,
   ) => (
     <button
       type="button"
@@ -75,5 +75,5 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     >
       {children}
     </button>
-  )
+  ),
 );

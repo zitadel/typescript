@@ -11,7 +11,7 @@ export default async (): Promise<Config.InitialOptions> => {
     transform: {
       "^.+\\.tsx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.json" }],
     },
-    setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
+    setupFilesAfterEnv: ["@testing-library/jest-dom"],
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
       prefix: "<rootDir>/../",
     }),

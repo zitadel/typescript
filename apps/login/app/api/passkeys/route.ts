@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const session = await getSession(
       server,
       sessionCookie.id,
-      sessionCookie.token
+      sessionCookie.token,
     );
 
     const domain: string = request.nextUrl.hostname;
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         { details: "could not get session" },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } else {

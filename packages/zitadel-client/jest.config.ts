@@ -1,8 +1,8 @@
-import type { JestConfigWithTsJest } from 'ts-jest'
+import type { JestConfigWithTsJest } from "ts-jest";
 
 const jestConfig: JestConfigWithTsJest = {
-  preset: 'ts-jest',
-  testEnvironment: 'node'
-}
+  preset: "ts-jest",
+  testEnvironment: "node",
+};
 
-export default jestConfig
+export default jestConfig;

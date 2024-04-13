@@ -20,20 +20,20 @@ export async function createSessionAndUpdateCookie(
   password: string | undefined,
   challenges: RequestChallenges | undefined,
   organization?: string,
-  authRequestId?: string
+  authRequestId?: string,
 ): Promise<Session> {
   const createdSession = await createSessionForLoginname(
     server,
     loginName,
     password,
-    challenges
+    challenges,
   );
 
   if (createdSession) {
     return getSession(
       server,
       createdSession.sessionId,
-      createdSession.sessionToken
+      createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
         const sessionCookie: SessionCookie = {
@@ -70,20 +70,20 @@ export async function createSessionForUserIdAndUpdateCookie(
   userId: string,
   password: string | undefined,
   challenges: RequestChallenges | undefined,
-  authRequestId: string | undefined
+  authRequestId: string | undefined,
 ): Promise<Session> {
   const createdSession = await createSessionForUserId(
     server,
     userId,
     password,
-    challenges
+    challenges,
   );
 
   if (createdSession) {
     return getSession(
       server,
       createdSession.sessionId,
-      createdSession.sessionToken
+      createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
         const sessionCookie: SessionCookie = {
@@ -123,19 +123,19 @@ export async function createSessionForIdpAndUpdateCookie(
     idpIntentToken?: string | undefined;
   },
   organization: string | undefined,
-  authRequestId: string | undefined
+  authRequestId: string | undefined,
 ): Promise<Session> {
   const createdSession = await createSessionForUserIdAndIdpIntent(
     server,
     userId,
-    idpIntent
+    idpIntent,
   );
 
   if (createdSession) {
     return getSession(
       server,
       createdSession.sessionId,
-      createdSession.sessionToken
+      createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
         const sessionCookie: SessionCookie = {
@@ -177,7 +177,7 @@ export async function setSessionAndUpdateCookie(
   password: string | undefined,
   webAuthN: { credentialAssertionData: any } | undefined,
   challenges: RequestChallenges | undefined,
-  authRequestId: string | undefined
+  authRequestId: string | undefined,
 ): Promise<SessionWithChallenges> {
   return setSession(
     server,
@@ -185,7 +185,7 @@ export async function setSessionAndUpdateCookie(
     recentCookie.token,
     password,
     webAuthN,
-    challenges
+    challenges,
   ).then((updatedSession) => {
     if (updatedSession) {
       const sessionCookie: SessionCookie = {
@@ -228,13 +228,13 @@ export async function setSessionAndUpdateCookie(
               return updateSessionCookie(sessionCookie.id, newCookie).then(
                 () => {
                   return { challenges: updatedSession.challenges, ...session };
-                }
+                },
               );
             } else {
               throw "could not get session or session does not have loginName";
             }
-          }
-        )
+          },
+        ),
       );
     } else {
       throw "Session not be set";

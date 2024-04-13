@@ -84,7 +84,7 @@ export function SignInWithIDP({
                     startFlow(idp.id, ProviderSlug.GITHUB).then(
                       ({ authUrl }) => {
                         router.push(authUrl);
-                      }
+                      },
                     )
                   }
                 ></SignInWithGithub>
@@ -113,7 +113,7 @@ export function SignInWithIDP({
                     startFlow(idp.id, ProviderSlug.GOOGLE).then(
                       ({ authUrl }) => {
                         router.push(authUrl);
-                      }
+                      },
                     )
                   }
                 ></SignInWithGoogle>

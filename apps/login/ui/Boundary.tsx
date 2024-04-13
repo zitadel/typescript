@@ -61,7 +61,7 @@ export const Boundary = ({
           {
             "left-3 lg:left-5": size === "small",
             "left-4 lg:left-9": size === "default",
-          }
+          },
         )}
       >
         {labels.map((label) => {

@@ -57,20 +57,20 @@ if (!getServers().length) {
 
 export async function getBrandingSettings(
   server: ZitadelServer,
-  organization?: string
+  organization?: string,
 ): Promise<BrandingSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
     .getBrandingSettings(
       { ctx: organization ? { orgId: organization } : { instance: true } },
-      {}
+      {},
     )
     .then((resp: GetBrandingSettingsResponse) => resp.settings);
 }
 
 export async function getLoginSettings(
   server: ZitadelServer,
-  orgId?: string
+  orgId?: string,
 ): Promise<LoginSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
@@ -79,7 +79,7 @@ export async function getLoginSettings(
 }
 
 export async function getGeneralSettings(
-  server: ZitadelServer
+  server: ZitadelServer,
 ): Promise<string[] | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
@@ -89,13 +89,13 @@ export async function getGeneralSettings(
 
 export async function getLegalAndSupportSettings(
   server: ZitadelServer,
-  organization?: string
+  organization?: string,
 ): Promise<LegalAndSupportSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
     .getLegalAndSupportSettings(
       { ctx: organization ? { orgId: organization } : { instance: true } },
-      {}
+      {},
     )
     .then((resp: GetLegalAndSupportSettingsResponse) => {
       return resp.settings;
@@ -104,7 +104,7 @@ export async function getLegalAndSupportSettings(
 
 export async function getPasswordComplexitySettings(
   server: ZitadelServer,
-  organization?: string
+  organization?: string,
 ): Promise<PasswordComplexitySettings | undefined> {
   const settingsService = settings.getSettings(server);
 
@@ -113,7 +113,7 @@ export async function getPasswordComplexitySettings(
       organization
         ? { ctx: { orgId: organization } }
         : { ctx: { instance: true } },
-      {}
+      {},
     )
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
@@ -122,7 +122,7 @@ export async function createSessionForLoginname(
   server: ZitadelServer,
   loginName: string,
   password: string | undefined,
-  challenges: RequestChallenges | undefined
+  challenges: RequestChallenges | undefined,
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return password
@@ -135,7 +135,7 @@ export async function createSessionForLoginname(
             nanos: 0,
           },
         },
-        {}
+        {},
       )
     : sessionService.createSession(
         {
@@ -146,7 +146,7 @@ export async function createSessionForLoginname(
             nanos: 0,
           },
         },
-        {}
+        {},
       );
 }
 
@@ -154,7 +154,7 @@ export async function createSessionForUserId(
   server: ZitadelServer,
   userId: string,
   password: string | undefined,
-  challenges: RequestChallenges | undefined
+  challenges: RequestChallenges | undefined,
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return password
@@ -167,7 +167,7 @@ export async function createSessionForUserId(
             nanos: 0,
           },
         },
-        {}
+        {},
       )
     : sessionService.createSession(
         {
@@ -178,7 +178,7 @@ export async function createSessionForUserId(
             nanos: 0,
           },
         },
-        {}
+        {},
       );
 }
 
@@ -188,7 +188,7 @@ export async function createSessionForUserIdAndIdpIntent(
   idpIntent: {
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
-  }
+  },
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 
@@ -200,7 +200,7 @@ export async function createSessionForUserIdAndIdpIntent(
       //   nanos: 0,
       // },
     },
-    {}
+    {},
   );
 }
 
@@ -210,7 +210,7 @@ export async function setSession(
   sessionToken: string,
   password: string | undefined,
   webAuthN: { credentialAssertionData: any } | undefined,
-  challenges: RequestChallenges | undefined
+  challenges: RequestChallenges | undefined,
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 
@@ -236,7 +236,7 @@ export async function setSession(
 export async function getSession(
   server: ZitadelServer,
   sessionId: string,
-  sessionToken: string
+  sessionToken: string,
 ): Promise<GetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return sessionService.getSession({ sessionId, sessionToken }, {});
@@ -245,7 +245,7 @@ export async function getSession(
 export async function deleteSession(
   server: ZitadelServer,
   sessionId: string,
-  sessionToken: string
+  sessionToken: string,
 ): Promise<DeleteSessionResponse | undefined> {
   const sessionService = session.getSession(server);
   return sessionService.deleteSession({ sessionId, sessionToken }, {});
@@ -253,7 +253,7 @@ export async function deleteSession(
 
 export async function listSessions(
   server: ZitadelServer,
-  ids: string[]
+  ids: string[],
 ): Promise<ListSessionsResponse | undefined> {
   const sessionService = session.getSession(server);
   const query = { offset: 0, limit: 100, asc: true };
@@ -271,7 +271,7 @@ export type AddHumanUserData = {
 
 export async function addHumanUser(
   server: ZitadelServer,
-  { email, firstName, lastName, password, organization }: AddHumanUserData
+  { email, firstName, lastName, password, organization }: AddHumanUserData,
 ): Promise<AddHumanUserResponse> {
   const userService = user.getUser(server);
 
@@ -292,13 +292,13 @@ export async function addHumanUser(
           password: { password },
         }
       : payload,
-    {}
+    {},
   );
 }
 
 export async function listUsers(
   userName: string,
-  organizationId: string
+  organizationId: string,
 ): Promise<ListUsersResponse> {
   const userService = user.getUser(server);
 
@@ -327,12 +327,12 @@ export async function listUsers(
             },
           ],
     },
-    {}
+    {},
   );
 }
 
 export async function getOrgByDomain(
-  domain: string
+  domain: string,
 ): Promise<GetOrgByDomainGlobalResponse> {
   const mgmtService = management.getManagement(server);
   return mgmtService.getOrgByDomainGlobal({ domain }, {});
@@ -340,7 +340,7 @@ export async function getOrgByDomain(
 
 export async function startIdentityProviderFlow(
   server: ZitadelServer,
-  { idpId, urls }: StartIdentityProviderIntentRequest
+  { idpId, urls }: StartIdentityProviderIntentRequest,
 ): Promise<StartIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
 
@@ -352,7 +352,7 @@ export async function startIdentityProviderFlow(
 
 export async function retrieveIdentityProviderInformation(
   server: ZitadelServer,
-  { idpIntentId, idpIntentToken }: RetrieveIdentityProviderIntentRequest
+  { idpIntentId, idpIntentToken }: RetrieveIdentityProviderIntentRequest,
 ): Promise<RetrieveIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
 
@@ -364,7 +364,7 @@ export async function retrieveIdentityProviderInformation(
 
 export async function getAuthRequest(
   server: ZitadelServer,
-  { authRequestId }: GetAuthRequestRequest
+  { authRequestId }: GetAuthRequestRequest,
 ): Promise<GetAuthRequestResponse> {
   const oidcService = oidc.getOidc(server);
 
@@ -375,7 +375,7 @@ export async function getAuthRequest(
 
 export async function createCallback(
   server: ZitadelServer,
-  req: CreateCallbackRequest
+  req: CreateCallbackRequest,
 ): Promise<CreateCallbackResponse> {
   const oidcService = oidc.getOidc(server);
 
@@ -385,7 +385,7 @@ export async function createCallback(
 export async function verifyEmail(
   server: ZitadelServer,
   userId: string,
-  verificationCode: string
+  verificationCode: string,
 ): Promise<VerifyEmailResponse> {
   const userservice = user.getUser(server);
   return userservice.verifyEmail(
@@ -393,7 +393,7 @@ export async function verifyEmail(
       userId,
       verificationCode,
     },
-    {}
+    {},
   );
 }
 
@@ -405,14 +405,14 @@ export async function verifyEmail(
  */
 export async function setEmail(
   server: ZitadelServer,
-  userId: string
+  userId: string,
 ): Promise<any> {
   const userservice = user.getUser(server);
   return userservice.setEmail(
     {
       userId,
     },
-    {}
+    {},
   );
 }
 
@@ -423,7 +423,7 @@ export async function setEmail(
  * @returns the newly set email
  */
 export async function createPasskeyRegistrationLink(
-  userId: string
+  userId: string,
 ): Promise<any> {
   const userservice = user.getUser(server);
 
@@ -448,7 +448,7 @@ export async function verifyPasskeyRegistration(
         [key: string]: any;
       }
     | undefined,
-  userId: string
+  userId: string,
 ): Promise<VerifyPasskeyRegistrationResponse> {
   const userservice = user.getUser(server);
   return userservice.verifyPasskeyRegistration(
@@ -458,7 +458,7 @@ export async function verifyPasskeyRegistration(
       publicKeyCredential,
       userId,
     },
-    {}
+    {},
   );
 }
 
@@ -471,7 +471,7 @@ export async function verifyPasskeyRegistration(
 export async function registerPasskey(
   userId: string,
   code: { id: string; code: string },
-  domain: string
+  domain: string,
 ): Promise<any> {
   const userservice = user.getUser(server);
   return userservice.registerPasskey({
@@ -489,7 +489,7 @@ export async function registerPasskey(
  * @returns the newly set email
  */
 export async function listAuthenticationMethodTypes(
-  userId: string
+  userId: string,
 ): Promise<ListAuthenticationMethodTypesResponse> {
   const userservice = user.getUser(server);
   return userservice.listAuthenticationMethodTypes({

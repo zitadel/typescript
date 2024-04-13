@@ -60,7 +60,7 @@ export default function RegisterPasskey({
     passkeyId: string,
     passkeyName: string,
     publicKeyCredential: any,
-    sessionId: string
+    sessionId: string,
   ) {
     setLoading(true);
     const res = await fetch("/api/passkeys/verify", {
@@ -97,12 +97,12 @@ export default function RegisterPasskey({
         resp.publicKeyCredentialCreationOptions.publicKey.challenge =
           coerceToArrayBuffer(
             resp.publicKeyCredentialCreationOptions.publicKey.challenge,
-            "challenge"
+            "challenge",
           );
         resp.publicKeyCredentialCreationOptions.publicKey.user.id =
           coerceToArrayBuffer(
             resp.publicKeyCredentialCreationOptions.publicKey.user.id,
-            "userid"
+            "userid",
           );
         if (
           resp.publicKeyCredentialCreationOptions.publicKey.excludeCredentials
@@ -111,10 +111,10 @@ export default function RegisterPasskey({
             (cred: any) => {
               cred.id = coerceToArrayBuffer(
                 cred.id as string,
-                "excludeCredentials.id"
+                "excludeCredentials.id",
               );
               return cred;
-            }
+            },
           );
         }
 
@@ -139,11 +139,11 @@ export default function RegisterPasskey({
                 response: {
                   attestationObject: coerceToBase64Url(
                     attestationObject,
-                    "attestationObject"
+                    "attestationObject",
                   ),
                   clientDataJSON: coerceToBase64Url(
                     clientDataJSON,
-                    "clientDataJSON"
+                    "clientDataJSON",
                   ),
                 },
               };

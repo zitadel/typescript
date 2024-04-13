@@ -103,7 +103,7 @@ export default function PasswordForm({
                 }
               : {
                   loginName: resp.factors.user.loginName,
-                }
+                },
           );
 
           if (organization) {
