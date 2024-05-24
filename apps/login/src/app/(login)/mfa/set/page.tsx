@@ -13,6 +13,7 @@ import {
   getMostRecentCookieWithLoginName,
   getSessionCookieById,
 } from "@/utils/cookies";
+import { HumanUser } from "@zitadel/proto/zitadel/user/v2beta/user_pb";
 
 export default async function Page({
   searchParams,
@@ -39,11 +40,12 @@ export default async function Page({
         const userId = response.session.factors.user.id;
         return listAuthenticationMethodTypes(userId).then((methods) => {
           return getUserByID(userId).then((user) => {
+            const human = user.user?.type.value as HumanUser;
             return {
               factors: response.session?.factors,
               authMethods: methods.authMethodTypes ?? [],
-              phoneVerified: user.user?.human?.phone?.isVerified ?? false,
-              emailVerified: user.user?.human?.email?.isVerified ?? false,
+              phoneVerified: human.phone?.isVerified ?? false,
+              emailVerified: human.email?.isVerified ?? false,
             };
           });
         });
@@ -53,16 +55,18 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         const userId = response.session.factors.user.id;
         return listAuthenticationMethodTypes(userId).then((methods) => {
           return getUserByID(userId).then((user) => {
+            const human = user.user?.type.value as HumanUser;
+
             return {
               factors: response.session?.factors,
               authMethods: methods.authMethodTypes ?? [],
-              phoneVerified: user.user?.human?.phone?.isVerified ?? false,
-              emailVerified: user.user?.human?.email?.isVerified ?? false,
+              phoneVerified: human.phone?.isVerified ?? false,
+              emailVerified: human.email?.isVerified ?? false,
             };
           });
         });
@@ -70,8 +74,8 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(server, organization);
-  const loginSettings = await getLoginSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
+  const loginSettings = await getLoginSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>
