@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { getBrandingSettings } from "@/lib/zitadel";
-=======
-import { getBrandingSettings, server } from "@/lib/zitadel";
->>>>>>> main
 import DynamicTheme from "@/ui/DynamicTheme";
 import VerifyEmailForm from "@/ui/VerifyEmailForm";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";

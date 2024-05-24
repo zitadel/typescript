@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { getBrandingSettings, sessionService } from "@/lib/zitadel";
-=======
-import { getBrandingSettings, getSession, server } from "@/lib/zitadel";
->>>>>>> main
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
@@ -36,19 +32,13 @@ export default async function Page({
       loginName,
       organization,
     );
-    const response = await sessionService.getSession({
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    });
+    const response = await getSession(recent.id, recent.token);
     return response?.session;
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    const response = await sessionService.getSession({
-      sessionId: recent.id,
-      sessionToken: recent.token,
-    });
+    const response = await getSession(recent.id, recent.token);
     return response?.session;
   }
 

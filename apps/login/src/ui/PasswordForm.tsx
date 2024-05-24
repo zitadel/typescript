@@ -7,25 +7,16 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-<<<<<<< HEAD
-=======
-import {
-  LoginSettings,
-  AuthFactor,
-  Checks,
-  AuthenticationMethodType,
-} from "@zitadel/server";
->>>>>>> main
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 
 type Inputs = {
   password: string;
 };
 
 type Props = {
-<<<<<<< HEAD
-=======
   loginSettings: LoginSettings | undefined;
->>>>>>> main
   loginName?: string;
   organization?: string;
   authRequestId?: string;
@@ -34,10 +25,7 @@ type Props = {
 };
 
 export default function PasswordForm({
-<<<<<<< HEAD
-=======
   loginSettings,
->>>>>>> main
   loginName,
   organization,
   authRequestId,
@@ -66,13 +54,9 @@ export default function PasswordForm({
       body: JSON.stringify({
         loginName,
         organization,
-<<<<<<< HEAD
-        password: values.password,
-=======
         checks: {
           password: { password: values.password },
         } as Checks,
->>>>>>> main
         authRequestId,
       }),
     });
@@ -81,22 +65,13 @@ export default function PasswordForm({
 
     setLoading(false);
     if (!res.ok) {
-<<<<<<< HEAD
       setError(response.details);
-=======
-      console.log(response.details.details);
-      setError(response.details?.details ?? "Could not verify password");
->>>>>>> main
       return Promise.reject(response.details);
     }
     return response;
   }
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
-<<<<<<< HEAD
-    return submitPassword(value).then((resp: any) => {
-      if (
-=======
     return submitPassword(value).then((resp) => {
       // if user has mfa -> /otp/[method] or /u2f
       // if mfa is forced and user has no mfa -> /mfa/set
@@ -159,7 +134,6 @@ export default function PasswordForm({
 
         return router.push(`/mfa/set?` + params);
       } else if (
->>>>>>> main
         resp.factors &&
         !resp.factors.passwordless && // if session was not verified with a passkey
         promptPasswordless && // if explicitly prompted due policy
@@ -170,50 +144,15 @@ export default function PasswordForm({
           promptPasswordless: "true",
         });
 
-<<<<<<< HEAD
-=======
         if (authRequestId) {
           params.append("authRequestId", authRequestId);
         }
 
->>>>>>> main
         if (organization) {
           params.append("organization", organization);
         }
 
         return router.push(`/passkey/add?` + params);
-<<<<<<< HEAD
-      } else {
-        if (authRequestId && resp && resp.sessionId) {
-          const params = new URLSearchParams({
-            sessionId: resp.sessionId,
-            authRequest: authRequestId,
-          });
-
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          return router.push(`/login?` + params);
-        } else {
-          const params = new URLSearchParams(
-            authRequestId
-              ? {
-                  loginName: resp.factors.user.loginName,
-                  authRequestId,
-                }
-              : {
-                  loginName: resp.factors.user.loginName,
-                },
-          );
-
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          return router.push(`/signedin?` + params);
-        }
-=======
       } else if (authRequestId && resp && resp.sessionId) {
         const params = new URLSearchParams({
           sessionId: resp.sessionId,
@@ -243,16 +182,10 @@ export default function PasswordForm({
         }
 
         return router.push(`/signedin?` + params);
->>>>>>> main
       }
     });
   }
 
-<<<<<<< HEAD
-  const { errors } = formState;
-
-=======
->>>>>>> main
   return (
     <form className="w-full">
       <div className={`${error && "transform-gpu animate-shake"}`}>

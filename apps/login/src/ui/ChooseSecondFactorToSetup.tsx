@@ -1,6 +1,5 @@
 "use client";
 
-import { AuthenticationMethodType, LoginSettings } from "@zitadel/server";
 import { EMAIL, SMS, TOTP, U2F } from "./AuthMethods";
 
 type Props = {

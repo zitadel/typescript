@@ -1,4 +1,3 @@
-import { Session } from "@zitadel/server";
 import { getBrandingSettings, sessionService } from "@/lib/zitadel";
 import { getAllSessionCookieIds } from "@/utils/cookies";
 import { UserPlusIcon } from "@heroicons/react/24/outline";

@@ -1,13 +1,5 @@
-<<<<<<< HEAD
 import { addHumanUser } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
-=======
-import { addHumanUser, server } from "@/lib/zitadel";
-import {
-  createSessionAndUpdateCookie,
-  createSessionForUserIdAndUpdateCookie,
-} from "@/utils/session";
->>>>>>> main
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

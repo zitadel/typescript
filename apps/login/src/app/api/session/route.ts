@@ -1,14 +1,9 @@
-<<<<<<< HEAD
-import { sessionService } from "@/lib/zitadel";
-=======
 import {
-  server,
   deleteSession,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
->>>>>>> main
 import {
   SessionCookie,
   getMostRecentSessionCookie,
@@ -21,12 +16,8 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/utils/session";
-<<<<<<< HEAD
-=======
-import { Challenges, Checks, RequestChallenges } from "@zitadel/server";
->>>>>>> main
 import { NextRequest, NextResponse } from "next/server";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
+import { HumanUser } from "@zitadel/proto/zitadel/user/v2beta/user_pb";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -76,9 +67,6 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const body = await request.json();
 
-<<<<<<< HEAD
-  if (!body) {
-=======
   if (body) {
     const {
       loginName,
@@ -99,9 +87,17 @@ export async function PUT(request: NextRequest) {
               return Promise.reject(error);
             },
           )
-        : getMostRecentSessionCookie().catch((error) => {
-            return Promise.reject(error);
-          });
+        : getMostRecentSessionCookie()
+            .then((session) => {
+              if (!session) {
+                return Promise.reject("No recent session found");
+              } else {
+                return session;
+              }
+            })
+            .catch((error) => {
+              return Promise.reject(error);
+            });
 
     const domain: string = request.nextUrl.hostname;
 
@@ -115,27 +111,20 @@ export async function PUT(request: NextRequest) {
           challenges &&
           (challenges.otpEmail === "" || challenges.otpSms === "")
         ) {
-          const sessionResponse = await getSession(
-            server,
-            recent.id,
-            recent.token,
-          );
+          const sessionResponse = await getSession(recent.id, recent.token);
           if (sessionResponse && sessionResponse.session?.factors?.user?.id) {
             const userResponse = await getUserByID(
               sessionResponse.session.factors.user.id,
             );
-            if (
-              challenges.otpEmail === "" &&
-              userResponse.user?.human?.email?.email
-            ) {
-              challenges.otpEmail = userResponse.user?.human?.email?.email;
+            const user = userResponse.user?.type?.value as HumanUser;
+            const isHuman = userResponse.user?.type.case === "human";
+
+            if (challenges.otpEmail === "" && isHuman && user?.email?.email) {
+              challenges.otpEmail = user?.email?.email;
             }
 
-            if (
-              challenges.otpSms === "" &&
-              userResponse.user?.human?.phone?.phone
-            ) {
-              challenges.otpSms = userResponse.user?.human?.phone?.phone;
+            if (challenges.otpSms === "" && isHuman && user?.phone?.phone) {
+              challenges.otpSms = user.phone?.phone;
             }
           }
         }
@@ -170,55 +159,11 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ details: error }, { status: 500 });
       });
   } else {
->>>>>>> main
     return NextResponse.json(
       { details: "Request body is missing" },
       { status: 400 },
     );
   }
-
-  const {
-    loginName,
-    sessionId,
-    organization,
-    password,
-    webAuthN,
-    authRequestId,
-  } = body;
-  const challenges: RequestChallenges = body.challenges;
-
-  const sessionCookie = sessionId
-    ? await getSessionCookieById(sessionId)
-    : loginName
-      ? await getSessionCookieByLoginName(loginName, organization)
-      : await getMostRecentSessionCookie();
-
-  if (!sessionCookie) {
-    return NextResponse.json(
-      { details: "No session cookie found" },
-      { status: 404 },
-    );
-  }
-
-  const domain: string = request.nextUrl.hostname;
-
-  if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
-    challenges.webAuthN.domain = domain;
-  }
-
-  const session = await setSessionAndUpdateCookie(
-    sessionCookie,
-    password,
-    webAuthN,
-    challenges,
-    authRequestId,
-  );
-
-  return NextResponse.json({
-    sessionId: session.id,
-    factors: session.factors,
-    challenges: session.challenges,
-  });
 }
 
 /**
@@ -231,8 +176,7 @@ export async function DELETE(request: NextRequest) {
   if (id) {
     const session = await getSessionCookieById(id);
 
-    return sessionService
-      .deleteSession({ sessionId: session.id, sessionToken: session.token })
+    return deleteSession(session.id, session.token)
       .then(() => {
         return removeSessionFromCookie(session)
           .then(() => {

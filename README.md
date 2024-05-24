@@ -51,13 +51,8 @@ This list should show the current implementation state, and also what is missing
 You can already use the current state, and extend it with your needs.
 
 - [x] Local User Registration (with Password)
-<<<<<<< HEAD
-- [ ] User Registration and Login with external Provider
-  - [ ] Google
-=======
-- [x] User Registration and Login with external Provider 
+- [x] User Registration and Login with external Provider
   - [x] Google
->>>>>>> main
   - [ ] GitHub
   - [ ] GitHub Enterprise
   - [x] GitLab
@@ -78,40 +73,22 @@ You can already use the current state, and extend it with your needs.
 - [ ] Domain Discovery
 - [x] Branding
 - OIDC Standard
-<<<<<<< HEAD
-  - [ ] Authorization Code Flow with PKCE
-  - [ ] AuthRequest `hintUserId`
-  - [ ] AuthRequest `loginHint`
-  - [ ] AuthRequest `prompt`
+  - [x] Authorization Code Flow with PKCE
+  - [x] AuthRequest `hintUserId`
+  - [x] AuthRequest `loginHint`
+  - [x] AuthRequest `prompt`
     - [x] Login
     - [x] Select Account
     - [ ] Consent
-    - [ ] Create
+    - [x] Create
   - Scopes
-    - [ ] `openid email profile address``
-    - [ ] `offline access`
+    - [x] `openid email profile address``
+    - [x] `offline access`
     - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
-    - [ ] `urn:zitadel:iam:org:project:id:zitadel:aud`
-    - [ ] `urn:zitadel:iam:org:id:{orgid}`
+    - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
+    - [x] `urn:zitadel:iam:org:id:{orgid}`
+    - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
   - [ ] AuthRequest UI locales
-=======
-   - [x] Authorization Code Flow with PKCE
-   - [x] AuthRequest `hintUserId`
-   - [x] AuthRequest `loginHint`
-   - [x] AuthRequest `prompt`
-     - [x] Login
-     - [x] Select Account
-     - [ ] Consent
-     - [x] Create
-   - Scopes
-     - [x] `openid email profile address``
-     - [x] `offline access`
-     - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
-     - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
-     - [x] `urn:zitadel:iam:org:id:{orgid}`
-     - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
-   - [ ] AuthRequest UI locales
->>>>>>> main
 
 ## Tooling
 

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { listUsers, userService } from "@/lib/zitadel";
-=======
 import { listAuthenticationMethodTypes, listUsers } from "@/lib/zitadel";
->>>>>>> main
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,10 +17,7 @@ export async function POST(request: NextRequest) {
         )
           .then((session) => {
             if (session.factors?.user?.id) {
-              return userService
-                .listAuthenticationMethodTypes({
-                  userId: session.factors?.user?.id,
-                })
+              return listAuthenticationMethodTypes(session.factors?.user?.id)
                 .then((methods) => {
                   return NextResponse.json({
                     authMethodTypes: methods.authMethodTypes,

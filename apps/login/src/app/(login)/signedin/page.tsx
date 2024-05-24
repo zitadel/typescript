@@ -1,42 +1,27 @@
-import {
-  getBrandingSettings,
-<<<<<<< HEAD
-  sessionService,
-  oidcService,
-} from "@/lib/zitadel";
+import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
 import { getMostRecentCookieWithLoginName } from "@/utils/cookies";
-=======
-  getSession,
-  server,
-} from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
-import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
->>>>>>> main
 import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {
   const recent = await getMostRecentCookieWithLoginName(`${loginName}`);
 
   if (authRequestId) {
-    return oidcService
-      .createCallback({
-        authRequestId,
-        callbackKind: {
-          case: "session",
-          value: { sessionId: recent.id, sessionToken: recent.token },
-        },
-      })
-      .then(({ callbackUrl }) => {
-        return redirect(callbackUrl);
-      });
+    return createCallback({
+      authRequestId,
+      callbackKind: {
+        case: "session",
+        value: { sessionId: recent.id, sessionToken: recent.token },
+      },
+    }).then(({ callbackUrl }) => {
+      return redirect(callbackUrl);
+    });
   }
-  const response = await sessionService.getSession({
+  const response = await getSession(
     sessionId: recent.id,
     sessionToken: recent.token,
-  });
+  );
   return response?.session;
 }
 

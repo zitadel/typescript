@@ -1,21 +1,13 @@
-<<<<<<< HEAD
-export default function Page() {
-  return <div className="flex flex-col items-center space-y-4">mfa</div>;
-=======
 import {
   getBrandingSettings,
   getSession,
   listAuthenticationMethodTypes,
-  server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import ChooseSecondFactor from "@/ui/ChooseSecondFactor";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import {
-  getMostRecentCookieWithLoginname,
-  getSessionCookieById,
-} from "@/utils/cookies";
+import { getSessionCookieById } from "@/utils/cookies";
 
 export default async function Page({
   searchParams,
@@ -37,7 +29,7 @@ export default async function Page({
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(
           response.session.factors.user.id,
@@ -53,7 +45,7 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(
           response.session.factors.user.id,
@@ -67,7 +59,7 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>
@@ -103,5 +95,4 @@ export default async function Page({
       </div>
     </DynamicTheme>
   );
->>>>>>> main
 }

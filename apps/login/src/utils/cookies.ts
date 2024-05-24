@@ -122,13 +122,9 @@ export async function getSessionCookieById(
   id: string,
   organization?: string,
 ): Promise<SessionCookie> {
-  const sessions = cookieSessions();
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
 
-<<<<<<< HEAD
-  const found = sessions.find((session) => {
-    if (session.id !== id) {
-      return false;
-=======
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
@@ -141,34 +137,19 @@ export async function getSessionCookieById(
       return found;
     } else {
       return Promise.reject();
->>>>>>> main
     }
-
-    if (organization) {
-      return session.organization === organization;
-    }
-
-    return true;
-  });
-
-  if (!found) {
-    throw new Error("No session cookie found");
+  } else {
+    return Promise.reject();
   }
-
-  return found;
 }
 
 export async function getSessionCookieByLoginName(
   loginName: string,
   organization?: string,
 ): Promise<SessionCookie> {
-  const sessions = cookieSessions();
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
 
-<<<<<<< HEAD
-  const found = sessions.find((session) => {
-    if (session.loginName !== loginName) {
-      return false;
-=======
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
     const found = sessions.find((s) =>
@@ -180,21 +161,10 @@ export async function getSessionCookieByLoginName(
       return found;
     } else {
       return Promise.reject("no cookie found with loginName: " + loginName);
->>>>>>> main
     }
-
-    if (organization) {
-      return session.organization === organization;
-    }
-
-    return true;
-  });
-
-  if (!found) {
-    throw new Error("No session cookie found");
+  } else {
+    return Promise.reject("no session cookie found");
   }
-
-  return found;
 }
 
 /**
@@ -234,19 +204,11 @@ export async function getAllSessionCookieIds(
  * @returns Session Cookies
  */
 export async function getAllSessions(
-<<<<<<< HEAD
-  cleanup: boolean = true,
-=======
   cleanup: boolean = false,
->>>>>>> main
 ): Promise<SessionCookie[]> {
-  const sessions = cookieSessions();
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
 
-<<<<<<< HEAD
-  if (cleanup) {
-    const now = new Date();
-    return sessions.filter(isAfterExpirationDate(now));
-=======
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
@@ -260,10 +222,7 @@ export async function getAllSessions(
     }
   } else {
     return [];
->>>>>>> main
   }
-
-  return sessions;
 }
 
 function isAfterExpirationDate(now: Date) {

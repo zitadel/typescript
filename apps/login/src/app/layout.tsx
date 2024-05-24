@@ -2,16 +2,7 @@ import "@/styles/globals.scss";
 import { AddressBar } from "@/ui/AddressBar";
 import { GlobalNav } from "@/ui/GlobalNav";
 import { Lato } from "next/font/google";
-<<<<<<< HEAD
 import { Analytics } from "@vercel/analytics/react";
-=======
-import { LayoutProviders } from "@/ui/LayoutProviders";
-import { Analytics } from "@vercel/analytics/react";
-import ThemeWrapper from "@/ui/ThemeWrapper";
-import { getBrandingSettings } from "@/lib/zitadel";
-import { server } from "../lib/zitadel";
-import { BrandingSettings } from "@zitadel/server";
->>>>>>> main
 import ThemeProvider from "@/ui/ThemeProvider";
 import Theme from "@/ui/Theme";
 

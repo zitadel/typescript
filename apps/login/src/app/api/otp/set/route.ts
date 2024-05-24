@@ -5,8 +5,9 @@ import {
   getSessionCookieByLoginName,
 } from "@/utils/cookies";
 import { setSessionAndUpdateCookie } from "@/utils/session";
-import { Checks } from "@zitadel/server";
-import { NextRequest, NextResponse, userAgent } from "next/server";
+import { PartialMessage } from "@zitadel/client";
+import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -25,13 +26,21 @@ export async function POST(request: NextRequest) {
               return Promise.reject(error);
             },
           )
-        : getMostRecentSessionCookie().catch((error) => {
-            return Promise.reject(error);
-          });
+        : getMostRecentSessionCookie()
+            .then((session) => {
+              if (!session) {
+                return Promise.reject("No recent session found");
+              } else {
+                return session;
+              }
+            })
+            .catch((error) => {
+              return Promise.reject(error);
+            });
 
     return recentPromise
       .then((recent) => {
-        const checks: Checks = {};
+        const checks: PartialMessage<Checks> = {};
 
         if (method === "time-based") {
           checks.totp = {

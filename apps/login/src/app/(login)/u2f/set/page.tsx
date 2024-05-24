@@ -1,10 +1,9 @@
-import { getBrandingSettings, getSession, server } from "@/lib/zitadel";
-import Alert, { AlertType } from "@/ui/Alert";
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import Alert,  from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
-import RegisterPasskey from "@/ui/RegisterPasskey";
 import RegisterU2F from "@/ui/RegisterU2F";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { getMostRecentCookieWithLoginName } from "@/utils/cookies";
 
 export default async function Page({
   searchParams,
@@ -16,11 +15,11 @@ export default async function Page({
   const sessionFactors = await loadSession(loginName);
 
   async function loadSession(loginName?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
+    const recent = await getMostRecentCookieWithLoginName(
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
@@ -30,7 +29,7 @@ export default async function Page({
   const description =
     "Your device will ask for your fingerprint, face, or screen lock";
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings( organization);
 
   return (
     <DynamicTheme branding={branding}>

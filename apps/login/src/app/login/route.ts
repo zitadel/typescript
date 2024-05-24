@@ -1,17 +1,5 @@
-<<<<<<< HEAD
-import { sessionService, managementService, oidcService } from "@/lib/zitadel";
+import { sessionService, oidcService } from "@/lib/zitadel";
 import { SessionCookie, getAllSessions } from "@/utils/cookies";
-=======
-import {
-  createCallback,
-  getAuthRequest,
-  getOrgByDomain,
-  listSessions,
-  server,
-} from "@/lib/zitadel";
-import { SessionCookie, getAllSessions } from "@/utils/cookies";
-import { Session, AuthRequest, Prompt } from "@zitadel/server";
->>>>>>> main
 import { NextRequest, NextResponse } from "next/server";
 import {
   AuthRequest,
@@ -20,7 +8,6 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
-<<<<<<< HEAD
   const response = await sessionService.listSessions({
     queries: [
       {
@@ -31,12 +18,6 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
       },
     ],
   });
-=======
-  const response = await listSessions(
-    server,
-    ids.filter((id: string | undefined) => !!id),
-  );
->>>>>>> main
 
   return response.sessions;
 }
@@ -116,14 +97,8 @@ export async function GET(request: NextRequest) {
 
   if (authRequestId) {
     console.log(`Login with authRequest: ${authRequestId}`);
-<<<<<<< HEAD
     const { authRequest } = await oidcService.getAuthRequest({ authRequestId });
-    let organization;
-=======
-    const { authRequest } = await getAuthRequest(server, { authRequestId });
-
     let organization = "";
->>>>>>> main
 
     if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
@@ -142,18 +117,16 @@ export async function GET(request: NextRequest) {
           const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
           const orgDomain = matched?.[1] ?? "";
           if (orgDomain) {
-            const org = await managementService.getOrgByDomainGlobal({
-              domain: orgDomain,
-            });
-            organization = org?.org?.id ?? "";
+            // TODO: implement org by domain lookup
+            // const org = await managementService.getOrgByDomainGlobal({
+            //   domain: orgDomain,
+            // });
+            // organization = org?.org?.id ?? "";
           }
         }
       }
     }
 
-<<<<<<< HEAD
-    if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
-=======
     const gotoAccounts = (): NextResponse<unknown> => {
       const accountsUrl = new URL("/accounts", request.url);
       if (authRequest?.id) {
@@ -166,8 +139,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(accountsUrl);
     };
 
-    if (authRequest && authRequest.prompt.includes(Prompt.PROMPT_CREATE)) {
->>>>>>> main
+    if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
       const registerUrl = new URL("/register", request.url);
       if (authRequest?.id) {
         registerUrl.searchParams.set("authRequestId", authRequest?.id);
@@ -182,23 +154,9 @@ export async function GET(request: NextRequest) {
     // use existing session and hydrate it for oidc
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
-<<<<<<< HEAD
       if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
-        const accountsUrl = new URL("/accounts", request.url);
-        if (authRequest?.id) {
-          accountsUrl.searchParams.set("authRequestId", authRequest?.id);
-        }
-        if (organization) {
-          accountsUrl.searchParams.set("organization", organization);
-        }
-
-        return NextResponse.redirect(accountsUrl);
-      } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
-=======
-      if (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)) {
         return gotoAccounts();
-      } else if (authRequest.prompt.includes(Prompt.PROMPT_LOGIN)) {
->>>>>>> main
+      } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
         // if prompt is login
         const loginNameUrl = new URL("/loginname", request.url);
         if (authRequest?.id) {
@@ -255,32 +213,20 @@ export async function GET(request: NextRequest) {
           );
 
           if (cookie && cookie.id && cookie.token) {
-<<<<<<< HEAD
-            const { callbackUrl } = await oidcService.createCallback({
-              authRequestId,
-              callbackKind: {
-                case: "session",
-                value: {
-                  sessionId: cookie?.id,
-                  sessionToken: cookie?.token,
-                },
-              },
-            });
-            return NextResponse.redirect(callbackUrl);
-          } else {
-            const accountsUrl = new URL("/accounts", request.url);
-            accountsUrl.searchParams.set("authRequestId", authRequestId);
-            if (organization) {
-              accountsUrl.searchParams.set("organization", organization);
-=======
             const session = {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
             try {
-              const { callbackUrl } = await createCallback(server, {
+              const { callbackUrl } = await oidcService.createCallback({
                 authRequestId,
-                session,
+                callbackKind: {
+                  case: "session",
+                  value: {
+                    sessionId: cookie?.id,
+                    sessionToken: cookie?.token,
+                  },
+                },
               });
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);
@@ -290,7 +236,6 @@ export async function GET(request: NextRequest) {
             } catch (error) {
               console.error(error);
               return gotoAccounts();
->>>>>>> main
             }
           } else {
             return gotoAccounts();

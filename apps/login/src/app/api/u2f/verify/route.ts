@@ -1,6 +1,7 @@
-import { getSession, server, verifyU2FRegistration } from "@/lib/zitadel";
+import { getSession, verifyU2FRegistration } from "@/lib/zitadel";
 import { getSessionCookieById } from "@/utils/cookies";
-import { VerifyU2FRegistrationRequest } from "@zitadel/server";
+import { PartialMessage } from "@zitadel/client";
+import { VerifyU2FRegistrationRequest } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 import { NextRequest, NextResponse, userAgent } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -16,16 +17,12 @@ export async function POST(request: NextRequest) {
     }
     const sessionCookie = await getSessionCookieById(sessionId);
 
-    const session = await getSession(
-      server,
-      sessionCookie.id,
-      sessionCookie.token,
-    );
+    const session = await getSession(sessionCookie.id, sessionCookie.token);
 
     const userId = session?.session?.factors?.user?.id;
 
     if (userId) {
-      const req: VerifyU2FRegistrationRequest = {
+      const req: PartialMessage<VerifyU2FRegistrationRequest> = {
         publicKeyCredential,
         u2fId,
         userId,

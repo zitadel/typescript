@@ -6,13 +6,9 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-<<<<<<< HEAD
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
 import { RegisterPasskeyResponse } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
-=======
-import { AuthRequest, RegisterPasskeyResponse } from "@zitadel/server";
-import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
->>>>>>> main
+
 type Inputs = {};
 
 type Props = {
@@ -105,20 +101,12 @@ export default function RegisterPasskey({
       ) {
         publicKeyCredentialCreationOptions.publicKey.challenge =
           coerceToArrayBuffer(
-<<<<<<< HEAD
             publicKeyCredentialCreationOptions.publicKey.challenge,
-=======
-            resp.publicKeyCredentialCreationOptions.publicKey.challenge,
->>>>>>> main
             "challenge",
           );
         publicKeyCredentialCreationOptions.publicKey.user.id =
           coerceToArrayBuffer(
-<<<<<<< HEAD
             publicKeyCredentialCreationOptions.publicKey.user.id,
-=======
-            resp.publicKeyCredentialCreationOptions.publicKey.user.id,
->>>>>>> main
             "userid",
           );
         if (publicKeyCredentialCreationOptions.publicKey.excludeCredentials) {

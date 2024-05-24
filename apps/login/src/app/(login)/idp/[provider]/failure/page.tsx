@@ -1,16 +1,6 @@
 import { ProviderSlug } from "@/lib/demos";
-import { getBrandingSettings, server } from "@/lib/zitadel";
-import Alert, { AlertType } from "@/ui/Alert";
+import { getBrandingSettings } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
-import IdpSignin from "@/ui/IdpSignin";
-import {
-  AddHumanUserRequest,
-  IDPInformation,
-  RetrieveIdentityProviderIntentResponse,
-  user,
-  IDPLink,
-} from "@zitadel/server";
-import { ClientError } from "nice-grpc";
 
 const PROVIDER_NAME_MAPPING: {
   [provider: string]: string;

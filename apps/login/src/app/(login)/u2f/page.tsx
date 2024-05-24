@@ -1,15 +1,10 @@
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getSession,
-  server,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
 import UserAvatar from "@/ui/UserAvatar";
 import {
-  getMostRecentCookieWithLoginname,
+  getMostRecentCookieWithLoginName,
   getSessionCookieById,
 } from "@/utils/cookies";
 
@@ -22,7 +17,7 @@ export default async function Page({
 }) {
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   const sessionFactors = sessionId
     ? await loadSessionById(sessionId, organization)
@@ -32,11 +27,11 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    const recent = await getMostRecentCookieWithLoginname(
+    const recent = await getMostRecentCookieWithLoginName(
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
@@ -45,7 +40,7 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }

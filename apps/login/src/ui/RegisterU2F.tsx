@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { RegisterU2FResponse } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 type Inputs = {};
 
 type Props = {
@@ -90,7 +90,7 @@ export default function RegisterU2F({
 
       if (
         resp.publicKeyCredentialCreationOptions &&
-        resp.publicKeyCredentialCreationOptions.publicKey
+        resp.publicKeyCredentialCreationOptions.
       ) {
         resp.publicKeyCredentialCreationOptions.publicKey.challenge =
           coerceToArrayBuffer(
