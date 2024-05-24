@@ -124,9 +124,24 @@ export async function getSessionCookieById(
 ): Promise<SessionCookie> {
   const sessions = cookieSessions();
 
+<<<<<<< HEAD
   const found = sessions.find((session) => {
     if (session.id !== id) {
       return false;
+=======
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+
+    const found = sessions.find((s) =>
+      organization
+        ? s.organization === organization && s.id === id
+        : s.id === id,
+    );
+    if (found) {
+      return found;
+    } else {
+      return Promise.reject();
+>>>>>>> main
     }
 
     if (organization) {
@@ -149,9 +164,23 @@ export async function getSessionCookieByLoginName(
 ): Promise<SessionCookie> {
   const sessions = cookieSessions();
 
+<<<<<<< HEAD
   const found = sessions.find((session) => {
     if (session.loginName !== loginName) {
       return false;
+=======
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+    const found = sessions.find((s) =>
+      organization
+        ? s.organization === organization && s.loginName === loginName
+        : s.loginName === loginName,
+    );
+    if (found) {
+      return found;
+    } else {
+      return Promise.reject("no cookie found with loginName: " + loginName);
+>>>>>>> main
     }
 
     if (organization) {
@@ -205,13 +234,33 @@ export async function getAllSessionCookieIds(
  * @returns Session Cookies
  */
 export async function getAllSessions(
+<<<<<<< HEAD
   cleanup: boolean = true,
+=======
+  cleanup: boolean = false,
+>>>>>>> main
 ): Promise<SessionCookie[]> {
   const sessions = cookieSessions();
 
+<<<<<<< HEAD
   if (cleanup) {
     const now = new Date();
     return sessions.filter(isAfterExpirationDate(now));
+=======
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+
+    if (cleanup) {
+      const now = new Date();
+      return sessions.filter((session) =>
+        session.expirationDate ? new Date(session.expirationDate) > now : true,
+      );
+    } else {
+      return sessions;
+    }
+  } else {
+    return [];
+>>>>>>> main
   }
 
   return sessions;

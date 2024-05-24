@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { listUsers, userService } from "@/lib/zitadel";
+=======
+import { listAuthenticationMethodTypes, listUsers } from "@/lib/zitadel";
+>>>>>>> main
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
 import { NextRequest, NextResponse } from "next/server";
 

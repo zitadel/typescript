@@ -1,11 +1,20 @@
 import {
   getBrandingSettings,
+<<<<<<< HEAD
   sessionService,
   oidcService,
 } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
 import { getMostRecentCookieWithLoginName } from "@/utils/cookies";
+=======
+  getSession,
+  server,
+} from "@/lib/zitadel";
+import DynamicTheme from "@/ui/DynamicTheme";
+import UserAvatar from "@/ui/UserAvatar";
+import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+>>>>>>> main
 import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {
@@ -47,6 +56,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}
           displayName={sessionFactors?.factors?.user?.displayName}
           showDropdown
+          searchParams={searchParams}
         ></UserAvatar>
       </div>
     </DynamicTheme>

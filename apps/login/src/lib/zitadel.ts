@@ -5,9 +5,9 @@ import {
   createSettingsServiceClient,
   makeReqCtx,
 } from "@zitadel/client/v2beta";
-import { createManagementServiceClient } from "@zitadel/client/v1";
 
 import { PartialMessage } from "@zitadel/client";
+
 import { createServerTransport } from "@zitadel/node";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2beta/branding_settings_pb";
 import {
@@ -43,7 +43,6 @@ const transport = createServerTransport(
 );
 
 export const sessionService = createSessionServiceClient(transport);
-export const managementService = createManagementServiceClient(transport);
 export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);

@@ -1,5 +1,9 @@
 "use client";
 
+<<<<<<< HEAD
+=======
+import { BrandingSettings } from "@zitadel/server";
+>>>>>>> main
 import { setTheme } from "@/utils/colors";
 import { useEffect } from "react";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2beta/branding_settings_pb";

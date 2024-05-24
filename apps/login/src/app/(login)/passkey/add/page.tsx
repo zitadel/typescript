@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 import { getBrandingSettings, sessionService } from "@/lib/zitadel";
+=======
+import { getBrandingSettings, getSession, server } from "@/lib/zitadel";
+>>>>>>> main
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
 import UserAvatar from "@/ui/UserAvatar";
+<<<<<<< HEAD
 import { getMostRecentCookieWithLoginName } from "@/utils/cookies";
+=======
+import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+>>>>>>> main
 
 export default async function Page({
   searchParams,
@@ -45,6 +53,7 @@ export default async function Page({
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
+            searchParams={searchParams}
           ></UserAvatar>
         )}
         <p className="ztdl-p mb-6 block">{description}</p>

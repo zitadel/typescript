@@ -22,14 +22,8 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
-  "peerDependencies": {
-    "@zitadel/react": "workspace:*",
-    "@zitadel/node": "workspace:*",
-    "next": "^14.2.1",
-    "react": "^18.2.0"
-  },
   "dependencies": {
-    "next": "^14.2.1"
+    "next": "^14.2.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.77",
@@ -43,5 +37,11 @@
     "zitadel-tailwind-config": "workspace:*",
     "@zitadel/node": "workspace:*",
     "vitest": "^1.5.0"
+  },
+  "peerDependencies": {
+    "@zitadel/react": "workspace:*",
+    "@zitadel/node": "workspace:*",
+    "next": "^14.2.3",
+    "react": "18.2.0"
   }
 }

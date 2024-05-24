@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 import { sessionService, userService } from "@/lib/zitadel";
+=======
+import {
+  createPasskeyRegistrationLink,
+  getSession,
+  registerPasskey,
+  server,
+} from "@/lib/zitadel";
+>>>>>>> main
 import { getSessionCookieById } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,10 +18,18 @@ export async function POST(request: NextRequest) {
 
     const sessionCookie = await getSessionCookieById(sessionId);
 
+<<<<<<< HEAD
     const session = await sessionService.getSession({
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     });
+=======
+    const session = await getSession(
+      server,
+      sessionCookie.id,
+      sessionCookie.token,
+    );
+>>>>>>> main
 
     const domain: string = request.nextUrl.hostname;
 

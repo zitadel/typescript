@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { userService } from "@/lib/zitadel";
+=======
+import { server, verifyEmail } from "@/lib/zitadel";
+>>>>>>> main
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

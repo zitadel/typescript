@@ -2,6 +2,30 @@
   "name": "@zitadel/client",
   "version": "0.0.0",
   "license": "MIT",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "pnpm test:unit",
+    "test:watch": "pnpm test:unit:watch",
+    "test:unit": "vitest",
+    "test:unit:watch": "vitest --watch",
+    "dev": "tsup --watch",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf src/proto"
+  },
+  "dependencies": {
+    "@zitadel/proto": "workspace:*",
+    "@bufbuild/protobuf": "^1.8.0",
+    "@connectrpc/connect": "^1.4.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.14.0",
+    "@zitadel/tsconfig": "workspace:*",
+    "eslint-config-zitadel": "workspace:*",
+    "ts-proto": "^1.139.0"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -28,31 +52,5 @@
       "types": "./dist/v3alpha.d.ts"
     }
   },
-  "files": [
-    "dist/**"
-  ],
-  "sideEffects": false,
-  "scripts": {
-    "build": "tsup",
-    "test": "pnpm test:unit",
-    "test:watch": "pnpm test:unit:watch",
-    "test:unit": "vitest",
-    "test:unit:watch": "vitest --watch",
-    "dev": "tsup --watch",
-    "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
-  },
-  "dependencies": {
-    "@zitadel/proto": "workspace:*",
-    "@bufbuild/protobuf": "^1.8.0",
-    "@connectrpc/connect": "^1.4.0"
-  },
-  "devDependencies": {
-    "@zitadel/tsconfig": "workspace:*",
-    "eslint": "^8.57.0",
-    "eslint-config-zitadel": "workspace:*",
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5",
-    "vitest": "^1.5.0"
-  }
+  "sideEffects": false
 }

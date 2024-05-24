@@ -106,6 +106,7 @@ export default async function Page({
     return retrieveIDPIntent(id, token)
       .then((resp) => {
         const { idpInformation, userId } = resp;
+
         if (idpInformation) {
           // handle login
           if (userId) {
@@ -144,7 +145,7 @@ export default async function Page({
                       <div className="w-full">
                         {
                           <Alert type={AlertType.ALERT}>
-                            {JSON.stringify(error.message)}
+                            {JSON.stringify(error.details)}
                           </Alert>
                         }
                       </div>
@@ -175,10 +176,14 @@ export default async function Page({
       });
   } else {
     return (
-      <div className="flex flex-col items-center space-y-4">
-        <h1>Register</h1>
-        <p className="ztdl-p">No id and token received!</p>
-      </div>
+      <DynamicTheme branding={branding}>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-col items-center space-y-4">
+            <h1>Register</h1>
+            <p className="ztdl-p">No id and token received!</p>
+          </div>
+        </div>
+      </DynamicTheme>
     );
   }
 }

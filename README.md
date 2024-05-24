@@ -51,11 +51,16 @@ This list should show the current implementation state, and also what is missing
 You can already use the current state, and extend it with your needs.
 
 - [x] Local User Registration (with Password)
+<<<<<<< HEAD
 - [ ] User Registration and Login with external Provider
   - [ ] Google
+=======
+- [x] User Registration and Login with external Provider 
+  - [x] Google
+>>>>>>> main
   - [ ] GitHub
   - [ ] GitHub Enterprise
-  - [ ] GitLab
+  - [x] GitLab
   - [ ] GitLab Enterprise
   - [ ] Azure
   - [ ] Apple
@@ -66,13 +71,14 @@ You can already use the current state, and extend it with your needs.
   - [ ] SAML SP
 - Multifactor Registration an Login
   - [x] Passkeys
-  - [ ] TOTP
-  - [ ] OTP: Email Code
-  - [ ] OTP: SMS Code
+  - [x] TOTP
+  - [x] OTP: Email Code
+  - [x] OTP: SMS Code
 - [ ] Password Change/Reset
 - [ ] Domain Discovery
-- [ ] Branding
+- [x] Branding
 - OIDC Standard
+<<<<<<< HEAD
   - [ ] Authorization Code Flow with PKCE
   - [ ] AuthRequest `hintUserId`
   - [ ] AuthRequest `loginHint`
@@ -88,6 +94,24 @@ You can already use the current state, and extend it with your needs.
     - [ ] `urn:zitadel:iam:org:project:id:zitadel:aud`
     - [ ] `urn:zitadel:iam:org:id:{orgid}`
   - [ ] AuthRequest UI locales
+=======
+   - [x] Authorization Code Flow with PKCE
+   - [x] AuthRequest `hintUserId`
+   - [x] AuthRequest `loginHint`
+   - [x] AuthRequest `prompt`
+     - [x] Login
+     - [x] Select Account
+     - [ ] Consent
+     - [x] Create
+   - Scopes
+     - [x] `openid email profile address``
+     - [x] `offline access`
+     - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+     - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
+     - [x] `urn:zitadel:iam:org:id:{orgid}`
+     - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
+   - [ ] AuthRequest UI locales
+>>>>>>> main
 
 ## Tooling
 

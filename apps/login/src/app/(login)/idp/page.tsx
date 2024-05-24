@@ -1,6 +1,7 @@
 import {
   getBrandingSettings,
   getLegalAndSupportSettings,
+<<<<<<< HEAD
   settingsService,
 } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
@@ -10,10 +11,32 @@ import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2beta/login_s
 import { GetActiveIdentityProvidersResponse } from "@zitadel/proto/zitadel/settings/v2beta/settings_service_pb";
 
 function getIdentityProviders(
+=======
+  server,
+} from "@/lib/zitadel";
+import DynamicTheme from "@/ui/DynamicTheme";
+import { SignInWithIDP } from "@/ui/SignInWithIDP";
+import {
+  GetActiveIdentityProvidersResponse,
+  IdentityProvider,
+  ZitadelServer,
+  settings,
+} from "@zitadel/server";
+
+function getIdentityProviders(
+  server: ZitadelServer,
+>>>>>>> main
   orgId?: string,
 ): Promise<IdentityProvider[] | undefined> {
   return settingsService
+<<<<<<< HEAD
     .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) })
+=======
+    .getActiveIdentityProviders(
+      orgId ? { ctx: { orgId } } : { ctx: { instance: true } },
+      {},
+    )
+>>>>>>> main
     .then((resp: GetActiveIdentityProvidersResponse) => {
       return resp.identityProviders;
     });

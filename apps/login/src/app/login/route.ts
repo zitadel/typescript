@@ -1,5 +1,17 @@
+<<<<<<< HEAD
 import { sessionService, managementService, oidcService } from "@/lib/zitadel";
 import { SessionCookie, getAllSessions } from "@/utils/cookies";
+=======
+import {
+  createCallback,
+  getAuthRequest,
+  getOrgByDomain,
+  listSessions,
+  server,
+} from "@/lib/zitadel";
+import { SessionCookie, getAllSessions } from "@/utils/cookies";
+import { Session, AuthRequest, Prompt } from "@zitadel/server";
+>>>>>>> main
 import { NextRequest, NextResponse } from "next/server";
 import {
   AuthRequest,
@@ -8,6 +20,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
+<<<<<<< HEAD
   const response = await sessionService.listSessions({
     queries: [
       {
@@ -18,6 +31,12 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
       },
     ],
   });
+=======
+  const response = await listSessions(
+    server,
+    ids.filter((id: string | undefined) => !!id),
+  );
+>>>>>>> main
 
   return response.sessions;
 }
@@ -57,6 +76,13 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions(ids);
   }
 
+  /**
+   * TODO: before automatically redirecting to the callbackUrl, check if the session is still valid
+   * possible scenaio:
+   * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
+   * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
+   **/
+
   if (authRequestId && sessionId) {
     console.log(
       `Login with session: ${sessionId} and authRequest: ${authRequestId}`,
@@ -90,8 +116,14 @@ export async function GET(request: NextRequest) {
 
   if (authRequestId) {
     console.log(`Login with authRequest: ${authRequestId}`);
+<<<<<<< HEAD
     const { authRequest } = await oidcService.getAuthRequest({ authRequestId });
     let organization;
+=======
+    const { authRequest } = await getAuthRequest(server, { authRequestId });
+
+    let organization = "";
+>>>>>>> main
 
     if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
@@ -119,7 +151,23 @@ export async function GET(request: NextRequest) {
       }
     }
 
+<<<<<<< HEAD
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
+=======
+    const gotoAccounts = (): NextResponse<unknown> => {
+      const accountsUrl = new URL("/accounts", request.url);
+      if (authRequest?.id) {
+        accountsUrl.searchParams.set("authRequestId", authRequest?.id);
+      }
+      if (organization) {
+        accountsUrl.searchParams.set("organization", organization);
+      }
+
+      return NextResponse.redirect(accountsUrl);
+    };
+
+    if (authRequest && authRequest.prompt.includes(Prompt.PROMPT_CREATE)) {
+>>>>>>> main
       const registerUrl = new URL("/register", request.url);
       if (authRequest?.id) {
         registerUrl.searchParams.set("authRequestId", authRequest?.id);
@@ -134,6 +182,7 @@ export async function GET(request: NextRequest) {
     // use existing session and hydrate it for oidc
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
+<<<<<<< HEAD
       if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
         const accountsUrl = new URL("/accounts", request.url);
         if (authRequest?.id) {
@@ -145,6 +194,11 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.redirect(accountsUrl);
       } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
+=======
+      if (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)) {
+        return gotoAccounts();
+      } else if (authRequest.prompt.includes(Prompt.PROMPT_LOGIN)) {
+>>>>>>> main
         // if prompt is login
         const loginNameUrl = new URL("/loginname", request.url);
         if (authRequest?.id) {
@@ -201,6 +255,7 @@ export async function GET(request: NextRequest) {
           );
 
           if (cookie && cookie.id && cookie.token) {
+<<<<<<< HEAD
             const { callbackUrl } = await oidcService.createCallback({
               authRequestId,
               callbackKind: {
@@ -217,16 +272,31 @@ export async function GET(request: NextRequest) {
             accountsUrl.searchParams.set("authRequestId", authRequestId);
             if (organization) {
               accountsUrl.searchParams.set("organization", organization);
+=======
+            const session = {
+              sessionId: cookie?.id,
+              sessionToken: cookie?.token,
+            };
+            try {
+              const { callbackUrl } = await createCallback(server, {
+                authRequestId,
+                session,
+              });
+              if (callbackUrl) {
+                return NextResponse.redirect(callbackUrl);
+              } else {
+                return gotoAccounts();
+              }
+            } catch (error) {
+              console.error(error);
+              return gotoAccounts();
+>>>>>>> main
             }
-            return NextResponse.redirect(accountsUrl);
+          } else {
+            return gotoAccounts();
           }
         } else {
-          const accountsUrl = new URL("/accounts", request.url);
-          accountsUrl.searchParams.set("authRequestId", authRequestId);
-          if (organization) {
-            accountsUrl.searchParams.set("organization", organization);
-          }
-          return NextResponse.redirect(accountsUrl);
+          return gotoAccounts();
         }
       }
     } else {

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { getBrandingSettings, sessionService } from "@/lib/zitadel";
+=======
+import { getBrandingSettings, getSession, server } from "@/lib/zitadel";
+>>>>>>> main
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
@@ -60,11 +64,10 @@ export default async function Page({
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
             displayName={sessionFactors.factors?.user?.displayName}
             showDropdown
+            searchParams={searchParams}
           ></UserAvatar>
         )}
         <p className="ztdl-p mb-6 block">{description}</p>
-
-        {!sessionFactors && <div className="py-4"></div>}
 
         {!(loginName || sessionId) && (
           <Alert>Provide your active session as loginName param</Alert>
