@@ -140,7 +140,9 @@ export async function registerTOTP(userId: string) {
   return userService.registerTOTP({ userId }, {});
 }
 
-export async function createCallback(req: CreateCallbackRequest) {
+export async function createCallback(
+  req: PartialMessage<CreateCallbackRequest>,
+) {
   return oidcService.createCallback(req);
 }
 

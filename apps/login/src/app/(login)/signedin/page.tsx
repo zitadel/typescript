@@ -7,21 +7,22 @@ import { redirect } from "next/navigation";
 async function loadSession(loginName: string, authRequestId?: string) {
   const recent = await getMostRecentCookieWithLoginName(`${loginName}`);
 
-  if (authRequestId) {
+  if (recent && recent.id && recent.token && authRequestId) {
+    const session = {
+      sessionId: recent.id as string,
+      sessionToken: recent.token as string,
+    };
     return createCallback({
       authRequestId,
       callbackKind: {
+        value: session,
         case: "session",
-        value: { sessionId: recent.id, sessionToken: recent.token },
       },
     }).then(({ callbackUrl }) => {
       return redirect(callbackUrl);
     });
   }
-  const response = await getSession(
-    sessionId: recent.id,
-    sessionToken: recent.token,
-  );
+  const response = await getSession(recent.id, recent.token);
   return response?.session;
 }
 

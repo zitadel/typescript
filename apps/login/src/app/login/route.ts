@@ -1,4 +1,4 @@
-import { sessionService, oidcService } from "@/lib/zitadel";
+import { createCallback, oidcService, sessionService } from "@/lib/zitadel";
 import { SessionCookie, getAllSessions } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       if (cookie && cookie.id && cookie.token) {
         console.log(`Found sessioncookie ${cookie.id}`);
 
-        const { callbackUrl } = await oidcService.createCallback({
+        const { callbackUrl } = await createCallback({
           authRequestId,
           callbackKind: {
             case: "session",
@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
           );
 
           if (cookie && cookie.id && cookie.token) {
-            const { callbackUrl } = await oidcService.createCallback({
+            const { callbackUrl } = await createCallback({
               authRequestId,
               callbackKind: {
                 case: "session",
@@ -218,14 +218,11 @@ export async function GET(request: NextRequest) {
               sessionToken: cookie?.token,
             };
             try {
-              const { callbackUrl } = await oidcService.createCallback({
+              const { callbackUrl } = await createCallback({
                 authRequestId,
                 callbackKind: {
                   case: "session",
-                  value: {
-                    sessionId: cookie?.id,
-                    sessionToken: cookie?.token,
-                  },
+                  value: session,
                 },
               });
               if (callbackUrl) {

@@ -88,24 +88,27 @@ export default function RegisterU2F({
     return submitRegister().then((resp: RegisterU2FResponse) => {
       const u2fId = resp.u2fId;
 
+      const publicKeyCredentialCreationOptions =
+        resp.publicKeyCredentialCreationOptions?.toJson() as {
+          publicKey?: PublicKeyCredentialCreationOptions;
+        };
+
       if (
-        resp.publicKeyCredentialCreationOptions &&
-        resp.publicKeyCredentialCreationOptions.
+        publicKeyCredentialCreationOptions &&
+        publicKeyCredentialCreationOptions.publicKey
       ) {
-        resp.publicKeyCredentialCreationOptions.publicKey.challenge =
+        publicKeyCredentialCreationOptions.publicKey.challenge =
           coerceToArrayBuffer(
-            resp.publicKeyCredentialCreationOptions.publicKey.challenge,
+            publicKeyCredentialCreationOptions.publicKey.challenge,
             "challenge",
           );
-        resp.publicKeyCredentialCreationOptions.publicKey.user.id =
+        publicKeyCredentialCreationOptions.publicKey.user.id =
           coerceToArrayBuffer(
-            resp.publicKeyCredentialCreationOptions.publicKey.user.id,
+            publicKeyCredentialCreationOptions.publicKey.user.id,
             "userid",
           );
-        if (
-          resp.publicKeyCredentialCreationOptions.publicKey.excludeCredentials
-        ) {
-          resp.publicKeyCredentialCreationOptions.publicKey.excludeCredentials.map(
+        if (publicKeyCredentialCreationOptions.publicKey.excludeCredentials) {
+          publicKeyCredentialCreationOptions.publicKey.excludeCredentials.map(
             (cred: any) => {
               cred.id = coerceToArrayBuffer(
                 cred.id as string,
@@ -117,7 +120,7 @@ export default function RegisterU2F({
         }
 
         navigator.credentials
-          .create(resp.publicKeyCredentialCreationOptions)
+          .create(publicKeyCredentialCreationOptions)
           .then((resp) => {
             if (
               resp &&
