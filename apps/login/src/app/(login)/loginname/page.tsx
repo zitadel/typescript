@@ -1,54 +1,45 @@
-import {
-  getBrandingSettings,
-  getLegalAndSupportSettings,
-  getLoginSettings,
-  server,
-} from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import UsernameForm from "@/ui/UsernameForm";
-import {
-  GetActiveIdentityProvidersResponse,
-  IdentityProvider,
-  ZitadelServer,
-  settings,
-} from "@zitadel/server";
+import { settingsService } from "@/lib/zitadel2";
+import { makeReqCtx } from "@zitadel/client2/v2beta";
+import { toPlainMessage } from "@zitadel/client2";
+import { BrandingSettings } from "@zitadel/server";
 
-function getIdentityProviders(
-  server: ZitadelServer,
-  orgId?: string,
-): Promise<IdentityProvider[] | undefined> {
-  const settingsService = settings.getSettings(server);
-  return settingsService
-    .getActiveIdentityProviders(
-      orgId ? { ctx: { orgId } } : { ctx: { instance: true } },
-      {},
-    )
-    .then((resp: GetActiveIdentityProvidersResponse) => {
-      return resp.identityProviders;
-    });
-}
-
-export default async function Page({
-  searchParams,
-}: {
+export default async function Page(props: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const loginName = searchParams?.loginName;
-  const authRequestId = searchParams?.authRequestId;
-  const organization = searchParams?.organization;
-  const submit: boolean = searchParams?.submit === "true";
+  const loginName = props.searchParams?.loginName;
+  const authRequestId = props.searchParams?.authRequestId;
+  const organization = props.searchParams?.organization;
+  const submit: boolean = props.searchParams?.submit === "true";
 
-  const loginSettings = await getLoginSettings(server, organization);
-  const legal = await getLegalAndSupportSettings(server);
-
-  const identityProviders = await getIdentityProviders(server, organization);
+  const loginSettings = toPlainMessage(
+    await settingsService.getLoginSettings({ ctx: makeReqCtx(organization) }),
+  );
+  const legalAndSupportSettings =
+    await settingsService.getLegalAndSupportSettings({
+      ctx: makeReqCtx(organization),
+    });
+  const activeIdentityProviders =
+    await settingsService.getActiveIdentityProviders({
+      ctx: makeReqCtx(organization),
+    });
 
   const host = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
 
-  const branding = await getBrandingSettings(server, organization);
+  const brandingSettings = toPlainMessage(
+    await settingsService.getBrandingSettings({
+      ctx: makeReqCtx(organization),
+    }),
+  );
+
+  // TODO: Remove type casting
+  // - Why is this cast necessary?
+  // It will require to fix everywhere we use `DynamicTheme` component, incremental update
+  const branding = brandingSettings.settings as BrandingSettings | undefined;
 
   return (
     <DynamicTheme branding={branding}>
@@ -57,21 +48,23 @@ export default async function Page({
         <p className="ztdl-p">Enter your login data.</p>
 
         <UsernameForm
-          loginSettings={loginSettings}
+          loginSettings={loginSettings.settings}
           loginName={loginName}
           authRequestId={authRequestId}
           organization={organization}
           submit={submit}
         />
 
-        {legal && identityProviders && process.env.ZITADEL_API_URL && (
-          <SignInWithIDP
-            host={host}
-            identityProviders={identityProviders}
-            authRequestId={authRequestId}
-            organization={organization}
-          ></SignInWithIDP>
-        )}
+        {legalAndSupportSettings.settings &&
+          activeIdentityProviders.identityProviders &&
+          process.env.ZITADEL_API_URL && (
+            <SignInWithIDP
+              host={host}
+              identityProviders={activeIdentityProviders.identityProviders}
+              authRequestId={authRequestId}
+              organization={organization}
+            ></SignInWithIDP>
+          )}
       </div>
     </DynamicTheme>
   );

@@ -6,16 +6,16 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": ["@zitadel/server#build", "@zitadel/react#build"]
+      "dependsOn": ["@zitadel/client2#build", "@zitadel/node#build", "@zitadel/server#build", "@zitadel/react#build"]
     },
     "test:integration": {
-      "dependsOn": ["@zitadel/server#build", "@zitadel/react#build"]
+      "dependsOn": ["@zitadel/client2#build", "@zitadel/node#build", "@zitadel/server#build", "@zitadel/react#build"]
     },
     "test:unit": {
-      "dependsOn": ["@zitadel/server#build"]
+      "dependsOn": ["@zitadel/client2#build", "@zitadel/node#build", "@zitadel/server#build"]
     },
     "test:watch": {
-      "dependsOn": ["@zitadel/server#build", "@zitadel/react#build"]
+      "dependsOn": ["@zitadel/client2#build", "@zitadel/node#build", "@zitadel/server#build", "@zitadel/react#build"]
     }
   }
 }
