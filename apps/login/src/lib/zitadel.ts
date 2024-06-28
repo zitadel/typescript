@@ -6,7 +6,7 @@ import {
   makeReqCtx,
 } from "@zitadel/client2/v2beta";
 import { createManagementServiceClient } from "@zitadel/client2/v1";
-import { createServerTransport } from "@zitadel/node";
+import { createTransport } from "@zitadel/node";
 import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
 import {
@@ -20,13 +20,10 @@ import { PlainMessage } from "@zitadel/client2";
 
 const SESSION_LIFETIME_S = 3000;
 
-const transport = createServerTransport(
-  process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  {
-    baseUrl: process.env.ZITADEL_API_URL!,
-    httpVersion: "2",
-  },
-);
+const transport = createTransport(process.env.ZITADEL_SERVICE_USER_TOKEN!, {
+  baseUrl: process.env.ZITADEL_API_URL!,
+  httpVersion: "2",
+});
 
 export const sessionService = createSessionServiceClient(transport);
 export const managementService = createManagementServiceClient(transport);
