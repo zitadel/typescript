@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export const config = {
-  matcher: ["/.well-known/:path*", "/oauth/:path*", "/oidc/:path*"],
+  matcher: [
+    "/.well-known/openid-configuration",
+    "/oauth/:path*",
+    "/oidc/:path*",
+  ],
 };
 
 const INSTANCE = process.env.ZITADEL_API_URL;
