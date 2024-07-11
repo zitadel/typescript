@@ -1,8 +1,8 @@
-import { createPromiseClient, Transport } from "@connectrpc/connect";
 import type { ServiceType } from "@bufbuild/protobuf";
+import { Transport, createPromiseClient } from "@connectrpc/connect";
 
 export function createClientFor<TService extends ServiceType>(
-  service: TService,
+  service: TService
 ) {
   return (transport: Transport) => createPromiseClient(service, transport);
 }

@@ -42,8 +42,9 @@ export async function getBrandingSettings(organization?: string) {
 
 export async function getLoginSettings(orgId?: string) {
   return settingsService
-    .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => resp.settings);
+    .getLoginSettings({ ctx: makeReqCtx(orgId) })
+    .then((resp) => resp.settings)
+    .catch(console.log);
 }
 
 export async function addOTPEmail(userId: string) {
