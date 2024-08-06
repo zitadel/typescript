@@ -32,11 +32,11 @@
     "next": "^14.2.3"
   },
   "devDependencies": {
-    "@types/react": "^17.0.13",
+    "@types/react": "^18.3.3",
     "@zitadel/tsconfig": "workspace:*",
     "eslint-config-zitadel": "workspace:*",
-    "tailwindcss": "3.2.4",
-    "postcss": "8.4.21",
+    "tailwindcss": "3.4.7",
+    "postcss": "8.4.41",
     "zitadel-tailwind-config": "workspace:*"
   }
 }
