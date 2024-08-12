@@ -318,6 +318,9 @@ importers:
 
   packages/zitadel-react:
     dependencies:
+      '@material/material-color-utilities':
+        specifier: ^0.3.0
+        version: 0.3.0
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -334,6 +337,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.0
+      '@zitadel/proto':
+        specifier: workspace:*
+        version: link:../zitadel-proto
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../zitadel-tsconfig
@@ -1510,6 +1516,10 @@ packages:
       - encoding
       - supports-color
     dev: true
+
+  /@material/material-color-utilities@0.3.0:
+    resolution: {integrity: sha512-ztmtTd6xwnuh2/xu+Vb01btgV8SQWYCaK56CkRK8gEkWe5TuDyBcYJ0wgkMRn+2VcE9KUmhvkz+N9GHrqw/C0g==}
+    dev: false
 
   /@next/env@14.2.3:
     resolution: {integrity: sha512-W7fd7IbkfmeeY2gXrzJYDx8D2lWKbVoTIj1o1ScPHNzvp30s1AuoEFSdr39bC5sjxJaxTtq3OTCZboNp0lNWHA==}

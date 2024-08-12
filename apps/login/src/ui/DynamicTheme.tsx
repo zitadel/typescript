@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Logo } from "@/ui/Logo";
-import ThemeWrapper from "./ThemeWrapper";
 import { LayoutProviders } from "./LayoutProviders";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 
@@ -21,9 +20,8 @@ export default function DynamicTheme({
     };
   }
   return (
-    <ThemeWrapper branding={partial}>
-      {/* <ThemeProvider> */}
-      <LayoutProviders>
+    <div className="bg-background-light-600 dark:bg-background-dark-600">
+      <LayoutProviders branding={partial}>
         <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20 mb-10">
           <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500 px-8 py-12">
             <div className="mx-auto flex flex-col items-center space-y-4">
@@ -44,7 +42,6 @@ export default function DynamicTheme({
           </div>
         </div>
       </LayoutProviders>
-      {/* </ThemeProvider> */}
-    </ThemeWrapper>
+    </div>
   );
 }
