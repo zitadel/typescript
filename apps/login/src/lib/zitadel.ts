@@ -36,7 +36,7 @@ const SESSION_LIFETIME_S = 3000;
 function createServiceForHost(host: string, mapper: (transport: any) => any) {
   const targetApi = getApiConfiguration(host);
 
-  console.log("targetApi", targetApi);
+  console.log("targetApi", host, targetApi);
   const transport = createServerTransport(targetApi.token, {
     baseUrl: targetApi.url,
     httpVersion: "2",
