@@ -45,7 +45,7 @@ export default async function Page({
           Select one of the following providers to register
         </p>
 
-        {legal && identityProviders && (
+        {legal && identityProviders && host && (
           <SignInWithIDP
             host={host}
             identityProviders={identityProviders}
