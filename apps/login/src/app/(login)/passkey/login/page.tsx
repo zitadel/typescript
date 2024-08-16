@@ -4,6 +4,7 @@ import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
 import UserAvatar from "@/ui/UserAvatar";
 import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
+import { headers } from "next/headers";
 
 const title = "Authenticate with a passkey";
 const description =
@@ -14,23 +15,35 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { loginName, altPassword, authRequestId, organization, sessionId } =
     searchParams;
 
   const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession(sessionService, { loginName, organization });
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadMostRecentSession(sessionService(host), {
+        loginName,
+        organization,
+      });
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession(recent.id, recent.token).then((response) => {
+    return getSession(host, recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
     });
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>
