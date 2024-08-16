@@ -31,7 +31,7 @@ async function loadSession(
 }
 
 export default async function Page({ searchParams }: { searchParams: any }) {
-  const host = headers().get("host");
+  const host = headers().get("X-Forwarded-Host");
   if (!host) {
     throw new Error("No host header found!");
   }
