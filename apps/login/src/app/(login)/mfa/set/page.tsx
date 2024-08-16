@@ -12,20 +12,27 @@ import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
 import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { loginName, checkAfter, authRequestId, organization, sessionId } =
     searchParams;
 
   const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadSessionByLoginname(host, loginName, organization);
 
   async function loadSessionByLoginname(
+    host: string,
     loginName?: string,
     organization?: string,
   ) {
@@ -35,8 +42,8 @@ export default async function Page({
     }).then((session) => {
       if (session && session.factors?.user?.id) {
         const userId = session.factors.user.id;
-        return listAuthenticationMethodTypes(userId).then((methods) => {
-          return getUserByID(userId).then((user) => {
+        return listAuthenticationMethodTypes(host, userId).then((methods) => {
+          return getUserByID(host, userId).then((user) => {
             const humanUser =
               user.user?.type.case === "human"
                 ? user.user?.type.value
@@ -54,13 +61,17 @@ export default async function Page({
     });
   }
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession(recent.id, recent.token).then((response) => {
+    return getSession(host, recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         const userId = response.session.factors.user.id;
-        return listAuthenticationMethodTypes(userId).then((methods) => {
-          return getUserByID(userId).then((user) => {
+        return listAuthenticationMethodTypes(host, userId).then((methods) => {
+          return getUserByID(host, userId).then((user) => {
             const humanUser =
               user.user?.type.case === "human"
                 ? user.user?.type.value
@@ -77,8 +88,8 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
+  const loginSettings = await getLoginSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>

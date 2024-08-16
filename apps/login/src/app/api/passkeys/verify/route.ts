@@ -15,7 +15,11 @@ export async function POST(request: NextRequest) {
     }
     const sessionCookie = await getSessionCookieById({ sessionId });
 
-    const session = await getSession(sessionCookie.id, sessionCookie.token);
+    const session = await getSession(
+      request.nextUrl.host,
+      sessionCookie.id,
+      sessionCookie.token,
+    );
 
     const userId = session?.session?.factors?.user?.id;
     console.log("payload", {
@@ -25,7 +29,7 @@ export async function POST(request: NextRequest) {
       userId,
     });
     if (userId) {
-      return verifyPasskeyRegistration({
+      return verifyPasskeyRegistration(request.nextUrl.host, {
         passkeyId,
         passkeyName,
         publicKeyCredential,

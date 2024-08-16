@@ -17,7 +17,11 @@ export async function POST(request: NextRequest) {
     }
     const sessionCookie = await getSessionCookieById({ sessionId });
 
-    const session = await getSession(sessionCookie.id, sessionCookie.token);
+    const session = await getSession(
+      request.nextUrl.host,
+      sessionCookie.id,
+      sessionCookie.token,
+    );
 
     const userId = session?.session?.factors?.user?.id;
 
@@ -31,7 +35,7 @@ export async function POST(request: NextRequest) {
 
       req = VerifyU2FRegistrationRequest.fromJson(request as any);
 
-      return verifyU2FRegistration(req)
+      return verifyU2FRegistration(request.nextUrl.host, req)
         .then((resp) => {
           return NextResponse.json(resp);
         })

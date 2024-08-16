@@ -1,13 +1,19 @@
 import { ProviderSlug } from "@/lib/demos";
-import { getBrandingSettings, userService } from "@/lib/zitadel";
+import {
+  createUser,
+  getBrandingSettings,
+  retrieveIDPIntent,
+  userService,
+} from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import IdpSignin from "@/ui/IdpSignin";
 import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { PartialMessage } from "@zitadel/client";
+import { headers } from "next/headers";
 
-const PROVIDER_MAPPING: {
+export const PROVIDER_MAPPING: {
   [provider: string]: (
     rI: IDPInformation,
   ) => PartialMessage<AddHumanUserRequest>;
@@ -102,21 +108,6 @@ const PROVIDER_MAPPING: {
   },
 };
 
-function retrieveIDPIntent(id: string, token: string) {
-  return userService.retrieveIdentityProviderIntent(
-    { idpIntentId: id, idpIntentToken: token },
-    {},
-  );
-}
-
-function createUser(
-  provider: ProviderSlug,
-  info: IDPInformation,
-): Promise<string> {
-  const userData = PROVIDER_MAPPING[provider](info);
-  return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
-}
-
 export default async function Page({
   searchParams,
   params,
@@ -124,14 +115,19 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: { provider: ProviderSlug };
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { id, token, authRequestId, organization } = searchParams;
   const { provider } = params;
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   if (provider && id && token) {
-    return retrieveIDPIntent(id, token)
-      .then((resp) => {
+    return retrieveIDPIntent(host, id, token)
+      .then((resp: any) => {
         const { idpInformation, userId } = resp;
 
         if (idpInformation) {
@@ -153,8 +149,8 @@ export default async function Page({
             );
           } else {
             // handle register
-            return createUser(provider, idpInformation)
-              .then((userId) => {
+            return createUser(host, provider, idpInformation)
+              .then((userId: string) => {
                 return (
                   <DynamicTheme branding={branding}>
                     <div className="flex flex-col items-center space-y-4">
@@ -185,7 +181,7 @@ export default async function Page({
           throw new Error("Could not get user information.");
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         return (
           <DynamicTheme branding={branding}>
             <div className="flex flex-col items-center space-y-4">

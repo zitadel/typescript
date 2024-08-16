@@ -1,41 +1,36 @@
 import {
   getBrandingSettings,
+  getIdentityProviders,
   getLegalAndSupportSettings,
-  settingsService,
 } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { headers } from "next/headers";
 
-function getIdentityProviders(orgId?: string) {
-  return settingsService
-    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => {
-      return resp.identityProviders;
-    });
-}
-
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
-  const legal = await getLegalAndSupportSettings(organization);
+  const legal = await getLegalAndSupportSettings(host, organization);
 
-  const identityProviders = await getIdentityProviders(organization);
-
-  const host = headers().get("host");
+  const identityProviders = await getIdentityProviders(host, organization);
 
   console.log("host", host);
   // const host = process.env.VERCEL_URL
   //   ? `https://${process.env.VERCEL_URL}`
   //   : "http://localhost:3000";
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>

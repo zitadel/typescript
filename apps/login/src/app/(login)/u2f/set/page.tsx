@@ -4,12 +4,18 @@ import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterU2F from "@/ui/RegisterU2F";
 import UserAvatar from "@/ui/UserAvatar";
 import { loadMostRecentSession } from "@zitadel/next";
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { loginName, organization, authRequestId } = searchParams;
 
   const sessionFactors = await loadMostRecentSession(sessionService, {
@@ -21,7 +27,7 @@ export default async function Page({
   const description =
     "Your device will ask for your fingerprint, face, or screen lock";
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>

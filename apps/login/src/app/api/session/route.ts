@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
 
     if (userId && idpIntent) {
       return createSessionForIdpAndUpdateCookie(
+        request.nextUrl.host,
         userId,
         idpIntent,
         organization,
@@ -101,10 +102,15 @@ export async function PUT(request: NextRequest) {
           challenges &&
           (challenges.otpEmail === "" || challenges.otpSms === "")
         ) {
-          const sessionResponse = await getSession(recent.id, recent.token);
+          const sessionResponse = await getSession(
+            request.nextUrl.host,
+            recent.id,
+            recent.token,
+          );
 
           if (sessionResponse && sessionResponse.session?.factors?.user?.id) {
             const userResponse = await getUserByID(
+              request.nextUrl.host,
               sessionResponse.session.factors.user.id,
             );
             const humanUser =
@@ -123,6 +129,7 @@ export async function PUT(request: NextRequest) {
         }
 
         return setSessionAndUpdateCookie(
+          request.nextUrl.host,
           recent,
           checks,
           challenges,
@@ -132,6 +139,7 @@ export async function PUT(request: NextRequest) {
           let authMethods;
           if (checks && checks.password && session.factors?.user?.id) {
             const response = await listAuthenticationMethodTypes(
+              request.nextUrl.host,
               session.factors?.user?.id,
             );
             if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -169,7 +177,7 @@ export async function DELETE(request: NextRequest) {
   if (sessionId) {
     const session = await getSessionCookieById({ sessionId });
 
-    return deleteSession(session.id, session.token)
+    return deleteSession(request.nextUrl.host, session.id, session.token)
       .then(() => {
         return removeSessionFromCookie(session)
           .then(() => {

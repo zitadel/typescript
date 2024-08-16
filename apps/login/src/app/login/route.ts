@@ -19,8 +19,9 @@ import {
 } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
-async function loadSessions(ids: string[]): Promise<Session[]> {
+async function loadSessions(host: string, ids: string[]): Promise<Session[]> {
   const response = await listSessions(
+    host,
     ids.filter((id: string | undefined) => !!id),
   );
 
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions(ids);
+    sessions = await loadSessions(request.nextUrl.host, ids);
   }
 
   /**
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
 
         // works not with _rsc request
         try {
-          const { callbackUrl } = await createCallback({
+          const { callbackUrl } = await createCallback(request.nextUrl.host, {
             authRequestId,
             callbackKind: {
               case: "session",
@@ -120,7 +121,9 @@ export async function GET(request: NextRequest) {
   }
 
   if (authRequestId) {
-    const { authRequest } = await getAuthRequest({ authRequestId });
+    const { authRequest } = await getAuthRequest(request.nextUrl.host, {
+      authRequestId,
+    });
 
     let organization = "";
     let idpId = "";
@@ -146,7 +149,7 @@ export async function GET(request: NextRequest) {
           const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
           const orgDomain = matched?.[1] ?? "";
           if (orgDomain) {
-            const org = await getOrgByDomain(orgDomain);
+            const org = await getOrgByDomain(request.nextUrl.host, orgDomain);
             organization = org?.org?.id ?? "";
           }
         }
@@ -157,12 +160,13 @@ export async function GET(request: NextRequest) {
         idpId = matched?.[1] ?? "";
 
         const identityProviders = await getActiveIdentityProviders(
+          request.nextUrl.host,
           organization ? organization : undefined,
         ).then((resp) => {
           return resp.identityProviders;
         });
 
-        const idp = identityProviders.find((idp) => idp.id === idpId);
+        const idp = identityProviders.find((idp: any) => idp.id === idpId);
 
         if (idp) {
           const host = request.nextUrl.origin;
@@ -201,7 +205,7 @@ export async function GET(request: NextRequest) {
             params.set("organization", organization);
           }
 
-          return startIdentityProviderFlow({
+          return startIdentityProviderFlow(request.nextUrl.host, {
             idpId,
             urls: {
               successUrl:
@@ -280,7 +284,7 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            const { callbackUrl } = await createCallback({
+            const { callbackUrl } = await createCallback(request.nextUrl.host, {
               authRequestId,
               callbackKind: {
                 case: "session",
@@ -315,13 +319,16 @@ export async function GET(request: NextRequest) {
               sessionToken: cookie?.token,
             };
             try {
-              const { callbackUrl } = await createCallback({
-                authRequestId,
-                callbackKind: {
-                  case: "session",
-                  value: session,
+              const { callbackUrl } = await createCallback(
+                request.nextUrl.host,
+                {
+                  authRequestId,
+                  callbackKind: {
+                    case: "session",
+                    value: session,
+                  },
                 },
-              });
+              );
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);
               } else {

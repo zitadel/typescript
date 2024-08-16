@@ -2,12 +2,18 @@ import { getBrandingSettings } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import VerifyEmailForm from "@/ui/VerifyEmailForm";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { headers } from "next/headers";
 
 export default async function Page({ searchParams }: { searchParams: any }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { userId, sessionId, code, submit, organization, authRequestId } =
     searchParams;
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>

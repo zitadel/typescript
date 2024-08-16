@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {
   createOIDCServiceClient,
   createSessionServiceClient,
@@ -22,42 +24,52 @@ import { ProviderSlug } from "./demos";
 import { PartialMessage, PlainMessage } from "@zitadel/client";
 import { headers } from "next/headers";
 import { getApiConfiguration } from "./api";
+import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+
+import { AnyKindOfDictionary } from "node_modules/cypress/types/lodash";
+import { PROVIDER_MAPPING } from "@/app/(login)/idp/[provider]/success/page";
+
+/* eslint no-use-before-define: 0 */ // --> OFF
 
 const SESSION_LIFETIME_S = 3000;
 
-// TODO: wildcard find out the target api url from the host of the request
-const host = headers().get("host");
-if (!host) {
-  throw new Error("No host header found!");
+function createServiceForHost(host: string, mapper: (transport: any) => any) {
+  const targetApi = getApiConfiguration(host);
+
+  console.log("targetApi", targetApi);
+  const transport = createServerTransport(targetApi.token, {
+    baseUrl: targetApi.url,
+    httpVersion: "2",
+  });
+
+  return mapper(transport);
 }
-const targetApi = getApiConfiguration(host);
 
-console.log("targetApi", targetApi);
-const transport = createServerTransport(targetApi.token, {
-  baseUrl: targetApi.url,
-  httpVersion: "2",
-});
+export const sessionService = (host: string) =>
+  createServiceForHost(host, createSessionServiceClient);
+export const managementService = (host: string) =>
+  createServiceForHost(host, createManagementServiceClient);
+export const userService = (host: string) =>
+  createServiceForHost(host, createUserServiceClient);
+export const oidcService = (host: string) =>
+  createServiceForHost(host, createOIDCServiceClient);
+export const settingsService = (host: string) =>
+  createServiceForHost(host, createSettingsServiceClient);
 
-export const sessionService = createSessionServiceClient(transport);
-export const managementService = createManagementServiceClient(transport);
-export const userService = createUserServiceClient(transport);
-export const oidcService = createOIDCServiceClient(transport);
-export const settingsService = createSettingsServiceClient(transport);
-
-export async function getBrandingSettings(organization?: string) {
-  return settingsService
+export async function getBrandingSettings(host: string, organization?: string) {
+  return settingsService(host)
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => resp.settings);
+    .then((resp: any) => resp.settings);
 }
 
-export async function getLoginSettings(orgId?: string) {
-  return settingsService
+export async function getLoginSettings(host: string, orgId?: string) {
+  return settingsService(host)
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => resp.settings);
+    .then((resp: any) => resp.settings);
 }
 
-export async function addOTPEmail(userId: string) {
-  return userService.addOTPEmail(
+export async function addOTPEmail(host: string, userId: string) {
+  return userService(host).addOTPEmail(
     {
       userId,
     },
@@ -65,39 +77,54 @@ export async function addOTPEmail(userId: string) {
   );
 }
 
-export async function addOTPSMS(userId: string) {
-  return userService.addOTPSMS({ userId }, {});
+export async function addOTPSMS(host: string, userId: string) {
+  return userService(host).addOTPSMS({ userId }, {});
 }
 
-export async function registerTOTP(userId: string) {
-  return userService.registerTOTP({ userId }, {});
+export async function registerTOTP(host: string, userId: string) {
+  return userService(host).registerTOTP({ userId }, {});
 }
 
-export async function getGeneralSettings() {
-  return settingsService
+export async function getGeneralSettings(host: string) {
+  return settingsService(host)
     .getGeneralSettings({}, {})
-    .then((resp) => resp.supportedLanguages);
+    .then((resp: any) => resp.supportedLanguages);
 }
 
-export async function getLegalAndSupportSettings(organization?: string) {
-  return settingsService
+export async function getIdentityProviders(host: string, orgId?: string) {
+  return settingsService(host)
+    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp: any) => {
+      return resp.identityProviders;
+    });
+}
+
+export async function getLegalAndSupportSettings(
+  host: string,
+  organization?: string,
+) {
+  return settingsService(host)
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => {
+    .then((resp: any) => {
       return resp.settings;
     });
 }
 
-export async function getPasswordComplexitySettings(organization?: string) {
-  return settingsService
+export async function getPasswordComplexitySettings(
+  host: string,
+  organization?: string,
+) {
+  return settingsService(host)
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-    .then((resp) => resp.settings);
+    .then((resp: any) => resp.settings);
 }
 
 export async function createSessionFromChecks(
+  host: string,
   checks: PlainMessage<Checks>,
   challenges: PlainMessage<RequestChallenges> | undefined,
 ) {
-  return sessionService.createSession(
+  return sessionService(host).createSession(
     {
       checks: checks,
       challenges,
@@ -110,14 +137,33 @@ export async function createSessionFromChecks(
   );
 }
 
+export function retrieveIDPIntent(host: string, id: string, token: string) {
+  return userService(host).retrieveIdentityProviderIntent(
+    { idpIntentId: id, idpIntentToken: token },
+    {},
+  );
+}
+
+export function createUser(
+  host: string,
+  provider: ProviderSlug,
+  info: IDPInformation,
+): Promise<string> {
+  const userData = PROVIDER_MAPPING[provider](info);
+  return userService(host)
+    .addHumanUser(userData, {})
+    .then((resp: any) => resp.userId);
+}
+
 export async function createSessionForUserIdAndIdpIntent(
+  host: string,
   userId: string,
   idpIntent: {
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   },
 ) {
-  return sessionService.createSession({
+  return sessionService(host).createSession({
     checks: {
       user: {
         search: {
@@ -135,12 +181,13 @@ export async function createSessionForUserIdAndIdpIntent(
 }
 
 export async function setSession(
+  host: string,
   sessionId: string,
   sessionToken: string,
   challenges: RequestChallenges | undefined,
   checks?: PlainMessage<Checks>,
 ) {
-  return sessionService.setSession(
+  return sessionService(host).setSession(
     {
       sessionId,
       sessionToken,
@@ -152,16 +199,24 @@ export async function setSession(
   );
 }
 
-export async function getSession(sessionId: string, sessionToken: string) {
-  return sessionService.getSession({ sessionId, sessionToken }, {});
+export async function getSession(
+  host: string,
+  sessionId: string,
+  sessionToken: string,
+) {
+  return sessionService(host).getSession({ sessionId, sessionToken }, {});
 }
 
-export async function deleteSession(sessionId: string, sessionToken: string) {
-  return sessionService.deleteSession({ sessionId, sessionToken }, {});
+export async function deleteSession(
+  host: string,
+  sessionId: string,
+  sessionToken: string,
+) {
+  return sessionService(host).deleteSession({ sessionId, sessionToken }, {});
 }
 
-export async function listSessions(ids: string[]) {
-  return sessionService.listSessions(
+export async function listSessions(host: string, ids: string[]) {
+  return sessionService(host).listSessions(
     {
       queries: [
         {
@@ -184,14 +239,11 @@ export type AddHumanUserData = {
   organization: string | undefined;
 };
 
-export async function addHumanUser({
-  email,
-  firstName,
-  lastName,
-  password,
-  organization,
-}: AddHumanUserData) {
-  return userService.addHumanUser({
+export async function addHumanUser(
+  host: string,
+  { email, firstName, lastName, password, organization }: AddHumanUserData,
+) {
+  return userService(host).addHumanUser({
     email: { email },
     username: email,
     profile: { givenName: firstName, familyName: lastName },
@@ -204,16 +256,24 @@ export async function addHumanUser({
   });
 }
 
-export async function verifyTOTPRegistration(code: string, userId: string) {
-  return userService.verifyTOTPRegistration({ code, userId }, {});
+export async function verifyTOTPRegistration(
+  host: string,
+  code: string,
+  userId: string,
+) {
+  return userService(host).verifyTOTPRegistration({ code, userId }, {});
 }
 
-export async function getUserByID(userId: string) {
-  return userService.getUserByID({ userId }, {});
+export async function getUserByID(host: string, userId: string) {
+  return userService(host).getUserByID({ userId }, {});
 }
 
-export async function listUsers(userName: string, organizationId: string) {
-  return userService.listUsers(
+export async function listUsers(
+  host: string,
+  userName: string,
+  organizationId: string,
+) {
+  return userService(host).listUsers(
     {
       queries: organizationId
         ? [
@@ -251,8 +311,8 @@ export async function listUsers(userName: string, organizationId: string) {
   );
 }
 
-export async function getOrgByDomain(domain: string) {
-  return managementService.getOrgByDomainGlobal({ domain }, {});
+export async function getOrgByDomain(host: string, domain: string) {
+  return managementService(host).getOrgByDomainGlobal({ domain }, {});
 }
 
 export const PROVIDER_NAME_MAPPING: {
@@ -263,14 +323,17 @@ export const PROVIDER_NAME_MAPPING: {
   [ProviderSlug.AZURE]: "Microft",
 };
 
-export async function startIdentityProviderFlow({
-  idpId,
-  urls,
-}: {
-  idpId: string;
-  urls: PlainMessage<RedirectURLs>;
-}) {
-  return userService.startIdentityProviderIntent({
+export async function startIdentityProviderFlow(
+  host: string,
+  {
+    idpId,
+    urls,
+  }: {
+    idpId: string;
+    urls: PlainMessage<RedirectURLs>;
+  },
+) {
+  return userService(host).startIdentityProviderIntent({
     idpId,
     content: {
       case: "urls",
@@ -279,32 +342,42 @@ export async function startIdentityProviderFlow({
   });
 }
 
-export async function retrieveIdentityProviderInformation({
-  idpIntentId,
-  idpIntentToken,
-}: RetrieveIdentityProviderIntentRequest) {
-  return userService.retrieveIdentityProviderIntent({
+export async function retrieveIdentityProviderInformation(
+  host: string,
+  { idpIntentId, idpIntentToken }: RetrieveIdentityProviderIntentRequest,
+) {
+  return userService(host).retrieveIdentityProviderIntent({
     idpIntentId,
     idpIntentToken,
   });
 }
 
-export async function getAuthRequest({
-  authRequestId,
-}: {
-  authRequestId: string;
-}) {
-  return oidcService.getAuthRequest({
+export async function getAuthRequest(
+  host: string,
+  {
+    authRequestId,
+  }: {
+    authRequestId: string;
+  },
+) {
+  return oidcService(host).getAuthRequest({
     authRequestId,
   });
 }
 
-export async function createCallback(req: PlainMessage<CreateCallbackRequest>) {
-  return oidcService.createCallback(req);
+export async function createCallback(
+  host: string,
+  req: PlainMessage<CreateCallbackRequest>,
+) {
+  return oidcService(host).createCallback(req);
 }
 
-export async function verifyEmail(userId: string, verificationCode: string) {
-  return userService.verifyEmail(
+export async function verifyEmail(
+  host: string,
+  userId: string,
+  verificationCode: string,
+) {
+  return userService(host).verifyEmail(
     {
       userId,
       verificationCode,
@@ -318,8 +391,8 @@ export async function verifyEmail(userId: string, verificationCode: string) {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function resendEmailCode(userId: string) {
-  return userService.resendEmailCode(
+export async function resendEmailCode(host: string, userId: string) {
+  return userService(host).resendEmailCode(
     {
       userId,
     },
@@ -332,8 +405,11 @@ export async function resendEmailCode(userId: string) {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(userId: string): Promise<any> {
-  return userService.passwordReset(
+export async function passwordReset(
+  host: string,
+  userId: string,
+): Promise<any> {
+  return userService(host).passwordReset(
     {
       userId,
     },
@@ -347,8 +423,11 @@ export async function passwordReset(userId: string): Promise<any> {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function createPasskeyRegistrationLink(userId: string) {
-  return userService.createPasskeyRegistrationLink({
+export async function createPasskeyRegistrationLink(
+  host: string,
+  userId: string,
+) {
+  return userService(host).createPasskeyRegistrationLink({
     userId,
     medium: {
       case: "returnCode",
@@ -363,8 +442,12 @@ export async function createPasskeyRegistrationLink(userId: string) {
  * @param domain the domain on which the factor is registered
  * @returns the newly set email
  */
-export async function registerU2F(userId: string, domain: string) {
-  return userService.registerU2F({
+export async function registerU2F(
+  host: string,
+  userId: string,
+  domain: string,
+) {
+  return userService(host).registerU2F({
     userId,
     domain,
   });
@@ -377,13 +460,14 @@ export async function registerU2F(userId: string, domain: string) {
  * @returns the newly set email
  */
 export async function verifyU2FRegistration(
+  host: string,
   request: PlainMessage<VerifyU2FRegistrationRequest>,
 ) {
-  return userService.verifyU2FRegistration(request, {});
+  return userService(host).verifyU2FRegistration(request, {});
 }
 
-export async function getActiveIdentityProviders(orgId?: string) {
-  return settingsService.getActiveIdentityProviders(
+export async function getActiveIdentityProviders(host: string, orgId?: string) {
+  return settingsService(host).getActiveIdentityProviders(
     { ctx: makeReqCtx(orgId) },
     {},
   );
@@ -395,11 +479,12 @@ export async function getActiveIdentityProviders(orgId?: string) {
  * @returns the newly set email
  */
 export async function verifyPasskeyRegistration(
+  host: string,
   request: PartialMessage<VerifyPasskeyRegistrationRequest>,
 ) {
   // TODO: find a better way to handle this
   request = VerifyPasskeyRegistrationRequest.fromJson(request as any);
-  return userService.verifyPasskeyRegistration(request, {});
+  return userService(host).verifyPasskeyRegistration(request, {});
 }
 
 /**
@@ -408,11 +493,12 @@ export async function verifyPasskeyRegistration(
  * @returns the newly set email
  */
 export async function registerPasskey(
+  host: string,
   userId: string,
   code: { id: string; code: string },
   domain: string,
 ) {
-  return userService.registerPasskey({
+  return userService(host).registerPasskey({
     userId,
     code,
     domain,
@@ -425,8 +511,11 @@ export async function registerPasskey(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function listAuthenticationMethodTypes(userId: string) {
-  return userService.listAuthenticationMethodTypes({
+export async function listAuthenticationMethodTypes(
+  host: string,
+  userId: string,
+) {
+  return userService(host).listAuthenticationMethodTypes({
     userId,
   });
 }

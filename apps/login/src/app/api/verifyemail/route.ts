@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { userId, code } = body;
 
-    return verifyEmail(userId, code)
+    return verifyEmail(request.nextUrl.host, userId, code)
       .then((resp) => {
         return NextResponse.json(resp);
       })

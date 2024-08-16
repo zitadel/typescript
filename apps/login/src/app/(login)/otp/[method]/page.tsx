@@ -4,6 +4,7 @@ import DynamicTheme from "@/ui/DynamicTheme";
 import LoginOTP from "@/ui/LoginOTP";
 import UserAvatar from "@/ui/UserAvatar";
 import { loadMostRecentSession } from "@zitadel/next";
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
@@ -12,6 +13,11 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { loginName, authRequestId, sessionId, organization, code, submit } =
     searchParams;
 
@@ -22,7 +28,7 @@ export default async function Page({
     organization,
   });
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>

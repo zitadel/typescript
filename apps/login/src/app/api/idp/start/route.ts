@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   if (body) {
     let { idpId, successUrl, failureUrl } = body;
 
-    return startIdentityProviderFlow({
+    return startIdentityProviderFlow(request.nextUrl.host, {
       idpId,
       urls: {
         successUrl,

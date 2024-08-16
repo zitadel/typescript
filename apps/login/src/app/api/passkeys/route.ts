@@ -13,7 +13,11 @@ export async function POST(request: NextRequest) {
 
     const sessionCookie = await getSessionCookieById({ sessionId });
 
-    const session = await getSession(sessionCookie.id, sessionCookie.token);
+    const session = await getSession(
+      request.nextUrl.host,
+      sessionCookie.id,
+      sessionCookie.token,
+    );
 
     const domain: string = request.nextUrl.hostname;
 
@@ -21,13 +25,18 @@ export async function POST(request: NextRequest) {
 
     if (userId) {
       // TODO: add org context
-      return createPasskeyRegistrationLink(userId)
+      return createPasskeyRegistrationLink(request.nextUrl.host, userId)
         .then((resp) => {
           const code = resp.code;
           if (!code) {
             throw new Error("Missing code in response");
           }
-          return registerPasskey(userId, code, domain).then((resp) => {
+          return registerPasskey(
+            request.nextUrl.host,
+            userId,
+            code,
+            domain,
+          ).then((resp) => {
             return NextResponse.json(resp);
           });
         })

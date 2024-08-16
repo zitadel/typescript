@@ -2,13 +2,18 @@ import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "@zitadel/next";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-async function loadSession(loginName: string, authRequestId?: string) {
+async function loadSession(
+  host: string,
+  loginName: string,
+  authRequestId?: string,
+) {
   const recent = await getMostRecentCookieWithLoginname({ loginName });
 
   if (authRequestId) {
-    return createCallback({
+    return createCallback(host, {
       authRequestId,
       callbackKind: {
         case: "session",
@@ -18,7 +23,7 @@ async function loadSession(loginName: string, authRequestId?: string) {
       return redirect(callbackUrl);
     });
   }
-  return getSession(recent.id, recent.token).then((response) => {
+  return getSession(host, recent.id, recent.token).then((response) => {
     if (response?.session) {
       return response.session;
     }
@@ -26,8 +31,13 @@ async function loadSession(loginName: string, authRequestId?: string) {
 }
 
 export default async function Page({ searchParams }: { searchParams: any }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { loginName, authRequestId, organization } = searchParams;
-  const sessionFactors = await loadSession(loginName, authRequestId);
+  const sessionFactors = await loadSession(host, loginName, authRequestId);
 
   const branding = await getBrandingSettings(organization);
 

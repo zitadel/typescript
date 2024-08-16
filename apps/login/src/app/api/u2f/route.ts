@@ -14,14 +14,18 @@ export async function POST(request: NextRequest) {
 
     const sessionCookie = await getSessionCookieById({ sessionId });
 
-    const session = await getSession(sessionCookie.id, sessionCookie.token);
+    const session = await getSession(
+      request.nextUrl.host,
+      sessionCookie.id,
+      sessionCookie.token,
+    );
 
     const domain: string = request.nextUrl.hostname;
 
     const userId = session?.session?.factors?.user?.id;
 
     if (userId) {
-      return registerU2F(userId, domain)
+      return registerU2F(request.nextUrl.host, userId, domain)
         .then((resp) => {
           return NextResponse.json(resp);
         })

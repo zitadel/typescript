@@ -6,22 +6,30 @@ import {
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterFormWithoutPassword from "@/ui/RegisterFormWithoutPassword";
 import SetPasswordForm from "@/ui/SetPasswordForm";
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
   const setPassword = !!(firstname && lastname && email);
 
-  const legal = await getLegalAndSupportSettings(organization);
-  const passwordComplexitySettings =
-    await getPasswordComplexitySettings(organization);
+  const legal = await getLegalAndSupportSettings(host, organization);
+  const passwordComplexitySettings = await getPasswordComplexitySettings(
+    host,
+    organization,
+  );
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return setPassword ? (
     <DynamicTheme branding={branding}>

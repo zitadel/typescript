@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       authRequestId,
     } = body;
 
-    return addHumanUser({
+    return addHumanUser(request.nextUrl.host, {
       email: email,
       firstName,
       lastName,
@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
     })
       .then((user) => {
         return createSessionForUserIdAndUpdateCookie(
+          request.nextUrl.host,
           user.userId,
           password,
           undefined,

@@ -1,6 +1,7 @@
 import { ProviderSlug } from "@/lib/demos";
 import { getBrandingSettings, PROVIDER_NAME_MAPPING } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
@@ -9,10 +10,15 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: { provider: ProviderSlug };
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { id, token, authRequestId, organization } = searchParams;
   const { provider } = params;
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   if (provider) {
     return (

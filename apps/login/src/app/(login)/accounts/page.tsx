@@ -4,12 +4,14 @@ import { UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import SessionsList from "@/ui/SessionsList";
 import DynamicTheme from "@/ui/DynamicTheme";
+import { headers } from "next/headers";
 
-async function loadSessions() {
+async function loadSessions(host: string) {
   const ids = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
     const response = await listSessions(
+      host,
       ids.filter((id: string | undefined) => !!id),
     );
     return response?.sessions ?? [];
@@ -24,12 +26,17 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
-  let sessions = await loadSessions();
+  let sessions = await loadSessions(host);
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>

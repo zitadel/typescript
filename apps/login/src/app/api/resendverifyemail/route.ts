@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { userId } = body;
 
     // replace with resend Mail method once its implemented
-    return resendEmailCode(userId)
+    return resendEmailCode(request.nextUrl.host, userId)
       .then((resp) => {
         return NextResponse.json(resp);
       })

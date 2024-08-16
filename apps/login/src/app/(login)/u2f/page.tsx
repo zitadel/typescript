@@ -4,23 +4,36 @@ import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
 import UserAvatar from "@/ui/UserAvatar";
 import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession(sessionService, { loginName, organization });
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadMostRecentSession(sessionService(host), {
+        loginName,
+        organization,
+      });
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession(recent.id, recent.token).then((response) => {
+    return getSession(host, recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }

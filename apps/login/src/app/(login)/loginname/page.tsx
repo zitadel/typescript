@@ -1,42 +1,45 @@
 import {
+  getActiveIdentityProviders,
   getBrandingSettings,
   getLegalAndSupportSettings,
   getLoginSettings,
-  settingsService,
 } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import UsernameForm from "@/ui/UsernameForm";
 import { makeReqCtx } from "@zitadel/client/v2";
-
-function getIdentityProviders(orgId?: string) {
-  return settingsService
-    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => {
-      return resp.identityProviders;
-    });
-}
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const loginName = searchParams?.loginName;
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
   const submit: boolean = searchParams?.submit === "true";
 
-  const loginSettings = await getLoginSettings(organization);
-  const legal = await getLegalAndSupportSettings();
+  const loginSettings = await getLoginSettings(host, organization);
+  const legal = await getLegalAndSupportSettings(host);
 
-  const identityProviders = await getIdentityProviders(organization);
+  const identityProviders = await getActiveIdentityProviders(
+    host,
+    organization,
+  ).then((resp) => {
+    return resp.identityProviders;
+  });
 
-  const host = process.env.VERCEL_URL
+  const idphost = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
 
   return (
     <DynamicTheme branding={branding}>
@@ -54,7 +57,7 @@ export default async function Page({
         >
           {legal && identityProviders && (
             <SignInWithIDP
-              host={host}
+              host={idphost}
               identityProviders={identityProviders}
               authRequestId={authRequestId}
               organization={organization}

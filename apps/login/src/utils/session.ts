@@ -27,6 +27,7 @@ type CustomCookieData = {
 };
 
 export async function createSessionAndUpdateCookie(
+  host: string,
   loginName: string,
   password: string | undefined,
   challenges: RequestChallenges | undefined,
@@ -34,6 +35,7 @@ export async function createSessionAndUpdateCookie(
   authRequestId?: string,
 ) {
   const createdSession = await createSessionFromChecks(
+    host,
     password
       ? {
           user: { search: { case: "loginName", value: loginName } },
@@ -45,6 +47,7 @@ export async function createSessionAndUpdateCookie(
 
   if (createdSession) {
     return getSession(
+      host,
       createdSession.sessionId,
       createdSession.sessionToken,
     ).then((response) => {
@@ -80,12 +83,14 @@ export async function createSessionAndUpdateCookie(
 }
 
 export async function createSessionForUserIdAndUpdateCookie(
+  host: string,
   userId: string,
   password: string | undefined,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
 ): Promise<Session> {
   const createdSession = await createSessionFromChecks(
+    host,
     password
       ? {
           user: { search: { case: "userId", value: userId } },
@@ -98,9 +103,10 @@ export async function createSessionForUserIdAndUpdateCookie(
 
   if (createdSession) {
     return getSession(
+      host,
       createdSession.sessionId,
       createdSession.sessionToken,
-    ).then((response) => {
+    ).then((response: any) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
@@ -133,6 +139,7 @@ export async function createSessionForUserIdAndUpdateCookie(
 }
 
 export async function createSessionForIdpAndUpdateCookie(
+  host: string,
   userId: string,
   idpIntent: {
     idpIntentId?: string | undefined;
@@ -142,12 +149,14 @@ export async function createSessionForIdpAndUpdateCookie(
   authRequestId: string | undefined,
 ): Promise<Session> {
   const createdSession = await createSessionForUserIdAndIdpIntent(
+    host,
     userId,
     idpIntent,
   );
 
   if (createdSession) {
     return getSession(
+      host,
       createdSession.sessionId,
       createdSession.sessionToken,
     ).then((response) => {
@@ -187,12 +196,14 @@ export type SessionWithChallenges = Session & {
 };
 
 export async function setSessionAndUpdateCookie(
+  host: string,
   recentCookie: CustomCookieData,
   checks: PlainMessage<Checks>,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
 ) {
   return setSession(
+    host,
     recentCookie.id,
     recentCookie.token,
     challenges,
@@ -213,7 +224,7 @@ export async function setSessionAndUpdateCookie(
         sessionCookie.authRequestId = authRequestId;
       }
 
-      return getSession(sessionCookie.id, sessionCookie.token).then(
+      return getSession(host, sessionCookie.id, sessionCookie.token).then(
         (response) => {
           if (response?.session && response.session.factors?.user?.loginName) {
             const { session } = response;
