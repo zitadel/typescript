@@ -14,6 +14,7 @@ import UserAvatar from "@/ui/UserAvatar";
 import Link from "next/link";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { loadMostRecentSession } from "@zitadel/next";
+import { headers } from "next/headers";
 
 export default async function Page({
   searchParams,
@@ -22,11 +23,16 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: Record<string | number | symbol, string | undefined>;
 }) {
+  const host = headers().get("host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+
   const { loginName, organization, sessionId, authRequestId, checkAfter } =
     searchParams;
   const { method } = params;
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(host, organization);
   const session = await loadMostRecentSession(sessionService, {
     loginName,
     organization,
@@ -36,7 +42,7 @@ export default async function Page({
     totpError: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP(session.factors.user.id)
+      await registerTOTP(host, session.factors.user.id)
         .then((resp) => {
           if (resp) {
             totpResponse = resp;
@@ -47,10 +53,10 @@ export default async function Page({
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS(session.factors.user.id);
+      await addOTPSMS(host, session.factors.user.id);
     } else if (method === "email") {
       // works
-      await addOTPEmail(session.factors.user.id);
+      await addOTPEmail(host, session.factors.user.id);
     } else {
       throw new Error("Invalid method");
     }
