@@ -8,6 +8,7 @@ import ThemeWrapper from "@/ui/ThemeWrapper";
 import { getBrandingSettings } from "@/lib/zitadel";
 import ThemeProvider from "@/ui/ThemeProvider";
 import Theme from "@/ui/Theme";
+import { headers } from "next/headers";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -23,9 +24,6 @@ export default async function RootLayout({
 }) {
   // later only shown with dev mode enabled
   const showNav = process.env.DEBUG === "true";
-
-  let domain = process.env.ZITADEL_API_URL;
-  domain = domain ? domain.replace("https://", "") : "acme.com";
 
   return (
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
@@ -56,7 +54,7 @@ export default async function RootLayout({
                 {showNav && (
                   <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
                     <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
-                      <AddressBar domain={domain} />
+                      <AddressBar />
                     </div>
                   </div>
                 )}

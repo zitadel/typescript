@@ -20,16 +20,23 @@ import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { ProviderSlug } from "./demos";
 import { PartialMessage, PlainMessage } from "@zitadel/client";
+import { headers } from "next/headers";
+import { getApiConfiguration } from "./api";
 
 const SESSION_LIFETIME_S = 3000;
 
-const transport = createServerTransport(
-  process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  {
-    baseUrl: process.env.ZITADEL_API_URL!,
-    httpVersion: "2",
-  },
-);
+// TODO: wildcard find out the target api url from the host of the request
+const host = headers().get("host");
+if (!host) {
+  throw new Error("No host header found!");
+}
+const targetApi = getApiConfiguration(host);
+
+console.log("targetApi", targetApi);
+const transport = createServerTransport(targetApi.token, {
+  baseUrl: targetApi.url,
+  httpVersion: "2",
+});
 
 export const sessionService = createSessionServiceClient(transport);
 export const managementService = createManagementServiceClient(transport);
@@ -58,39 +65,11 @@ export async function addOTPEmail(userId: string) {
   );
 }
 
-export async function addOTPSMS(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
-
+export async function addOTPSMS(userId: string) {
   return userService.addOTPSMS({ userId }, {});
 }
 
-export async function registerTOTP(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+export async function registerTOTP(userId: string) {
   return userService.registerTOTP({ userId }, {});
 }
 
@@ -368,24 +347,7 @@ export async function passwordReset(userId: string): Promise<any> {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function createPasskeyRegistrationLink(
-  userId: string,
-  token?: string,
-) {
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
-
+export async function createPasskeyRegistrationLink(userId: string) {
   return userService.createPasskeyRegistrationLink({
     userId,
     medium: {

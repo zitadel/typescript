@@ -6,6 +6,7 @@ import {
 import DynamicTheme from "@/ui/DynamicTheme";
 import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import { makeReqCtx } from "@zitadel/client/v2";
+import { headers } from "next/headers";
 
 function getIdentityProviders(orgId?: string) {
   return settingsService
@@ -27,9 +28,12 @@ export default async function Page({
 
   const identityProviders = await getIdentityProviders(organization);
 
-  const host = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
+  const host = headers().get("host");
+
+  console.log("host", host);
+  // const host = process.env.VERCEL_URL
+  //   ? `https://${process.env.VERCEL_URL}`
+  //   : "http://localhost:3000";
 
   const branding = await getBrandingSettings(organization);
 
@@ -41,7 +45,7 @@ export default async function Page({
           Select one of the following providers to register
         </p>
 
-        {legal && identityProviders && process.env.ZITADEL_API_URL && (
+        {legal && identityProviders && (
           <SignInWithIDP
             host={host}
             identityProviders={identityProviders}

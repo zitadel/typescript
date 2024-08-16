@@ -3,11 +3,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 
-type Props = {
-  domain: string;
-};
-
-export function AddressBar({ domain }: Props) {
+export function AddressBar() {
   const pathname = usePathname();
 
   return (
@@ -27,9 +23,6 @@ export function AddressBar({ domain }: Props) {
         </svg>
       </div>
       <div className="flex space-x-1 text-sm font-medium">
-        <div className="max-w-[150px] px-2 overflow-hidden text-gray-500  text-ellipsis">
-          <span className="whitespace-nowrap">{domain}</span>
-        </div>
         {pathname ? (
           <>
             <span className="text-gray-600">/</span>

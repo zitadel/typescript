@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getApiConfiguration } from "./lib/api";
 
 export const config = {
   matcher: [
@@ -10,10 +11,16 @@ export const config = {
   ],
 };
 
-const INSTANCE = process.env.ZITADEL_API_URL;
-const SERVICE_USER_ID = process.env.ZITADEL_SERVICE_USER_ID as string;
-
 export function middleware(request: NextRequest) {
+  // TODO: wildcard find out the target api url from the host of the request
+  const host = request.nextUrl.host;
+  if (!host) {
+    throw new Error("No host header found!");
+  }
+  const targetApi = getApiConfiguration(host);
+  const INSTANCE = targetApi.url;
+  const SERVICE_USER_ID = targetApi.userId;
+
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-zitadel-login-client", SERVICE_USER_ID);
 

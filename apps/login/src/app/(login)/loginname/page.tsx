@@ -52,7 +52,7 @@ export default async function Page({
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
-          {legal && identityProviders && process.env.ZITADEL_API_URL && (
+          {legal && identityProviders && (
             <SignInWithIDP
               host={host}
               identityProviders={identityProviders}
