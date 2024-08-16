@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
         }
 
         return setSessionAndUpdateCookie(
+          request.nextUrl.host,
           recent,
           checks,
           undefined,
