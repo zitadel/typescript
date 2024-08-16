@@ -17,6 +17,8 @@ export function middleware(request: NextRequest) {
   if (!host) {
     throw new Error("No host header found!");
   }
+
+  console.log("host", host);
   const targetApi = getApiConfiguration(host);
   const INSTANCE = targetApi.url;
   const SERVICE_USER_ID = targetApi.userId;
