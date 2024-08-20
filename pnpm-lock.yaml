@@ -309,8 +309,14 @@ importers:
   packages/zitadel-proto:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^1.10.0
-        version: 1.10.0
+        specifier: ^2.0.0
+        version: 2.0.0
+      '@bufbuild/protoc-gen-es':
+        specifier: ^2.0.0
+        version: 2.0.0(@bufbuild/protobuf@2.0.0)
+      '@connectrpc/connect':
+        specifier: 2.0.0-alpha.1
+        version: 2.0.0-alpha.1(@bufbuild/protobuf@2.0.0)
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.36.0
@@ -640,6 +646,36 @@ packages:
     resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
     dev: false
 
+  /@bufbuild/protobuf@2.0.0:
+    resolution: {integrity: sha512-sw2JhwJyvyL0zlhG61aDzOVryEfJg2PDZFSV7i7IdC7nAE41WuXCru3QWLGiP87At0BMzKOoKO/FqEGoKygGZQ==}
+    dev: false
+
+  /@bufbuild/protoc-gen-es@2.0.0(@bufbuild/protobuf@2.0.0):
+    resolution: {integrity: sha512-xXDrDFjSD97jGu9RMA8O4Myj66DdCLOFeYG7Z0mX1aCE9hayymfor+BKgKCQouUfty6CYv8709FPYpEtDurLFQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/protobuf': 2.0.0
+    peerDependenciesMeta:
+      '@bufbuild/protobuf':
+        optional: true
+    dependencies:
+      '@bufbuild/protobuf': 2.0.0
+      '@bufbuild/protoplugin': 2.0.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@bufbuild/protoplugin@2.0.0:
+    resolution: {integrity: sha512-y77IarGNbJfr5YZHQ+biO0O9B8rXicKLLOFRJu9mKr9LYE5/CLIKqonIBfkc/lggCK2YOtinjZJEYb39HymIog==}
+    dependencies:
+      '@bufbuild/protobuf': 2.0.0
+      '@typescript/vfs': 1.6.0(typescript@5.4.5)
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /@changesets/apply-release-plan@7.0.4:
     resolution: {integrity: sha512-HLFwhKWayKinWAul0Vj+76jVx1Pc2v55MGPVjZ924Y/ROeSsBMFutv9heHmCUj48lJyRfOTJG5+ar+29FUky/A==}
     dependencies:
@@ -868,6 +904,14 @@ packages:
       '@bufbuild/protobuf': ^1.4.2
     dependencies:
       '@bufbuild/protobuf': 1.10.0
+    dev: false
+
+  /@connectrpc/connect@2.0.0-alpha.1(@bufbuild/protobuf@2.0.0):
+    resolution: {integrity: sha512-eAjezEy1m+7bDtWt/TeXY2qIayq7R+WW8Jqwq3p8Q7ZTHpFJu0SBQivhRGQbNXSYR+QmqMk+j/FLAVlgB6CfHA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^2.0.0-beta.2
+    dependencies:
+      '@bufbuild/protobuf': 2.0.0
     dev: false
 
   /@cypress/request@3.0.1:
@@ -2069,6 +2113,17 @@ packages:
     dependencies:
       '@typescript-eslint/types': 7.18.0
       eslint-visitor-keys: 3.4.3
+    dev: false
+
+  /@typescript/vfs@1.6.0(typescript@5.4.5):
+    resolution: {integrity: sha512-hvJUjNVeBMp77qPINuUvYXj4FyWeeMMKZkxEATEU3hqBAQ7qdTBCUFT7Sp0Zu0faeEtFf+ldXxMEDr/bk73ISg==}
+    peerDependencies:
+      typescript: '*'
+    dependencies:
+      debug: 4.3.6(supports-color@5.5.0)
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /@ungap/structured-clone@1.2.0:
@@ -7306,6 +7361,12 @@ packages:
       has-proto: 1.0.3
       is-typed-array: 1.1.13
       possible-typed-array-names: 1.0.0
+    dev: false
+
+  /typescript@5.4.5:
+    resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
     dev: false
 
   /typescript@5.5.4:
