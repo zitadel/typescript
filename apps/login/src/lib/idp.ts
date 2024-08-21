@@ -39,7 +39,6 @@ export const PROVIDER_MAPPING: {
 } = {
   [idpTypeToSlug(IdentityProviderType.GOOGLE)]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as OIDC_USER;
-    console.log(rawInfo);
     const idpLink: PartialMessage<IDPLink> = {
       idpId: idp.idpId,
       userId: idp.userId,
@@ -126,6 +125,62 @@ export const PROVIDER_MAPPING: {
       idpLinks: [idpLink],
     };
 
+    return req;
+  },
+  [idpTypeToSlug(IdentityProviderType.GITHUB)]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      email: string;
+      name: string;
+    };
+
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo.email,
+        verification: { case: "isVerified", value: true },
+      },
+      profile: {
+        displayName: rawInfo.name ?? "",
+        givenName: rawInfo.name ?? "",
+        familyName: rawInfo.name ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+
+    return req;
+  },
+  [idpTypeToSlug(IdentityProviderType.GITLAB)]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      name: string;
+      email: string;
+      email_verified: boolean;
+    };
+
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo.email,
+        verification: { case: "isVerified", value: rawInfo.email_verified },
+      },
+      profile: {
+        displayName: rawInfo.name || idp.userName || "",
+        givenName: "",
+        familyName: "",
+      },
+      idpLinks: [idpLink],
+    };
     return req;
   },
 };
