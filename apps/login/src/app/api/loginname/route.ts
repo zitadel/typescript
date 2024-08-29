@@ -54,10 +54,14 @@ export async function POST(request: NextRequest) {
         // TODO: check if allowDomainDiscovery has to be allowed too, to redirect to the register page
         // user not found, check if register is enabled on organization
 
-        if (
-          loginSettings?.allowRegister &&
-          !loginSettings?.allowUsernamePassword
-        ) {
+        if (!loginSettings.allowRegister) {
+            return NextResponse.json(
+                { message: "Could not find user" },
+                { status: 404 },
+            );
+        }
+
+        if (!loginSettings?.allowUsernamePassword) {
           // TODO redirect to loginname page with idp hint
           const identityProviders = await getActiveIdentityProviders(
             organization,
@@ -65,96 +69,88 @@ export async function POST(request: NextRequest) {
             return resp.identityProviders;
           });
 
-          if (identityProviders.length === 1) {
-            const host = request.nextUrl.origin;
-
-            const identityProviderType = identityProviders[0].type;
-
-            const provider = idpTypeToSlug(identityProviderType);
-
-            const params = new URLSearchParams();
-
-            if (authRequestId) {
-              params.set("authRequestId", authRequestId);
-            }
-
-            if (organization) {
-              params.set("organization", organization);
-            }
-
-            return startIdentityProviderFlow({
-              idpId: identityProviders[0].id,
-              urls: {
-                successUrl:
-                  `${host}/idp/${provider}/success?` +
-                  new URLSearchParams(params),
-                failureUrl:
-                  `${host}/idp/${provider}/failure?` +
-                  new URLSearchParams(params),
-              },
-            }).then((resp: any) => {
-              if (resp.authUrl) {
-                return NextResponse.json({ nextStep: resp.authUrl });
-              }
-            });
-          } else {
+          if (identityProviders.length != 1) {
             return NextResponse.json(
-              { message: "Could not find user" },
-              { status: 404 },
+                { message: "Could not find user" },
+                { status: 404 },
             );
           }
-        } else if (
-          loginSettings?.allowRegister &&
-          loginSettings?.allowUsernamePassword
-        ) {
-          let orgToRegisterOn: string | undefined = organization;
 
-          if (
-            !orgToRegisterOn &&
-            loginName &&
-            ORG_SUFFIX_REGEX.test(loginName) &&
-            loginSettings.allowDomainDiscovery
-          ) {
-            const matched = ORG_SUFFIX_REGEX.exec(loginName);
-            const suffix = matched?.[1] ?? "";
+          const host = request.nextUrl.origin;
 
-            // this just returns orgs where the suffix is set as primary domain
-            const orgs = await getOrgsByDomain(suffix);
-            orgToRegisterOn =
-              orgs.result && orgs.result.length === 1
-                ? orgs.result[0].id
-                : undefined;
-          }
+          const identityProviderType = identityProviders[0].type;
 
-          const params: any = {};
+          const provider = idpTypeToSlug(identityProviderType);
+
+          const params = new URLSearchParams();
 
           if (authRequestId) {
-            params.authRequestId = authRequestId;
+            params.set("authRequestId", authRequestId);
           }
 
-          if (loginName) {
-            params.email = loginName;
+          if (organization) {
+            params.set("organization", organization);
           }
 
-          if (orgToRegisterOn) {
-            params.organization = orgToRegisterOn;
-          }
-
-          const registerUrl = new URL(
-            "/register?" + new URLSearchParams(params),
-            request.url,
-          );
-
-          return NextResponse.json({
-            nextStep: registerUrl,
-            status: 200,
+          return startIdentityProviderFlow({
+            idpId: identityProviders[0].id,
+            urls: {
+              successUrl:
+                `${host}/idp/${provider}/success?` +
+                new URLSearchParams(params),
+              failureUrl:
+                `${host}/idp/${provider}/failure?` +
+                new URLSearchParams(params),
+            },
+          }).then((resp: any) => {
+            if (resp.authUrl) {
+              return NextResponse.json({ nextStep: resp.authUrl });
+            }
           });
         }
 
-        return NextResponse.json(
-          { message: "Could not find user" },
-          { status: 404 },
+        let orgToRegisterOn: string | undefined = organization;
+
+        if (
+          !orgToRegisterOn &&
+          loginName &&
+          ORG_SUFFIX_REGEX.test(loginName) &&
+          loginSettings.allowDomainDiscovery
+        ) {
+          const matched = ORG_SUFFIX_REGEX.exec(loginName);
+          const suffix = matched?.[1] ?? "";
+
+          // this just returns orgs where the suffix is set as primary domain
+          const orgs = await getOrgsByDomain(suffix);
+          orgToRegisterOn =
+            orgs.result && orgs.result.length === 1
+              ? orgs.result[0].id
+              : undefined;
+        }
+
+        const params: any = {};
+
+        if (authRequestId) {
+          params.authRequestId = authRequestId;
+        }
+
+        if (loginName) {
+          params.email = loginName;
+        }
+
+        if (orgToRegisterOn) {
+          params.organization = orgToRegisterOn;
+        }
+
+        const registerUrl = new URL(
+          "/register?" + new URLSearchParams(params),
+          request.url,
         );
+
+        return NextResponse.json({
+          nextStep: registerUrl,
+          status: 200,
+        });
       }
     });
   } else {
