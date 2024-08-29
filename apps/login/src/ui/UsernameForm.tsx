@@ -12,6 +12,8 @@ import {
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import BackButton from "./BackButton";
+import { sendLoginname } from "@/lib/server/loginname";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 type Inputs = {
   loginName: string;
@@ -44,41 +46,23 @@ export default function UsernameForm({
   });
 
   const router = useRouter();
-
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   async function submitLoginName(values: Inputs, organization?: string) {
     setLoading(true);
 
-    let body: any = {
+    const res = await sendLoginname({
       loginName: values.loginName,
-    };
-
-    if (organization) {
-      body.organization = organization;
-    }
-
-    if (authRequestId) {
-      body.authRequestId = authRequestId;
-    }
-
-    const res = await fetch("/api/loginname", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
+      organization,
+      authRequestId,
+    }).catch((error) => {
+      setError(error ?? "An internal error occurred");
     });
 
     setLoading(false);
-    if (!res.ok) {
-      const response = await res.json();
 
-      setError(response.message ?? "An internal error occurred");
-      return Promise.reject(response.message ?? "An internal error occurred");
-    }
-    return res.json();
+    return res;
   }
 
   function setLoginNameAndGetAuthMethods(
@@ -86,21 +70,19 @@ export default function UsernameForm({
     organization?: string,
   ) {
     return submitLoginName(values, organization).then((response) => {
-      if (response.nextStep) {
-        return router.push(response.nextStep);
-      } else if (response.authMethodTypes.length == 1) {
+      if (response?.authMethodTypes?.length == 1) {
         const method = response.authMethodTypes[0];
         switch (method) {
-          case 1: // user has only password as auth method
+          case AuthenticationMethodType.PASSWORD: // user has only password as auth method
             const paramsPassword: any = {
-              loginName: response.factors.user.loginName,
+              loginName: response?.factors?.user?.loginName,
             };
 
             // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
 
-            if (organization || response.factors.user.organizationId) {
+            if (organization || response?.factors?.user?.organizationId) {
               paramsPassword.organization =
-                organization ?? response.factors.user.organizationId;
+                organization ?? response?.factors?.user?.organizationId;
             }
 
             if (
@@ -125,9 +107,9 @@ export default function UsernameForm({
               paramsPasskey.authRequestId = authRequestId;
             }
 
-            if (organization || response.factors.user.organizationId) {
+            if (organization || response?.factors?.user?.organizationId) {
               paramsPasskey.organization =
-                organization ?? response.factors.user.organizationId;
+                organization ?? response?.factors?.user?.organizationId;
             }
 
             return router.push(
@@ -144,9 +126,9 @@ export default function UsernameForm({
               paramsPasskeyDefault.authRequestId = authRequestId;
             }
 
-            if (organization || response.factors.user.organizationId) {
+            if (organization || response?.factors?.user?.organizationId) {
               paramsPasskeyDefault.organization =
-                organization ?? response.factors.user.organizationId;
+                organization ?? response?.factors?.user?.organizationId;
             }
 
             return router.push(
@@ -154,7 +136,7 @@ export default function UsernameForm({
             );
         }
       } else if (
-        response.authMethodTypes &&
+        response?.authMethodTypes &&
         response.authMethodTypes.length === 0
       ) {
         setError(
@@ -162,7 +144,7 @@ export default function UsernameForm({
         );
       } else {
         // prefer passkey in favor of other methods
-        if (response.authMethodTypes.includes(2)) {
+        if (response?.authMethodTypes.includes(2)) {
           const passkeyParams: any = {
             loginName: values.loginName,
             altPassword: `${response.authMethodTypes.includes(1)}`, // show alternative password option
@@ -172,9 +154,9 @@ export default function UsernameForm({
             passkeyParams.authRequestId = authRequestId;
           }
 
-          if (organization || response.factors.user.organizationId) {
+          if (organization || response?.factors?.user?.organizationId) {
             passkeyParams.organization =
-              organization ?? response.factors.user.organizationId;
+              organization ?? response?.factors?.user?.organizationId;
           }
 
           return router.push(
@@ -192,9 +174,9 @@ export default function UsernameForm({
             paramsPasswordDefault.authRequestId = authRequestId;
           }
 
-          if (organization || response.factors.user.organizationId) {
+          if (organization || response?.factors?.user?.organizationId) {
             paramsPasswordDefault.organization =
-              organization ?? response.factors.user.organizationId;
+              organization ?? response?.factors?.user?.organizationId;
           }
 
           return router.push(
