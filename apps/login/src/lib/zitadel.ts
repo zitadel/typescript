@@ -1,7 +1,5 @@
 import {
-  createIdpServiceClient,
   createOIDCServiceClient,
-  createOrganizationServiceClient,
   createSessionServiceClient,
   createSettingsServiceClient,
   createUserServiceClient,
@@ -33,6 +31,7 @@ import {
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { unstable_cache } from "next/cache";
+import { getApiConfiguration } from "./api";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
@@ -49,20 +48,38 @@ const transport = createServerTransport(
   },
 );
 
-export const sessionService = createSessionServiceClient(transport);
-export const userService = createUserServiceClient(transport);
-export const oidcService = createOIDCServiceClient(transport);
-export const idpService = createIdpServiceClient(transport);
-export const orgService = createOrganizationServiceClient(transport);
+// TODO: check for better typing
+function createServiceForHost(host: string, mapper: (transport: any) => any) {
+  const targetApi = getApiConfiguration(host);
 
-export const settingsService = createSettingsServiceClient(transport);
+  console.log("targetApi", host, targetApi);
+  const transport = createServerTransport(targetApi.token, {
+    baseUrl: targetApi.url,
+    httpVersion: "2",
+  });
 
-export async function getBrandingSettings(organization?: string) {
+  return mapper(transport);
+}
+
+export const idpService = (host: string) =>
+  createServiceForHost(host, createSessionServiceClient);
+export const orgService = (host: string) =>
+  createServiceForHost(host, createSessionServiceClient);
+export const sessionService = (host: string) =>
+  createServiceForHost(host, createSessionServiceClient);
+export const userService = (host: string) =>
+  createServiceForHost(host, createUserServiceClient);
+export const oidcService = (host: string) =>
+  createServiceForHost(host, createOIDCServiceClient);
+export const settingsService = (host: string) =>
+  createServiceForHost(host, createSettingsServiceClient);
+
+export async function getBrandingSettings(host: string, organization?: string) {
   return unstable_cache(
     async () => {
-      return await settingsService
+      return await settingsService(host)
         .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) =>
+        .then((resp: any) =>
           resp.settings
             ? toJson(BrandingSettingsSchema, resp.settings)
             : undefined,
@@ -78,10 +95,10 @@ export async function getBrandingSettings(organization?: string) {
   );
 }
 
-export async function getLoginSettings(orgId?: string) {
+export async function getLoginSettings(host: string, orgId?: string) {
   return unstable_cache(
     async () => {
-      return await settingsService
+      return await settingsService(host)
         .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
         .then((resp) =>
           resp.settings
@@ -97,8 +114,8 @@ export async function getLoginSettings(orgId?: string) {
   )().then((resp) => (resp ? fromJson(LoginSettingsSchema, resp) : undefined));
 }
 
-export async function addOTPEmail(userId: string) {
-  return userService.addOTPEmail(
+export async function addOTPEmail(host: string, userId: string) {
+  return userService(host).addOTPEmail(
     {
       userId,
     },
@@ -106,24 +123,27 @@ export async function addOTPEmail(userId: string) {
   );
 }
 
-export async function addOTPSMS(userId: string) {
-  return userService.addOTPSMS({ userId }, {});
+export async function addOTPSMS(host: string, userId: string) {
+  return userService(host).addOTPSMS({ userId }, {});
 }
 
-export async function registerTOTP(userId: string) {
-  return userService.registerTOTP({ userId }, {});
+export async function registerTOTP(host: string, userId: string) {
+  return userService(host).registerTOTP({ userId }, {});
 }
 
-export async function getGeneralSettings() {
-  return settingsService
+export async function getGeneralSettings(host: string) {
+  return settingsService(host)
     .getGeneralSettings({}, {})
-    .then((resp) => resp.supportedLanguages);
+    .then((resp: any) => resp.supportedLanguages);
 }
 
-export async function getLegalAndSupportSettings(organization?: string) {
+export async function getLegalAndSupportSettings(
+  host: string,
+  organization?: string,
+) {
   return unstable_cache(
     async () => {
-      return await settingsService
+      return await settingsService(host)
         .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
         .then((resp) =>
           resp.settings
@@ -163,13 +183,13 @@ export async function getPasswordComplexitySettings(organization?: string) {
 }
 
 export async function createSessionFromChecks(
-  checks: Checks,
-  challenges: RequestChallenges | undefined,
+  host: string,
+  command: { checks: Checks; challenges: RequestChallenges | undefined },
 ) {
-  return sessionService.createSession(
+  return sessionService(host).createSession(
     {
-      checks: checks,
-      challenges,
+      checks: command.checks,
+      challenges: command.challenges,
       lifetime: {
         seconds: BigInt(SESSION_LIFETIME_S),
         nanos: 0,
@@ -180,21 +200,24 @@ export async function createSessionFromChecks(
 }
 
 export async function createSessionForUserIdAndIdpIntent(
-  userId: string,
-  idpIntent: {
-    idpIntentId?: string | undefined;
-    idpIntentToken?: string | undefined;
+  host: string,
+  command: {
+    userId: string;
+    idpIntent: {
+      idpIntentId?: string | undefined;
+      idpIntentToken?: string | undefined;
+    };
   },
 ) {
-  return sessionService.createSession({
+  return sessionService(host).createSession({
     checks: {
       user: {
         search: {
           case: "userId",
-          value: userId,
+          value: command.userId,
         },
       },
-      idpIntent,
+      idpIntent: command.idpIntent,
     },
     // lifetime: {
     //   seconds: 300,
@@ -204,39 +227,51 @@ export async function createSessionForUserIdAndIdpIntent(
 }
 
 export async function setSession(
-  sessionId: string,
-  sessionToken: string,
-  challenges: RequestChallenges | undefined,
-  checks?: Checks,
+  host: string,
+  command: {
+    sessionId: string;
+    sessionToken: string;
+    challenges: RequestChallenges | undefined;
+    checks?: Checks;
+  },
 ) {
-  return sessionService.setSession(
+  return sessionService(host).setSession(
     {
-      sessionId,
-      sessionToken,
-      challenges,
-      checks: checks ? checks : {},
+      sessionId: command.sessionId,
+      sessionToken: command.sessionToken,
+      challenges: command.challenges,
+      checks: command.checks ? command.checks : {},
       metadata: {},
     },
     {},
   );
 }
 
-export async function getSession({
-  sessionId,
-  sessionToken,
-}: {
-  sessionId: string;
-  sessionToken: string;
-}) {
-  return sessionService.getSession({ sessionId, sessionToken }, {});
+export async function getSession(
+  host: string,
+  command: {
+    sessionId: string;
+    sessionToken: string;
+  },
+) {
+  return sessionService(host).getSession(
+    { sessionId: command.sessionId, sessionToken: command.sessionToken },
+    {},
+  );
 }
 
-export async function deleteSession(sessionId: string, sessionToken: string) {
-  return sessionService.deleteSession({ sessionId, sessionToken }, {});
+export async function deleteSession(
+  host: string,
+  command: { sessionId: string; sessionToken: string },
+) {
+  return sessionService(host).deleteSession(
+    { sessionId: command.sessionId, sessionToken: command.sessionToken },
+    {},
+  );
 }
 
-export async function listSessions(ids: string[]) {
-  return sessionService.listSessions(
+export async function listSessions(host: string, ids: string[]) {
+  return sessionService(host).listSessions(
     {
       queries: [
         {
@@ -259,14 +294,11 @@ export type AddHumanUserData = {
   organization: string | undefined;
 };
 
-export async function addHumanUser({
-  email,
-  firstName,
-  lastName,
-  password,
-  organization,
-}: AddHumanUserData) {
-  return userService.addHumanUser({
+export async function addHumanUser(
+  host: string,
+  { email, firstName, lastName, password, organization }: AddHumanUserData,
+) {
+  return userService(host).addHumanUser({
     email: { email },
     username: email,
     profile: { givenName: firstName, familyName: lastName },
@@ -279,25 +311,34 @@ export async function addHumanUser({
   });
 }
 
-export async function verifyTOTPRegistration(code: string, userId: string) {
-  return userService.verifyTOTPRegistration({ code, userId }, {});
+export async function verifyTOTPRegistration(
+  host: string,
+  command: { code: string; userId: string },
+) {
+  return userService(host).verifyTOTPRegistration(
+    { code: command.code, userId: command.userId },
+    {},
+  );
 }
 
-export async function getUserByID(userId: string) {
-  return userService.getUserByID({ userId }, {});
+export async function getUserByID(host: string, userId: string) {
+  return userService(host).getUserByID({ userId }, {});
 }
 
-export async function listUsers({
-  loginName,
-  userName,
-  email,
-  organizationId,
-}: {
-  loginName?: string;
-  userName?: string;
-  email?: string;
-  organizationId?: string;
-}) {
+export async function listUsers(
+  host: string,
+  {
+    loginName,
+    userName,
+    email,
+    organizationId,
+  }: {
+    loginName?: string;
+    userName?: string;
+    email?: string;
+    organizationId?: string;
+  },
+) {
   const queries: SearchQuery[] = [];
 
   if (loginName) {
@@ -354,11 +395,11 @@ export async function listUsers({
     );
   }
 
-  return userService.listUsers({ queries: queries });
+  return userService(host).listUsers({ queries: queries });
 }
 
-export async function getOrgsByDomain(domain: string) {
-  return orgService.listOrganizations(
+export async function getOrgsByDomain(host: string, domain: string) {
+  return orgService(host).listOrganizations(
     {
       queries: [
         {
@@ -380,7 +421,7 @@ export async function startIdentityProviderFlow({
   idpId: string;
   urls: RedirectURLsJson;
 }) {
-  return userService.startIdentityProviderIntent({
+  return userService(host).startIdentityProviderIntent({
     idpId,
     content: {
       case: "urls",
@@ -393,7 +434,7 @@ export async function retrieveIdentityProviderInformation({
   idpIntentId,
   idpIntentToken,
 }: RetrieveIdentityProviderIntentRequest) {
-  return userService.retrieveIdentityProviderIntent({
+  return userService(host).retrieveIdentityProviderIntent({
     idpIntentId,
     idpIntentToken,
   });
@@ -404,17 +445,17 @@ export async function getAuthRequest({
 }: {
   authRequestId: string;
 }) {
-  return oidcService.getAuthRequest({
+  return oidcService(host).getAuthRequest({
     authRequestId,
   });
 }
 
 export async function createCallback(req: CreateCallbackRequest) {
-  return oidcService.createCallback(req);
+  return oidcService(host).createCallback(req);
 }
 
 export async function verifyEmail(userId: string, verificationCode: string) {
-  return userService.verifyEmail(
+  return userService(host).verifyEmail(
     {
       userId,
       verificationCode,
@@ -429,7 +470,7 @@ export async function verifyEmail(userId: string, verificationCode: string) {
  * @returns the newly set email
  */
 export async function resendEmailCode(userId: string) {
-  return userService.resendEmailCode(
+  return userService(host).resendEmailCode(
     {
       userId,
     },
@@ -438,7 +479,7 @@ export async function resendEmailCode(userId: string) {
 }
 
 export function retrieveIDPIntent(id: string, token: string) {
-  return userService.retrieveIdentityProviderIntent(
+  return userService(host).retrieveIdentityProviderIntent(
     { idpIntentId: id, idpIntentToken: token },
     {},
   );
@@ -456,7 +497,7 @@ export function addIDPLink(
   },
   userId: string,
 ) {
-  return userService.addIDPLink(
+  return userService(host).addIDPLink(
     {
       idpLink: {
         userId: idp.userId,
@@ -474,7 +515,7 @@ export function createUser(
   info: IDPInformation,
 ) {
   const userData = PROVIDER_MAPPING[provider](info);
-  return userService.addHumanUser(userData, {});
+  return userService(host).addHumanUser(userData, {});
 }
 
 /**
@@ -483,7 +524,7 @@ export function createUser(
  * @returns the newly set email
  */
 export async function passwordReset(userId: string) {
-  return userService.passwordReset(
+  return userService(host).passwordReset(
     {
       userId,
     },
@@ -509,7 +550,7 @@ export async function createPasskeyRegistrationLink(
   // });
 
   // const service = createUserServiceClient(transport);
-  return userService.createPasskeyRegistrationLink({
+  return userService(host).createPasskeyRegistrationLink({
     userId,
     medium: {
       case: "returnCode",
@@ -537,7 +578,7 @@ export async function registerU2F(
   // });
 
   // const service = createUserServiceClient(transport);
-  return userService.registerU2F({
+  return userService(host).registerU2F({
     userId,
     domain,
   });
@@ -552,11 +593,11 @@ export async function registerU2F(
 export async function verifyU2FRegistration(
   request: VerifyU2FRegistrationRequest,
 ) {
-  return userService.verifyU2FRegistration(request, {});
+  return userService(host).verifyU2FRegistration(request, {});
 }
 
 export async function getActiveIdentityProviders(orgId?: string) {
-  return settingsService.getActiveIdentityProviders(
+  return settingsService(host).getActiveIdentityProviders(
     { ctx: makeReqCtx(orgId) },
     {},
   );
@@ -570,7 +611,7 @@ export async function getActiveIdentityProviders(orgId?: string) {
 export async function verifyPasskeyRegistration(
   request: VerifyPasskeyRegistrationRequest,
 ) {
-  return userService.verifyPasskeyRegistration(request, {});
+  return userService(host).verifyPasskeyRegistration(request, {});
 }
 
 /**
@@ -583,7 +624,7 @@ export async function registerPasskey(
   code: { id: string; code: string },
   domain: string,
 ) {
-  return userService.registerPasskey({
+  return userService(host).registerPasskey({
     userId,
     code,
     domain,
@@ -596,7 +637,7 @@ export async function registerPasskey(
  * @returns the newly set email
  */
 export async function listAuthenticationMethodTypes(userId: string) {
-  return userService.listAuthenticationMethodTypes({
+  return userService(host).listAuthenticationMethodTypes({
     userId,
   });
 }
