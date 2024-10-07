@@ -23,10 +23,12 @@ import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_servi
 import { BrandingSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import {
+  IdentityProvider,
   IdentityProviderType,
   LoginSettingsSchema,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { GetActiveIdentityProvidersResponse } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   SearchQuery,
@@ -44,13 +46,16 @@ const CACHE_REVALIDATION_INTERVAL_IN_SECONDS = process.env
   : 3600;
 
 // TODO: check for better typing
-function createServiceForHost(mapper: (transport: any) => any) {
-  const host = headers().get("X-Forwarded-Host");
+async function createServiceForHost(mapper: (transport: any) => any) {
+  const host =
+    process.env.NEXT_PUBLIC_HOST ?? headers().get("X-Forwarded-Host");
   if (!host) {
     throw new Error("No host header found!");
   }
 
-  const targetApi = getApiConfiguration(host);
+  const targetApi = await getApiConfiguration(host);
+
+  console.log("t", targetApi);
 
   const transport = createServerTransport(targetApi.token, {
     baseUrl: targetApi.url,
@@ -60,12 +65,16 @@ function createServiceForHost(mapper: (transport: any) => any) {
   return mapper(transport);
 }
 
-export const idpService = createServiceForHost(createIdpServiceClient);
-export const orgService = createServiceForHost(createOrganizationServiceClient);
-export const sessionService = createServiceForHost(createSessionServiceClient);
-export const userService = createServiceForHost(createUserServiceClient);
-export const oidcService = createServiceForHost(createOIDCServiceClient);
-export const settingsService = createServiceForHost(
+export const idpService = await createServiceForHost(createIdpServiceClient);
+export const orgService = await createServiceForHost(
+  createOrganizationServiceClient,
+);
+export const sessionService = await createServiceForHost(
+  createSessionServiceClient,
+);
+export const userService = await createServiceForHost(createUserServiceClient);
+export const oidcService = await createServiceForHost(createOIDCServiceClient);
+export const settingsService = await createServiceForHost(
   createSettingsServiceClient,
 );
 
@@ -511,16 +520,7 @@ export async function passwordReset(userId: string) {
  */
 
 // TODO check for token requirements!
-export async function createPasskeyRegistrationLink(
-  userId: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  //   httpVersion: "2",
-  // });
-
-  // const service = createUserServiceClient(transport);
+export async function createPasskeyRegistrationLink(userId: string) {
   return userService.createPasskeyRegistrationLink({
     userId,
     medium: {
@@ -538,17 +538,7 @@ export async function createPasskeyRegistrationLink(
  */
 
 // TODO check for token requirements!
-export async function registerU2F(
-  userId: string,
-  domain: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  //   httpVersion: "2",
-  // });
-
-  // const service = createUserServiceClient(transport);
+export async function registerU2F(userId: string, domain: string) {
   return userService.registerU2F({
     userId,
     domain,
@@ -567,11 +557,12 @@ export async function verifyU2FRegistration(
   return userService.verifyU2FRegistration(request, {});
 }
 
-export async function getActiveIdentityProviders(orgId?: string) {
-  return settingsService.getActiveIdentityProviders(
-    { ctx: makeReqCtx(orgId) },
-    {},
-  );
+export async function getActiveIdentityProviders(
+  orgId?: string,
+): Promise<IdentityProvider[]> {
+  return settingsService
+    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp: GetActiveIdentityProvidersResponse) => resp.identityProviders);
 }
 
 /**

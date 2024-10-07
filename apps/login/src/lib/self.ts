@@ -1,27 +1,21 @@
 "use server";
 
-import {
-  createSessionServiceClient,
-  createUserServiceClient,
-} from "@zitadel/client/v2";
+import { createUserServiceClient } from "@zitadel/client/v2";
 import { createServerTransport } from "@zitadel/node";
 import { getSessionCookieById } from "./cookies";
 
-const transport = (token: string) =>
+const transport = (url: string, token: string) =>
   createServerTransport(token, {
-    baseUrl: process.env.ZITADEL_API_URL!,
+    baseUrl: url,
     httpVersion: "2",
   });
 
-const sessionService = (sessionId: string) => {
-  return getSessionCookieById({ sessionId }).then((session) => {
-    return createSessionServiceClient(transport(session.token));
-  });
-};
-
 const userService = (sessionId: string) => {
   return getSessionCookieById({ sessionId }).then((session) => {
-    return createUserServiceClient(transport(session.token));
+    return createUserServiceClient(
+      // TODO: get baseurl dynamically
+      transport(process.env.ZITADEL_API_URL, session.token),
+    );
   });
 };
 

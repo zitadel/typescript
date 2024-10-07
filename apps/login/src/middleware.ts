@@ -11,8 +11,8 @@ export const config = {
   ],
 };
 
-export function middleware(request: NextRequest) {
-  const apiConfig = getApiConfiguration(request.nextUrl.host);
+export async function middleware(request: NextRequest) {
+  const apiConfig = await getApiConfiguration(request.nextUrl.host);
 
   const INSTANCE_URL = apiConfig.url;
   const INSTANCE_HOST = `${INSTANCE_URL}`.replace("https://", "");

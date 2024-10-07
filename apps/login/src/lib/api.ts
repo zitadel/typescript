@@ -1,22 +1,45 @@
+import { importPKCS8, SignJWT } from "jose";
+
 type ApiConfiguration = {
   url: string;
   token: string;
   userId: string;
 };
 
-const QA: ApiConfiguration = {
-  url: process.env.MULTITENANCY_QA_URL!,
-  token: process.env.MULTITENANCY_QA_TOKEN!,
-  userId: process.env.MULTITENANCY_QA_USERID!,
+const QA: Omit<ApiConfiguration, "token"> = {
+  url: process.env.MULTITENANCY_QA_URL,
+  userId: process.env.MULTITENANCY_QA_USERID,
 };
 
-const PROD: ApiConfiguration = {
-  url: process.env.MULTITENANCY_PROD_URL!,
-  token: process.env.MULTITENANCY_PROD_TOKEN!,
-  userId: process.env.MULTITENANCY_PROD_USERID!,
+const PROD: Omit<ApiConfiguration, "token"> = {
+  url: process.env.MULTITENANCY_PROD_URL,
+  userId: process.env.MULTITENANCY_PROD_USERID,
 };
 
-export function getApiConfiguration(host: string): ApiConfiguration {
-  console.log(host);
-  return host.includes("wild") ? QA : PROD;
+export async function getApiConfiguration(
+  host: string,
+): Promise<ApiConfiguration> {
+  const config = host.includes("wild") ? QA : PROD;
+
+  const systemToken = await systemAPIToken(config.url);
+
+  return { ...config, token: systemToken };
+}
+
+export async function systemAPIToken(url: string) {
+  console.log(url);
+  const audience = url; // ?? process.env.ZITADEL_API_URL;
+  const userID = process.env.ZITADEL_SERVICE_USER_ID;
+  const key = process.env.ZITADEL_SERVICE_USER_TOKEN;
+
+  const token = new SignJWT({})
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .setIssuer(userID)
+    .setSubject(userID)
+    .setAudience(audience)
+    .sign(await importPKCS8(key, "RS256"));
+
+  return token;
 }

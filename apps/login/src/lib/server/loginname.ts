@@ -35,9 +35,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders(
       command.organization,
-    ).then((resp) => {
-      return resp.identityProviders;
-    });
+    );
 
     if (identityProviders.length === 1) {
       const host = headers().get("host");
