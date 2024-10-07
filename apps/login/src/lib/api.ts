@@ -17,5 +17,6 @@ const PROD: ApiConfiguration = {
 };
 
 export function getApiConfiguration(host: string): ApiConfiguration {
+  console.log(host);
   return host.includes("wild") ? QA : PROD;
 }
