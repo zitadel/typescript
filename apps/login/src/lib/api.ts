@@ -21,16 +21,15 @@ export async function getApiConfiguration(
 ): Promise<ApiConfiguration> {
   const config = host.includes("wild") ? QA : PROD;
 
-  const systemToken = await systemAPIToken(config.url);
+  const systemToken = await systemAPIToken();
 
   return { ...config, token: systemToken };
 }
 
-export async function systemAPIToken(url: string) {
-  console.log(url);
-  const audience = url; // ?? process.env.ZITADEL_API_URL;
-  const userID = process.env.ZITADEL_SERVICE_USER_ID;
-  const key = process.env.ZITADEL_SERVICE_USER_TOKEN;
+export async function systemAPIToken() {
+  const audience = process.env.ZITADEL_API_URL; // https://zitadel.app
+  const userID = process.env.ZITADEL_SERVICE_USER_ID; // customer-portal
+  const key = process.env.ZITADEL_SERVICE_USER_TOKEN; // private key
 
   const token = new SignJWT({})
     .setProtectedHeader({ alg: "RS256" })

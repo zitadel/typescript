@@ -20,6 +20,7 @@ import {
 import { create, fromJson, toJson } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { ListOrganizationsResponse } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
 import { BrandingSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import {
@@ -392,6 +393,23 @@ export async function getOrgsByDomain(domain: string) {
     },
     {},
   );
+}
+
+export async function getDefaultOrg() {
+  return orgService
+    .listOrganizations(
+      {
+        queries: [
+          {
+            query: {
+              case: "defaultQuery",
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp: ListOrganizationsResponse) => resp.result[0]);
 }
 
 export async function startIdentityProviderFlow({
