@@ -11,6 +11,7 @@ import {
   retrieveIDPIntent,
 } from "@/lib/zitadel";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { RetrieveIdentityProviderIntentResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 export default async function Page({
   searchParams,
@@ -25,7 +26,7 @@ export default async function Page({
   const branding = await getBrandingSettings(organization);
   if (provider && id && token) {
     return retrieveIDPIntent(id, token)
-      .then(async (resp) => {
+      .then(async (resp: RetrieveIdentityProviderIntentResponse) => {
         const { idpInformation, userId } = resp;
 
         if (userId) {
