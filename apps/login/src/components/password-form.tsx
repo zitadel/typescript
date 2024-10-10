@@ -5,6 +5,7 @@ import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -35,6 +36,8 @@ export function PasswordForm({
   promptPasswordless,
   isAlternative,
 }: Props) {
+  const t = useTranslations("password");
+
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -67,6 +70,7 @@ export function PasswordForm({
 
     setLoading(false);
 
+    console.log(response);
     return response;
   }
 
@@ -108,6 +112,11 @@ export function PasswordForm({
       !submitted.authMethods ||
       !submitted.factors?.user?.loginName
     ) {
+      console.log(
+        !submitted,
+        !submitted?.authMethods,
+        !submitted?.factors?.user?.loginName,
+      );
       return;
     }
 
@@ -117,6 +126,7 @@ export function PasswordForm({
         m !== AuthenticationMethodType.PASSKEY,
     );
 
+    console.log(availableSecondFactors);
     if (availableSecondFactors?.length == 1) {
       const params = new URLSearchParams({
         loginName: submitted.factors?.user.loginName,
@@ -203,25 +213,25 @@ export function PasswordForm({
       }
 
       return router.push(`/login?` + params);
-    } else {
-      // without OIDC flow
-      const params = new URLSearchParams(
-        authRequestId
-          ? {
-              loginName: submitted.factors.user.loginName,
-              authRequestId,
-            }
-          : {
-              loginName: submitted.factors.user.loginName,
-            },
-      );
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      return router.push(`/signedin?` + params);
     }
+
+    // without OIDC flow
+    const params = new URLSearchParams(
+      authRequestId
+        ? {
+            loginName: submitted.factors.user.loginName,
+            authRequestId,
+          }
+        : {
+            loginName: submitted.factors.user.loginName,
+          },
+    );
+
+    if (organization) {
+      params.append("organization", organization);
+    }
+
+    return router.push(`/signedin?` + params);
   }
 
   return (
@@ -240,7 +250,7 @@ export function PasswordForm({
             type="button"
             disabled={loading}
           >
-            Reset Password
+            {t("resetPassword")}
           </button>
         )}
 
@@ -277,7 +287,7 @@ export function PasswordForm({
           onClick={handleSubmit(submitPasswordAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("submit")}
         </Button>
       </div>
     </form>

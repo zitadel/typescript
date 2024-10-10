@@ -17,10 +17,21 @@ type SessionCookie<T> = Cookie & T;
 
 function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
   const cookiesList = cookies();
-  // @ts-ignore
+
   return cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
+    httpOnly: true,
+    path: "/",
+  });
+}
+
+export async function setLanguageCookie(language: string) {
+  const cookiesList = cookies();
+
+  await cookiesList.set({
+    name: "NEXT_LOCALE",
+    value: language,
     httpOnly: true,
     path: "/",
   });
