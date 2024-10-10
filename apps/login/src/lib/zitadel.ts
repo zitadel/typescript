@@ -38,7 +38,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { unstable_cache } from "next/cache";
 import { headers } from "next/headers";
-import { getApiUrl, systemAPIToken } from "./api";
+import { getInstanceUrl, systemAPIToken } from "./api";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
@@ -55,10 +55,11 @@ async function createServiceForHost(mapper: (transport: any) => any) {
     throw new Error("No host header found!");
   }
 
-  const targetApi = await getApiUrl(host);
+  const instanceUrl = await getInstanceUrl(host);
+  const systemToken = await systemAPIToken();
 
-  const transport = createServerTransport(targetApi.token, {
-    baseUrl: targetApi.url,
+  const transport = createServerTransport(systemToken, {
+    baseUrl: instanceUrl,
     httpVersion: "2",
   });
 

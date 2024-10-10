@@ -1,12 +1,7 @@
 import { importPKCS8, SignJWT } from "jose";
 import { getInstanceByHost } from "./zitadel";
 
-type ApiConfiguration = {
-  url: string;
-  token: string;
-};
-
-export async function getApiUrl(host: string): Promise<ApiConfiguration> {
+export async function getInstanceUrl(host: string): Promise<string> {
   const instance = await getInstanceByHost(host);
   const generatedDomain = instance.domains.find(
     (domain) => domain.generated === true,
@@ -16,11 +11,9 @@ export async function getApiUrl(host: string): Promise<ApiConfiguration> {
     throw new Error("No generated domain found");
   }
 
-  const systemToken = await systemAPIToken();
-
   console.log(`host: ${host}, api: ${generatedDomain?.domain}`);
 
-  return { url: generatedDomain?.domain, token: systemToken };
+  return generatedDomain?.domain;
 }
 
 export async function systemAPIToken() {
