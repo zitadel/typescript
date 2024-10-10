@@ -49,8 +49,7 @@ const CACHE_REVALIDATION_INTERVAL_IN_SECONDS = process.env
 
 // TODO: check for better typing
 async function createServiceForHost(mapper: (transport: any) => any) {
-  const host =
-    process.env.NEXT_PUBLIC_HOST ?? headers().get("X-Forwarded-Host");
+  const host = headers().get("X-Forwarded-Host");
   if (!host) {
     throw new Error("No host header found!");
   }
