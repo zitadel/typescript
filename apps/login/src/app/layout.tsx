@@ -6,7 +6,6 @@ import { Theme } from "@/components/theme";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { Lato } from "next/font/google";
-import { headers } from "next/headers";
 import { ReactNode } from "react";
 
 const lato = Lato({
@@ -24,9 +23,9 @@ export default async function RootLayout({
   // later only shown with dev mode enabled
   const showNav = process.env.DEBUG === "true";
 
-  const host = headers().get("host");
-
-  let domain = host ? host.replace("https://", "") : "acme.com";
+  // TODO remove for actual host
+  let domain = process.env.ZITADEL_API_URL;
+  domain = domain ? domain.replace("https://", "") : "acme.com";
 
   return (
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
