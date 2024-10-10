@@ -37,8 +37,7 @@ import {
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { unstable_cache } from "next/cache";
-import { headers } from "next/headers";
-import { getInstanceUrl, systemAPIToken } from "./api";
+import { systemAPIToken } from "./api";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
@@ -49,21 +48,25 @@ const CACHE_REVALIDATION_INTERVAL_IN_SECONDS = process.env
 
 // TODO: check for better typing
 async function createServiceForHost(mapper: (transport: any) => any) {
-  const host = headers().get("X-Forwarded-Host");
-  if (!host) {
-    throw new Error("No host header found!");
-  }
+  // const host = headers().get("X-Forwarded-Host");
+  // if (!host) {
+  //   throw new Error("No host header found!");
+  // }
 
-  let instanceUrl;
-  try {
-    instanceUrl = await getInstanceUrl(host);
-  } catch (error) {
-    console.error(
-      "Could not get instance url, fallback to ZITADEL_API_URL",
-      error,
-    );
-    instanceUrl = process.env.ZITADEL_API_URL;
-  }
+  // let instanceUrl;
+  // try {
+  //   instanceUrl = await getInstanceUrl(host);
+  // } catch (error) {
+  //   console.error(
+  //     "Could not get instance url, fallback to ZITADEL_API_URL",
+  //     error,
+  //   );
+  //   instanceUrl = process.env.ZITADEL_API_URL;
+  // }
+
+  // remove in favor of the above
+  const instanceUrl = process.env.ZITADEL_API_URL;
+
   const systemToken = await systemAPIToken();
 
   const transport = createServerTransport(systemToken, {
@@ -74,20 +77,16 @@ async function createServiceForHost(mapper: (transport: any) => any) {
   return mapper(transport);
 }
 
-export const idpService = await createServiceForHost(createIdpServiceClient);
-export const orgService = await createServiceForHost(
-  createOrganizationServiceClient,
-);
+const idpService = await createServiceForHost(createIdpServiceClient);
+const orgService = await createServiceForHost(createOrganizationServiceClient);
 export const sessionService = await createServiceForHost(
   createSessionServiceClient,
 );
-export const userService = await createServiceForHost(createUserServiceClient);
-export const oidcService = await createServiceForHost(createOIDCServiceClient);
-export const settingsService = await createServiceForHost(
-  createSettingsServiceClient,
-);
+const userService = await createServiceForHost(createUserServiceClient);
+const oidcService = await createServiceForHost(createOIDCServiceClient);
+const settingsService = await createServiceForHost(createSettingsServiceClient);
 
-export const systemService = async () => {
+const systemService = async () => {
   const systemToken = await systemAPIToken();
 
   const transport = createServerTransport(systemToken, {
