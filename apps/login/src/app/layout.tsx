@@ -23,6 +23,7 @@ export default async function RootLayout({
   // later only shown with dev mode enabled
   const showNav = process.env.DEBUG === "true";
 
+  // TODO remove for actual host
   let domain = process.env.ZITADEL_API_URL;
   domain = domain ? domain.replace("https://", "") : "acme.com";
 

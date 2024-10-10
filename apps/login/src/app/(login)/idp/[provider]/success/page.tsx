@@ -11,6 +11,7 @@ import {
   retrieveIDPIntent,
 } from "@/lib/zitadel";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { RetrieveIdentityProviderIntentResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 export default async function Page({
   searchParams,
@@ -25,7 +26,7 @@ export default async function Page({
   const branding = await getBrandingSettings(organization);
   if (provider && id && token) {
     return retrieveIDPIntent(id, token)
-      .then(async (resp) => {
+      .then(async (resp: RetrieveIdentityProviderIntentResponse) => {
         const { idpInformation, userId } = resp;
 
         if (userId) {
@@ -92,7 +93,7 @@ export default async function Page({
                   userName: idpInformation.userName,
                 },
                 foundUser.userId,
-              ).catch((error) => {
+              ).catch(() => {
                 return (
                   <DynamicTheme branding={branding}>
                     <div className="flex flex-col items-center space-y-4">
@@ -100,7 +101,7 @@ export default async function Page({
                       <div className="w-full">
                         {
                           <Alert type={AlertType.ALERT}>
-                            {JSON.stringify(error.message)}
+                            User could not be linked
                           </Alert>
                         }
                       </div>
@@ -170,17 +171,13 @@ export default async function Page({
           );
         }
       })
-      .catch((error) => {
+      .catch(() => {
         return (
           <DynamicTheme branding={branding}>
             <div className="flex flex-col items-center space-y-4">
               <h1>An error occurred</h1>
               <div className="w-full">
-                {
-                  <Alert type={AlertType.ALERT}>
-                    {JSON.stringify(error.message)}
-                  </Alert>
-                }
+                {<Alert type={AlertType.ALERT}>An error occurred</Alert>}
               </div>
             </div>
           </DynamicTheme>

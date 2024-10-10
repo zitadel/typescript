@@ -3,6 +3,7 @@ import { RegisterFormWithoutPassword } from "@/components/register-form-without-
 import { SetPasswordForm } from "@/components/set-password-form";
 import {
   getBrandingSettings,
+  getDefaultOrg,
   getLegalAndSupportSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
@@ -12,11 +13,16 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { firstname, lastname, email, organization, authRequestId } =
+  let { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
   if (!organization) {
-    // TODO: get default organization
+    const org = await getDefaultOrg();
+    if (!org) {
+      throw new Error("No default organization found");
+    }
+
+    organization = org.id;
   }
 
   const setPassword = !!(firstname && lastname && email);

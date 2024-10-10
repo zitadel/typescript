@@ -18,21 +18,26 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 import { create, fromJson, toJson } from "@zitadel/client";
+import { createSystemServiceClient } from "@zitadel/client/v1";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { ListOrganizationsResponse } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
 import { BrandingSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import {
+  IdentityProvider,
   IdentityProviderType,
   LoginSettingsSchema,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { GetActiveIdentityProvidersResponse } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { unstable_cache } from "next/cache";
+import { systemAPIToken } from "./api";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
@@ -41,28 +46,89 @@ const CACHE_REVALIDATION_INTERVAL_IN_SECONDS = process.env
   ? Number(process.env.CACHE_REVALIDATION_INTERVAL_IN_SECONDS)
   : 3600;
 
-const transport = createServerTransport(
-  process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  {
-    baseUrl: process.env.ZITADEL_API_URL!,
+// TODO: check for better typing
+async function createServiceForHost(mapper: (transport: any) => any) {
+  // const host = headers().get("X-Forwarded-Host");
+  // if (!host) {
+  //   throw new Error("No host header found!");
+  // }
+
+  // let instanceUrl;
+  // try {
+  //   instanceUrl = await getInstanceUrl(host);
+  // } catch (error) {
+  //   console.error(
+  //     "Could not get instance url, fallback to ZITADEL_API_URL",
+  //     error,
+  //   );
+  //   instanceUrl = process.env.ZITADEL_API_URL;
+  // }
+
+  // remove in favor of the above
+  const instanceUrl = process.env.ZITADEL_API_URL;
+
+  const systemToken = await systemAPIToken();
+
+  const transport = createServerTransport(systemToken, {
+    baseUrl: instanceUrl,
     httpVersion: "2",
-  },
+  });
+
+  return mapper(transport);
+}
+
+const idpService = await createServiceForHost(createIdpServiceClient);
+const orgService = await createServiceForHost(createOrganizationServiceClient);
+export const sessionService = await createServiceForHost(
+  createSessionServiceClient,
 );
+const userService = await createServiceForHost(createUserServiceClient);
+const oidcService = await createServiceForHost(createOIDCServiceClient);
+const settingsService = await createServiceForHost(createSettingsServiceClient);
 
-export const sessionService = createSessionServiceClient(transport);
-export const userService = createUserServiceClient(transport);
-export const oidcService = createOIDCServiceClient(transport);
-export const idpService = createIdpServiceClient(transport);
-export const orgService = createOrganizationServiceClient(transport);
+const systemService = async () => {
+  const systemToken = await systemAPIToken();
 
-export const settingsService = createSettingsServiceClient(transport);
+  const transport = createServerTransport(systemToken, {
+    baseUrl: process.env.ZITADEL_API_URL,
+    httpVersion: "2",
+  });
+
+  return createSystemServiceClient(transport);
+};
+
+export async function getInstanceByHost(host: string) {
+  return (await systemService())
+    .listInstances(
+      {
+        queries: [
+          {
+            query: {
+              case: "domainQuery",
+              value: {
+                domains: [host],
+              },
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp) => {
+      if (resp.result.length !== 1) {
+        throw new Error("Could not find instance");
+      }
+
+      return resp.result[0];
+    });
+}
 
 export async function getBrandingSettings(organization?: string) {
   return unstable_cache(
     async () => {
       return await settingsService
         .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) =>
+        .then((resp: any) =>
           resp.settings
             ? toJson(BrandingSettingsSchema, resp.settings)
             : undefined,
@@ -83,7 +149,7 @@ export async function getLoginSettings(orgId?: string) {
     async () => {
       return await settingsService
         .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-        .then((resp) =>
+        .then((resp: any) =>
           resp.settings
             ? toJson(LoginSettingsSchema, resp.settings)
             : undefined,
@@ -117,7 +183,7 @@ export async function registerTOTP(userId: string) {
 export async function getGeneralSettings() {
   return settingsService
     .getGeneralSettings({}, {})
-    .then((resp) => resp.supportedLanguages);
+    .then((resp: any) => resp.supportedLanguages);
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
@@ -125,7 +191,7 @@ export async function getLegalAndSupportSettings(organization?: string) {
     async () => {
       return await settingsService
         .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) =>
+        .then((resp: any) =>
           resp.settings
             ? toJson(LegalAndSupportSettingsSchema, resp.settings)
             : undefined,
@@ -146,7 +212,7 @@ export async function getPasswordComplexitySettings(organization?: string) {
     async () => {
       return await settingsService
         .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-        .then((resp) =>
+        .then((resp: any) =>
           resp.settings
             ? toJson(PasswordComplexitySettingsSchema, resp.settings)
             : undefined,
@@ -373,6 +439,24 @@ export async function getOrgsByDomain(domain: string) {
   );
 }
 
+export async function getDefaultOrg() {
+  return orgService
+    .listOrganizations(
+      {
+        queries: [
+          {
+            query: {
+              case: "defaultQuery",
+              value: { default: true },
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp: ListOrganizationsResponse) => resp.result[0]);
+}
+
 export async function startIdentityProviderFlow({
   idpId,
   urls,
@@ -445,7 +529,7 @@ export function retrieveIDPIntent(id: string, token: string) {
 }
 
 export function getIDPByID(id: string) {
-  return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
+  return idpService.getIDPByID({ id }, {}).then((resp: any) => resp.idp);
 }
 
 export function addIDPLink(
@@ -499,16 +583,7 @@ export async function passwordReset(userId: string) {
  */
 
 // TODO check for token requirements!
-export async function createPasskeyRegistrationLink(
-  userId: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  //   httpVersion: "2",
-  // });
-
-  // const service = createUserServiceClient(transport);
+export async function createPasskeyRegistrationLink(userId: string) {
   return userService.createPasskeyRegistrationLink({
     userId,
     medium: {
@@ -526,17 +601,7 @@ export async function createPasskeyRegistrationLink(
  */
 
 // TODO check for token requirements!
-export async function registerU2F(
-  userId: string,
-  domain: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  //   httpVersion: "2",
-  // });
-
-  // const service = createUserServiceClient(transport);
+export async function registerU2F(userId: string, domain: string) {
   return userService.registerU2F({
     userId,
     domain,
@@ -555,11 +620,12 @@ export async function verifyU2FRegistration(
   return userService.verifyU2FRegistration(request, {});
 }
 
-export async function getActiveIdentityProviders(orgId?: string) {
-  return settingsService.getActiveIdentityProviders(
-    { ctx: makeReqCtx(orgId) },
-    {},
-  );
+export async function getActiveIdentityProviders(
+  orgId?: string,
+): Promise<IdentityProvider[]> {
+  return settingsService
+    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp: GetActiveIdentityProvidersResponse) => resp.identityProviders);
 }
 
 /**
