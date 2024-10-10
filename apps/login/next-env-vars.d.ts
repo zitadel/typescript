@@ -3,22 +3,31 @@ declare namespace NodeJS {
     /**
      * The system api url
      */
-    ZITADEL_API_URL: string;
+    AUDIENCE: string;
 
     /**
      * The system api service user ID
      */
-    ZITADEL_SERVICE_USER_ID: string;
+    SYSTEM_USER_ID: string;
 
     /**
      * The service user key
      */
-    ZITADEL_SERVICE_USER_TOKEN: string;
+    SYSTEM_USER_PRIVATE_KEY: string;
 
-    // TODO remove this
-    MULTITENANCY_QA_URL: string;
-    MULTITENANCY_QA_USERID: string;
-    MULTITENANCY_PROD_URL: string;
-    MULTITENANCY_PROD_USERID: string;
+    /**
+     * The instance url
+     */
+    ZITADEL_API_URL: string;
+
+    /**
+     * The service user id for the instance
+     */
+    ZITADEL_USER_ID: string;
+
+    /**
+     * The service user token for the instance
+     */
+    ZITADEL_USER_TOKEN: string;
   }
 }

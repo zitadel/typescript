@@ -1,35 +1,34 @@
 import { importPKCS8, SignJWT } from "jose";
+import { getInstanceByHost } from "./zitadel";
 
 type ApiConfiguration = {
   url: string;
   token: string;
-  userId: string;
 };
 
-const QA: Omit<ApiConfiguration, "token"> = {
-  url: process.env.MULTITENANCY_QA_URL,
-  userId: process.env.MULTITENANCY_QA_USERID,
-};
+export async function getApiUrl(host: string): Promise<ApiConfiguration> {
+  const instance = await getInstanceByHost(host);
+  const generatedDomain = instance.domains.find(
+    (domain) => domain.generated === true,
+  );
 
-const PROD: Omit<ApiConfiguration, "token"> = {
-  url: process.env.MULTITENANCY_PROD_URL,
-  userId: process.env.MULTITENANCY_PROD_USERID,
-};
-
-export async function getApiConfiguration(
-  host: string,
-): Promise<ApiConfiguration> {
-  const config = host.includes("wild") ? QA : PROD;
+  if (!generatedDomain?.domain) {
+    throw new Error("No generated domain found");
+  }
 
   const systemToken = await systemAPIToken();
 
-  return { ...config, token: systemToken };
+  console.log(`host: ${host}, api: ${generatedDomain?.domain}`);
+
+  return { url: generatedDomain?.domain, token: systemToken };
 }
 
 export async function systemAPIToken() {
-  const audience = process.env.ZITADEL_API_URL; // https://zitadel.app
-  const userID = process.env.ZITADEL_SERVICE_USER_ID; // customer-portal
-  const key = process.env.ZITADEL_SERVICE_USER_TOKEN; // private key
+  const audience = process.env.AUDIENCE;
+  const userID = process.env.SYSTEM_USER_ID;
+  const key = process.env.SYSTEM_USER_PRIVATE_KEY;
+
+  const decodedToken = Buffer.from(key, "base64").toString("utf-8");
 
   const token = new SignJWT({})
     .setProtectedHeader({ alg: "RS256" })
@@ -38,7 +37,7 @@ export async function systemAPIToken() {
     .setIssuer(userID)
     .setSubject(userID)
     .setAudience(audience)
-    .sign(await importPKCS8(key, "RS256"));
+    .sign(await importPKCS8(decodedToken, "RS256"));
 
   return token;
 }

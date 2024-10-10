@@ -18,6 +18,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 import { create, fromJson, toJson } from "@zitadel/client";
+import { createSystemServiceClient } from "@zitadel/client/v1";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { ListOrganizationsResponse } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
@@ -37,7 +38,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { unstable_cache } from "next/cache";
 import { headers } from "next/headers";
-import { getApiConfiguration } from "./api";
+import { getApiUrl, systemAPIToken } from "./api";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
@@ -54,9 +55,7 @@ async function createServiceForHost(mapper: (transport: any) => any) {
     throw new Error("No host header found!");
   }
 
-  const targetApi = await getApiConfiguration(host);
-
-  console.log("t", targetApi);
+  const targetApi = await getApiUrl(host);
 
   const transport = createServerTransport(targetApi.token, {
     baseUrl: targetApi.url,
@@ -78,6 +77,43 @@ export const oidcService = await createServiceForHost(createOIDCServiceClient);
 export const settingsService = await createServiceForHost(
   createSettingsServiceClient,
 );
+
+export const systemService = async () => {
+  const systemToken = await systemAPIToken();
+
+  const transport = createServerTransport(systemToken, {
+    baseUrl: process.env.ZITADEL_API_URL,
+    httpVersion: "2",
+  });
+
+  return createSystemServiceClient(transport);
+};
+
+export async function getInstanceByHost(host: string) {
+  return (await systemService())
+    .listInstances(
+      {
+        queries: [
+          {
+            query: {
+              case: "domainQuery",
+              value: {
+                domains: [host],
+              },
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp) => {
+      if (resp.result.length !== 1) {
+        throw new Error("Could not find instance");
+      }
+
+      return resp.result[0];
+    });
+}
 
 export async function getBrandingSettings(organization?: string) {
   return unstable_cache(
@@ -403,6 +439,7 @@ export async function getDefaultOrg() {
           {
             query: {
               case: "defaultQuery",
+              value: { default: true },
             },
           },
         ],
