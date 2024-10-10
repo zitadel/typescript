@@ -54,7 +54,16 @@ async function createServiceForHost(mapper: (transport: any) => any) {
     throw new Error("No host header found!");
   }
 
-  const instanceUrl = await getInstanceUrl(host);
+  let instanceUrl;
+  try {
+    instanceUrl = await getInstanceUrl(host);
+  } catch (error) {
+    console.error(
+      "Could not get instance url, fallback to ZITADEL_API_URL",
+      error,
+    );
+    instanceUrl = process.env.ZITADEL_API_URL;
+  }
   const systemToken = await systemAPIToken();
 
   const transport = createServerTransport(systemToken, {
