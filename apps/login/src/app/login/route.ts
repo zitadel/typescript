@@ -167,9 +167,7 @@ export async function GET(request: NextRequest) {
 
         const identityProviders = await getActiveIdentityProviders(
           organization ? organization : undefined,
-        ).then((resp) => {
-          return resp.identityProviders;
-        });
+        );
 
         const idp = identityProviders.find((idp) => idp.id === idpId);
 

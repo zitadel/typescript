@@ -2,21 +2,12 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UsernameForm } from "@/components/username-form";
 import {
+  getActiveIdentityProviders,
   getBrandingSettings,
   getLegalAndSupportSettings,
   getLoginSettings,
-  settingsService,
 } from "@/lib/zitadel";
-import { makeReqCtx } from "@zitadel/client/v2";
 import { getLocale, getTranslations } from "next-intl/server";
-
-function getIdentityProviders(orgId?: string) {
-  return settingsService
-    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => {
-      return resp.identityProviders;
-    });
-}
 
 export default async function Page({
   searchParams,
@@ -34,7 +25,7 @@ export default async function Page({
   const loginSettings = await getLoginSettings(organization);
   const legal = await getLegalAndSupportSettings();
 
-  const identityProviders = await getIdentityProviders(organization);
+  const identityProviders = await getActiveIdentityProviders(organization);
 
   const host = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
@@ -55,7 +46,7 @@ export default async function Page({
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
-          {legal && identityProviders && process.env.ZITADEL_API_URL && (
+          {legal && identityProviders && (
             <SignInWithIdp
               host={host}
               identityProviders={identityProviders}

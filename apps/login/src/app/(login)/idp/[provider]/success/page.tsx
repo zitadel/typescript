@@ -117,7 +117,7 @@ export default async function Page({
           userName: idpInformation.userName,
         },
         foundUser.userId,
-      ).catch((error) => {
+      ).catch(() => {
         return (
           <DynamicTheme branding={branding}>
             <div className="flex flex-col items-center space-y-4">
