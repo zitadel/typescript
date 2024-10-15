@@ -456,7 +456,7 @@ export async function getDefaultOrg() {
           {
             query: {
               case: "defaultQuery",
-              value: { default: true },
+              value: {},
             },
           },
         ],
