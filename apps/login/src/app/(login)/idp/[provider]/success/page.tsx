@@ -11,7 +11,6 @@ import {
   retrieveIDPIntent,
 } from "@/lib/zitadel";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
-import { RetrieveIdentityProviderIntentResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
