@@ -44,11 +44,12 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
-    "@zitadel/proto": "workspace:*",
     "@bufbuild/protobuf": "^2.0.0",
-    "@connectrpc/connect": "2.0.0-alpha.1"
+    "@connectrpc/connect": "2.0.0-alpha.1",
+    "@zitadel/proto": "workspace:*"
   },
   "devDependencies": {
+    "@bufbuild/protocompile": "^0.0.1",
     "@zitadel/tsconfig": "workspace:*",
     "eslint-config-zitadel": "workspace:*"
   }
