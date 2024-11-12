@@ -7,6 +7,7 @@ jobs:
     env:
       ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:v2.63.4
       POSTGRES_IMAGE: postgres:17.0-alpine3.19
+      CI: true
 
     name: Ensure Quality
 
