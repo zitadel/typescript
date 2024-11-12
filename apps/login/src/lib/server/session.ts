@@ -67,7 +67,7 @@ export async function updateSession(options: UpdateSessionCommand) {
           return Promise.reject(error);
         });
 
-  const host = headers().get("host");
+  const host = (await headers()).get("host");
 
   if (
     host &&
