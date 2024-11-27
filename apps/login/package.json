@@ -57,11 +57,11 @@
     "tinycolor2": "1.4.2"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.46.0",
+    "@bufbuild/buf": "^1.47.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "@types/ms": "0.7.34",
-    "@types/node": "22.9.0",
+    "@types/node": "22.10.0",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@types/tinycolor2": "1.4.3",
@@ -71,7 +71,7 @@
     "@zitadel/tsconfig": "workspace:*",
     "autoprefixer": "10.4.20",
     "concurrently": "^9.1.0",
-    "cypress": "^13.15.2",
+    "cypress": "^13.16.0",
     "del-cli": "6.0.0",
     "env-cmd": "^10.1.0",
     "eslint-config-zitadel": "workspace:*",
@@ -81,12 +81,12 @@
     "make-dir-cli": "4.0.0",
     "nodemon": "^3.1.7",
     "postcss": "8.4.49",
-    "prettier-plugin-tailwindcss": "0.6.8",
-    "sass": "^1.80.7",
+    "prettier-plugin-tailwindcss": "0.6.9",
+    "sass": "^1.81.0",
     "start-server-and-test": "^2.0.8",
-    "tailwindcss": "3.4.14",
-    "ts-proto": "^2.2.7",
-    "typescript": "^5.6.3",
+    "tailwindcss": "3.4.15",
+    "ts-proto": "^2.4.1",
+    "typescript": "^5.7.2",
     "zitadel-tailwind-config": "workspace:*"
   }
 }
