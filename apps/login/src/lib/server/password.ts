@@ -41,7 +41,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   if (
     !users.details ||
     users.details.totalResult !== BigInt(1) ||
-    !users.result[0].userId
+    !users.result[0]?.userId
   ) {
     return { error: "Could not send Password Reset Link" };
   }
@@ -75,7 +75,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       organizationId: command.organization,
     });
 
-    if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
+    if (users.details?.totalResult == BigInt(1) && users.result[0]?.userId) {
       user = users.result[0];
 
       const checks = create(ChecksSchema, {

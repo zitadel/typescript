@@ -33,7 +33,7 @@
     "@zitadel/prettier-config": "workspace:*",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
-    "zitadel-eslint-config": "workspace:*",
+    "@zitadel/eslint-config": "workspace:*",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^4.1.0",
     "tsup": "^8.3.5",

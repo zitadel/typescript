@@ -213,7 +213,7 @@ export interface ColorShade {
   900: string;
 }
 
-export const COLORS = [
+export const COLORS: ColorShade[] = [
   {
     500: "#ef4444",
     200: "#fecaca",
@@ -350,12 +350,12 @@ export const COLORS = [
     700: "#be123c",
     900: "#881337",
   },
-];
+] as ColorShade[];
 
 export function getColorHash(value: string): ColorShade {
   let hash = 0;
 
-  if (value.length === 0) {
+  if (value.length === 0 && COLORS[hash]) {
     return COLORS[hash];
   }
 

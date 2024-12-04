@@ -8,7 +8,7 @@ export enum AuthenticationMethod {
   Password = "password",
 }
 
-export const methods = [
+export const METHODS: AuthenticationMethod[] = [
   AuthenticationMethod.Passkey,
   AuthenticationMethod.Password,
 ];
@@ -28,7 +28,7 @@ export function AuthenticationMethodRadio({
         <RadioGroup value={selected} onChange={selectionChanged}>
           <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
           <div className="flex flex-row space-x-4">
-            {methods.map((method) => (
+            {METHODS.map((method) => (
               <RadioGroup.Option
                 key={method}
                 value={method}

@@ -51,6 +51,6 @@
   "devDependencies": {
     "@bufbuild/protocompile": "^0.0.1",
     "@zitadel/tsconfig": "workspace:*",
-    "zitadel-eslint-config": "workspace:*"
+    "@zitadel/eslint-config": "workspace:*"
   }
 }

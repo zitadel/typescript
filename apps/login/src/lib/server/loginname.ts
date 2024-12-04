@@ -52,7 +52,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return resp.identityProviders;
     });
 
-    if (identityProviders.length === 1) {
+    if (identityProviders.length === 1 && identityProviders[0]) {
       const host = (await headers()).get("host");
 
       if (!host) {
@@ -96,7 +96,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return resp.result;
     });
 
-    if (identityProviders.length === 1) {
+    if (
+      identityProviders &&
+      identityProviders.length === 1 &&
+      identityProviders[0]
+    ) {
       const host = (await headers()).get("host");
 
       if (!host) {
@@ -144,7 +148,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   };
 
-  if (potentialUsers.length == 1 && potentialUsers[0].userId) {
+  if (potentialUsers.length == 1 && potentialUsers[0]?.userId) {
     const userId = potentialUsers[0].userId;
 
     const checks = create(ChecksSchema, {
@@ -335,7 +339,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // this just returns orgs where the suffix is set as primary domain
       const orgs = await getOrgsByDomain(suffix);
       const orgToCheckForDiscovery =
-        orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+        orgs.result && orgs.result.length === 1
+          ? orgs.result[0]?.id
+          : undefined;
 
       const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
       if (orgLoginSettings?.allowDomainDiscovery) {
