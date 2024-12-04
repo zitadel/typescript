@@ -41,6 +41,6 @@
     "@types/node": "^22.9.0",
     "@zitadel/client": "workspace:*",
     "@zitadel/tsconfig": "workspace:*",
-    "eslint-config-zitadel": "workspace:*"
+    "zitadel-eslint-config": "workspace:*"
   }
 }
