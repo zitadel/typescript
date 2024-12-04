@@ -25,13 +25,6 @@
     "release": "turbo run build --filter=login^... && changeset publish",
     "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup"
   },
-  "pnpm": {
-    "overrides": {
-      "@typescript-eslint/parser": "^7.9.0",
-      "@types/react": "npm:types-react@19.0.0-rc.1",
-      "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
-    }
-  },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
     "@playwright/test": "^1.48.2",
