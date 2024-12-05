@@ -83,6 +83,10 @@ export default async function Page(props: {
 
   const providerType = idpTypeToIdentityProviderType(idp.type);
 
+  if (!PROVIDER_MAPPING[providerType]) {
+    throw new Error("Provider mapping not found");
+  }
+
   // search for potential user via username, then link
   if (options?.isLinkingAllowed) {
     let foundUser;

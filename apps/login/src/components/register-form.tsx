@@ -14,7 +14,7 @@ import { Alert } from "./alert";
 import {
   AuthenticationMethod,
   AuthenticationMethodRadio,
-  methods,
+  METHODS,
 } from "./authentication-method-radio";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
@@ -61,7 +61,9 @@ export function RegisterForm({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
+  const [selected, setSelected] = useState<AuthenticationMethod>(
+    METHODS[0] as AuthenticationMethod,
+  );
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
@@ -193,7 +195,7 @@ export function RegisterForm({
             const usePasswordToContinue: boolean =
               loginSettings?.allowUsernamePassword &&
               loginSettings?.passkeysType == PasskeysType.ALLOWED
-                ? !!!(selected === methods[0]) // choose selection if both available
+                ? !!!(selected === METHODS[0]) // choose selection if both available
                 : !!loginSettings?.allowUsernamePassword; // if password is chosen
             // set password as default if only password is allowed
             return submitAndContinue(values, usePasswordToContinue);

@@ -17,8 +17,9 @@ import { useState } from "react";
 export function LanguageSwitcher() {
   const currentLocale = useLocale();
 
-  const [selected, setSelected] = useState(
-    LANGS.find((l) => l.code === currentLocale) || LANGS[0],
+  const currentLang = LANGS.find((l) => l.code === currentLocale);
+  const [selected, setSelected] = useState<Lang>(
+    (currentLang ?? LANGS[0]) as Lang,
   );
 
   const router = useRouter();

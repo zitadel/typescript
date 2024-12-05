@@ -16,7 +16,7 @@ function getInitials(name: string, loginName: string) {
   let credentials = "";
   if (name) {
     const split = name.split(" ");
-    if (split) {
+    if (split && split[0]) {
       const initials =
         split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
       credentials = initials;
@@ -26,15 +26,20 @@ function getInitials(name: string, loginName: string) {
   } else {
     const username = loginName.split("@")[0];
     let separator = "_";
-    if (username.includes("-")) {
+    if (username?.includes("-")) {
       separator = "-";
     }
-    if (username.includes(".")) {
+    if (username?.includes(".")) {
       separator = ".";
     }
-    const split = username.split(separator);
-    const initials = split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
-    credentials = initials;
+    const split = username?.split(separator);
+    if (split && split[0]) {
+      const initials =
+        split[0].charAt(0) + (split[1] ? split[1].charAt(0) : "");
+      credentials = initials;
+    } else {
+      credentials = username?.charAt(0) ?? "A";
+    }
   }
 
   return credentials;

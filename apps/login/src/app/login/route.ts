@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
           if (orgDomain) {
             const orgs = await getOrgsByDomain(orgDomain);
             if (orgs.result && orgs.result.length === 1) {
-              organization = orgs.result[0].id ?? "";
+              organization = orgs.result[0]?.id ?? "";
             }
           }
         }
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
         if (idp) {
           const origin = request.nextUrl.origin;
 
-          const identityProviderType = identityProviders[0].type;
+          const identityProviderType = idp.type;
           let provider = idpTypeToSlug(identityProviderType);
 
           const params = new URLSearchParams();

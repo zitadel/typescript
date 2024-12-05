@@ -9,12 +9,12 @@ export function coerceToBase64Url(thing: any, name: string) {
   }
 
   // Uint8Array to base64
-  if (thing instanceof Uint8Array) {
+  if (thing && thing instanceof Uint8Array) {
     var str = "";
     var len = thing.byteLength;
 
     for (var i = 0; i < len; i++) {
-      str += String.fromCharCode(thing[i]);
+      str += String.fromCharCode(thing[i] as number);
     }
     thing = window.btoa(str);
   }
