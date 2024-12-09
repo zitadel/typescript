@@ -65,10 +65,14 @@ export function SessionItem({
     <button
       onClick={async () => {
         if (valid && session?.factors?.user) {
-          return continueWithSession({
+          const resp = await continueWithSession({
             ...session,
             authRequestId: authRequestId,
           });
+
+          if (resp?.redirect) {
+            return router.push(resp.redirect);
+          }
         } else if (session.factors?.user) {
           setLoading(true);
           const res = await sendLoginname({
@@ -114,11 +118,13 @@ export function SessionItem({
             {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
           </span>
         ) : (
-          <span className="text-xs opacity-80 text-ellipsis">
-            expired{" "}
-            {session.expirationDate &&
-              moment(timestampDate(session.expirationDate)).fromNow()}
-          </span>
+          verifiedAt && (
+            <span className="text-xs opacity-80 text-ellipsis">
+              expired{" "}
+              {session.expirationDate &&
+                moment(timestampDate(session.expirationDate)).fromNow()}
+            </span>
+          )
         )}
       </div>
 

@@ -182,6 +182,10 @@ export function LoginOTP({
 
   function setCodeAndContinue(values: Inputs, organization?: string) {
     return submitCode(values, organization).then(async (response) => {
+      setLoading(true);
+      // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+
       if (response) {
         const url =
           authRequestId && response.sessionId
@@ -203,6 +207,7 @@ export function LoginOTP({
                 )
               : null;
 
+        setLoading(false);
         if (url) {
           router.push(url);
         }
@@ -221,6 +226,7 @@ export function LoginOTP({
             <button
               aria-label="Resend OTP Code"
               disabled={loading}
+              type="button"
               className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
               onClick={() => {
                 setLoading(true);
