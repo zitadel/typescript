@@ -13,6 +13,7 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
+  SetPasswordRequest,
   SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -536,7 +537,7 @@ export async function passwordReset(
  * @param code optional if the password should be set with a code (reset), no code for initial setup of password
  * @returns
  */
-export async function setPassword(
+export async function setUserPassword(
   userId: string,
   password: string,
   user: User,
@@ -580,6 +581,10 @@ export async function setPassword(
       throw error;
     }
   });
+}
+
+export async function setPassword(payload: SetPasswordRequest) {
+  return userService.setPassword(payload, {});
 }
 
 /**
