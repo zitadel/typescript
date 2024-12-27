@@ -9,8 +9,9 @@ export default getRequestConfig(async () => {
 
   let locale: string = fallback;
 
-  const languageHeader = await (await headers()).get(LANGUAGE_HEADER_NAME);
-  if (languageHeader) {
+  const _headers = await headers();
+  const languageHeader = _headers.get(LANGUAGE_HEADER_NAME);
+  if (languageHeader !== undefined) {
     const headerLocale = languageHeader.split(",")[0].split("-")[0]; // Extract the language code
     if (LANGS.map((l) => l.code).includes(headerLocale)) {
       locale = headerLocale;

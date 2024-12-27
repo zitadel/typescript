@@ -222,7 +222,9 @@ export default async function Page(props: {
       // this just returns orgs where the suffix is set as primary domain
       const orgs = await getOrgsByDomain(suffix);
       const orgToCheckForDiscovery =
-        orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+        orgs?.result && orgs.result.length === 1
+          ? orgs.result[0]?.id
+          : undefined;
 
       const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
       if (orgLoginSettings?.allowDomainDiscovery) {

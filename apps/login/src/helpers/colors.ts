@@ -350,17 +350,17 @@ export const COLORS: ColorShade[] = [
     700: "#be123c",
     900: "#881337",
   },
-] as ColorShade[];
+];
 
 export function getColorHash(value: string): ColorShade {
   let hash = 0;
 
-  if (value.length === 0 && COLORS[hash]) {
-    return COLORS[hash];
+  if (value.length === 0 && COLORS[hash] !== undefined) {
+    return COLORS[hash] as ColorShade;
   }
 
   hash = hashCode(value);
-  return COLORS[hash % COLORS.length];
+  return COLORS[hash % COLORS.length] as ColorShade;
 }
 
 export function hashCode(str: string, seed = 0): number {
@@ -435,5 +435,5 @@ export function getMembershipColor(role: string): ColorShade {
       break;
   }
 
-  return color;
+  return color as ColorShade;
 }
