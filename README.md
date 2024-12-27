@@ -60,9 +60,9 @@ You can already use the current state, and extend it with your needs.
   - [x] GitLab
   - [x] GitLab Enterprise
   - [x] Azure
-  - [ ] Apple
+  - [x] Apple
   - [x] Generic OIDC
-  - [ ] Generic OAuth
+  - [x] Generic OAuth
   - [ ] Generic JWT
   - [ ] LDAP
   - [ ] SAML SP
@@ -229,6 +229,24 @@ pnpm test
 ```
 
 To satisfy your unique workflow requirements, check out the package.json in the root directory for more detailed scripts.
+
+### Run Login UI Acceptance tests
+
+To run the acceptance tests you need a running ZITADEL environment and a component which receives HTTP requests for the emails and sms's.
+This component should also be able to return the content of these notifications, as the codes and links are used in the login flows.
+There is a basic implementation in Golang available under [the sink package](./acceptance/sink).
+
+To setup ZITADEL with the additional Sink container for handling the notifications:
+
+```sh
+pnpm run-sink
+```
+
+Then you can start the acceptance tests with:
+
+```sh
+pnpm test:acceptance
+```
 
 ### Deploy to Vercel
 

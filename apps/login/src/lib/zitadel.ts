@@ -10,9 +10,10 @@ import {
 import { createServerTransport } from "@zitadel/node";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
+  AddHumanUserRequest,
   RetrieveIdentityProviderIntentRequest,
+  SetPasswordRequest,
   SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -22,7 +23,6 @@ import { create, Duration } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
@@ -38,7 +38,6 @@ import {
   UserState,
 } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { PROVIDER_MAPPING } from "./idp";
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -248,6 +247,10 @@ export async function addHumanUser({
   });
 }
 
+export async function addHuman(request: AddHumanUserRequest) {
+  return userService.addHumanUser(request);
+}
+
 export async function verifyTOTPRegistration(code: string, userId: string) {
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
@@ -445,11 +448,6 @@ export async function verifyEmail(userId: string, verificationCode: string) {
   );
 }
 
-/**
- *
- * @param userId the id of the user where the email should be set
- * @returns the newly set email
- */
 export async function resendEmailCode(userId: string) {
   return userService.resendEmailCode(
     {
@@ -489,14 +487,6 @@ export function addIDPLink(
     },
     {},
   );
-}
-
-export function createUser(
-  provider: IdentityProviderType,
-  info: IDPInformation,
-) {
-  const userData = PROVIDER_MAPPING[provider](info);
-  return userService.addHumanUser(userData, {});
 }
 
 /**
@@ -541,7 +531,7 @@ export async function passwordReset(
  * @param code optional if the password should be set with a code (reset), no code for initial setup of password
  * @returns
  */
-export async function setPassword(
+export async function setUserPassword(
   userId: string,
   password: string,
   user: User,
@@ -587,6 +577,10 @@ export async function setPassword(
   });
 }
 
+export async function setPassword(payload: SetPasswordRequest) {
+  return userService.setPassword(payload, {});
+}
+
 /**
  *
  * @param server
@@ -620,17 +614,7 @@ export async function createPasskeyRegistrationLink(
  * @returns the newly set email
  */
 
-// TODO check for token requirements!
-export async function registerU2F(
-  userId: string,
-  domain: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  // });
-
-  // const service = createUserServiceClient(transport);
+export async function registerU2F(userId: string, domain: string) {
   return userService.registerU2F({
     userId,
     domain,
