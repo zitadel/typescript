@@ -294,19 +294,24 @@ export async function createInviteCode(userId: string, host: string | null) {
   );
 }
 
-export async function listUsers({
-  loginName,
-  userName,
-  email,
-  organizationId,
-}: {
+export type ListUsersCommand = {
   loginName?: string;
   userName?: string;
   email?: string;
+  phone?: string;
   organizationId?: string;
-}) {
+};
+
+export async function listUsers({
+  loginName,
+  userName,
+  phone,
+  email,
+  organizationId,
+}: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
+  // either use loginName or userName, email, phone
   if (loginName) {
     queries.push(
       create(SearchQuerySchema, {
@@ -319,16 +324,54 @@ export async function listUsers({
         },
       }),
     );
-  }
+  } else if (userName || email || phone) {
+    const orQueries: SearchQuery[] = [];
 
-  if (userName) {
-    queries.push(
-      create(SearchQuerySchema, {
+    if (userName) {
+      const userNameQuery = create(SearchQuerySchema, {
         query: {
           case: "userNameQuery",
           value: {
             userName: userName,
             method: TextQueryMethod.EQUALS,
+          },
+        },
+      });
+      orQueries.push(userNameQuery);
+    }
+
+    if (email) {
+      const emailQuery = create(SearchQuerySchema, {
+        query: {
+          case: "emailQuery",
+          value: {
+            emailAddress: email,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      });
+      orQueries.push(emailQuery);
+    }
+
+    if (phone) {
+      const phoneQuery = create(SearchQuerySchema, {
+        query: {
+          case: "phoneQuery",
+          value: {
+            number: phone,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      });
+      orQueries.push(phoneQuery);
+    }
+
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "orQuery",
+          value: {
+            queries: orQueries,
           },
         },
       }),
@@ -342,19 +385,6 @@ export async function listUsers({
           case: "organizationIdQuery",
           value: {
             organizationId,
-          },
-        },
-      }),
-    );
-  }
-
-  if (email) {
-    queries.push(
-      create(SearchQuerySchema, {
-        query: {
-          case: "emailQuery",
-          value: {
-            emailAddress: email,
           },
         },
       }),
