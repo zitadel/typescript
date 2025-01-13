@@ -6,35 +6,31 @@
     "access": "public"
   },
   "type": "module",
+  "main": "./dist/index.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./v1": {
       "types": "./dist/v1.d.ts",
-      "import": "./dist/v1.js",
-      "require": "./dist/v1.cjs"
+      "import": "./dist/v1.js"
     },
     "./v2": {
       "types": "./dist/v2.d.ts",
-      "import": "./dist/v2.js",
-      "require": "./dist/v2.cjs"
+      "import": "./dist/v2.js"
     },
     "./v3alpha": {
       "types": "./dist/v3alpha.d.ts",
-      "import": "./dist/v3alpha.js",
-      "require": "./dist/v3alpha.cjs"
+      "import": "./dist/v3alpha.js"
     },
     "./node": {
       "types": "./dist/node.d.ts",
-      "import": "./dist/node.js",
-      "require": "./dist/node.cjs"
+      "import": "./dist/node.js"
     }
   },
   "files": [
-    "dist/**"
+    "dist"
   ],
   "sideEffects": false,
   "scripts": {
