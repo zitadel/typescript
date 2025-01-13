@@ -8,7 +8,7 @@ import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_servic
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { createClientFor } from "./helpers";
+import { createClientFor } from "../helpers";
 
 export const createUserServiceClient = createClientFor(UserService);
 export const createSettingsServiceClient = createClientFor(SettingsService);

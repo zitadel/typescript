@@ -1,4 +1,4 @@
-import { createClientFor } from "./helpers";
+import { createClientFor } from "../helpers";
 
 import { AdminService } from "@zitadel/proto/zitadel/admin_pb";
 import { AuthService } from "@zitadel/proto/zitadel/auth_pb";
