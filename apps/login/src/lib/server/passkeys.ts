@@ -120,12 +120,12 @@ type SendPasskeyCommand = {
   sessionId?: string;
   organization?: string;
   checks?: Checks;
-  authRequestId?: string;
+  requestId?: string;
   lifetime?: Duration;
 };
 
 export async function sendPasskey(command: SendPasskeyCommand) {
-  let { loginName, sessionId, organization, checks, authRequestId } = command;
+  let { loginName, sessionId, organization, checks, requestId } = command;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -156,7 +156,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     recentSession,
     checks,
     undefined,
-    authRequestId,
+    requestId,
     lifetime,
   );
 
@@ -179,7 +179,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     session,
     humanUser,
     organization,
-    authRequestId,
+    requestId,
   );
 
   if (emailVerificationCheck?.redirect) {
@@ -187,11 +187,11 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   const url =
-    authRequestId && session.id
+    requestId && session.id
       ? await getNextUrl(
           {
             sessionId: session.id,
-            authRequestId: authRequestId,
+            requestId: requestId,
             organization: organization,
           },
           loginSettings?.defaultRedirectUri,

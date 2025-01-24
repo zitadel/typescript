@@ -11,21 +11,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { isSessionValid } from "./session";
 
 type LoginWithOIDCandSession = {
-  authRequestId: string;
+  authRequest: string;
   sessionId: string;
   sessions: Session[];
   sessionCookies: Cookie[];
   request: NextRequest;
 };
 export async function loginWithOIDCandSession({
-  authRequestId,
+  authRequest,
   sessionId,
   sessions,
   sessionCookies,
   request,
 }: LoginWithOIDCandSession) {
   console.log(
-    `Login with session: ${sessionId} and authRequest: ${authRequestId}`,
+    `Login with session: ${sessionId} and authRequest: ${authRequest}`,
   );
 
   const selectedSession = sessions.find((s) => s.id === sessionId);
@@ -43,7 +43,7 @@ export async function loginWithOIDCandSession({
       const command: SendLoginnameCommand = {
         loginName: selectedSession.factors.user?.loginName,
         organization: selectedSession.factors?.user?.organizationId,
-        authRequestId: authRequestId,
+        requestId: authRequest,
       };
 
       const res = await sendLoginname(command);
@@ -68,7 +68,7 @@ export async function loginWithOIDCandSession({
       try {
         const { callbackUrl } = await createCallback(
           create(CreateCallbackRequestSchema, {
-            authRequestId,
+            requestId: authRequest,
             callbackKind: {
               case: "session",
               value: create(SessionSchema, session),
@@ -84,7 +84,7 @@ export async function loginWithOIDCandSession({
           );
         }
       } catch (error: unknown) {
-        // handle already handled gracefully as these could come up if old emails with authRequestId are used (reset password, register emails etc.)
+        // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (
           error &&

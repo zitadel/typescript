@@ -34,7 +34,7 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
-  const { id, token, authRequestId, organization, link } = searchParams;
+  const { id, token, requestId, organization, link } = searchParams;
   const { provider } = params;
 
   const branding = await getBrandingSettings(organization);
@@ -54,7 +54,7 @@ export default async function Page(props: {
     return loginSuccess(
       userId,
       { idpIntentId: id, idpIntentToken: token },
-      authRequestId,
+      requestId,
       branding,
     );
   }
@@ -99,7 +99,7 @@ export default async function Page(props: {
       return linkingSuccess(
         userId,
         { idpIntentId: id, idpIntentToken: token },
-        authRequestId,
+        requestId,
         branding,
       );
     }
@@ -153,7 +153,7 @@ export default async function Page(props: {
         return linkingSuccess(
           foundUser.userId,
           { idpIntentId: id, idpIntentToken: token },
-          authRequestId,
+          requestId,
           branding,
         );
       }
@@ -207,7 +207,7 @@ export default async function Page(props: {
             <IdpSignin
               userId={newUser.userId}
               idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-              authRequestId={authRequestId}
+              requestId={requestId}
             />
           </div>
         </DynamicTheme>

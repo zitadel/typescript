@@ -15,7 +15,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "u2f" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, authRequestId, sessionId, organization } = searchParams;
+  const { loginName, requestId, sessionId, organization } = searchParams;
 
   const branding = await getBrandingSettings(organization);
 
@@ -56,7 +56,7 @@ export default async function Page(props: {
           <LoginPasskey
             loginName={loginName}
             sessionId={sessionId}
-            authRequestId={authRequestId}
+            requestId={requestId}
             altPassword={false}
             organization={organization}
             login={false} // this sets the userVerificationRequirement to discouraged as its used as second factor

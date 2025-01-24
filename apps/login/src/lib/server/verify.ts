@@ -27,7 +27,7 @@ type VerifyUserByEmailCommand = {
   organization?: string;
   code: string;
   isInvite: boolean;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
@@ -103,7 +103,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     session = await createSessionAndUpdateCookie(
       checks,
       undefined,
-      command.authRequestId,
+      command.requestId,
     );
   }
 
@@ -149,7 +149,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     loginSettings,
     authMethodResponse.authMethodTypes,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (mfaFactorCheck?.redirect) {
@@ -157,11 +157,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   // login user if no additional steps are required
-  if (command.authRequestId && session.id) {
+  if (command.requestId && session.id) {
     const nextUrl = await getNextUrl(
       {
         sessionId: session.id,
-        authRequestId: command.authRequestId,
+        requestId: command.requestId,
         organization:
           command.organization ?? session.factors?.user?.organizationId,
       },
@@ -185,7 +185,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 type resendVerifyEmailCommand = {
   userId: string;
   isInvite: boolean;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
@@ -193,22 +193,22 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
 
   return command.isInvite
     ? resendInviteCode(command.userId)
-    : resendEmailCode(command.userId, host, command.authRequestId);
+    : resendEmailCode(command.userId, host, command.requestId);
 }
 
 type sendEmailCommand = {
   userId: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function sendEmailCode(command: sendEmailCommand) {
   const host = (await headers()).get("host");
-  return zitadelSendEmailCode(command.userId, host, command.authRequestId);
+  return zitadelSendEmailCode(command.userId, host, command.requestId);
 }
 
 export type SendVerificationRedirectWithoutCheckCommand = {
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 } & (
   | { userId: string; loginName?: never }
   | { userId?: never; loginName: string }
@@ -277,7 +277,7 @@ export async function sendVerificationRedirectWithoutCheck(
     session = await createSessionAndUpdateCookie(
       checks,
       undefined,
-      command.authRequestId,
+      command.requestId,
     );
   }
 
@@ -323,7 +323,7 @@ export async function sendVerificationRedirectWithoutCheck(
     loginSettings,
     authMethodResponse.authMethodTypes,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (mfaFactorCheck?.redirect) {
@@ -331,11 +331,11 @@ export async function sendVerificationRedirectWithoutCheck(
   }
 
   // login user if no additional steps are required
-  if (command.authRequestId && session.id) {
+  if (command.requestId && session.id) {
     const nextUrl = await getNextUrl(
       {
         sessionId: session.id,
-        authRequestId: command.authRequestId,
+        requestId: command.requestId,
         organization:
           command.organization ?? session.factors?.user?.organizationId,
       },

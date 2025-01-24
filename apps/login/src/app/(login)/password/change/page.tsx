@@ -18,7 +18,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "password" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, authRequestId } = searchParams;
+  const { loginName, organization, requestId } = searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
   const sessionFactors = await loadMostRecentSession({
@@ -67,7 +67,7 @@ export default async function Page(props: {
           <ChangePasswordForm
             sessionId={sessionFactors.id}
             loginName={loginName}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={organization}
             passwordComplexitySettings={passwordComplexity}
           />

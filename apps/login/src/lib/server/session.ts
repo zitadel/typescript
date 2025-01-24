@@ -20,19 +20,19 @@ import {
 } from "../cookies";
 
 export async function continueWithSession({
-  authRequestId,
+  requestId,
   ...session
-}: Session & { authRequestId?: string }) {
+}: Session & { requestId?: string }) {
   const loginSettings = await getLoginSettings(
     session.factors?.user?.organizationId,
   );
 
   const url =
-    authRequestId && session.id && session.factors?.user
+    requestId && session.id && session.factors?.user
       ? await getNextUrl(
           {
             sessionId: session.id,
-            authRequestId: authRequestId,
+            requestId: requestId,
             organization: session.factors.user.organizationId,
           },
           loginSettings?.defaultRedirectUri,
@@ -56,20 +56,14 @@ export type UpdateSessionCommand = {
   sessionId?: string;
   organization?: string;
   checks?: Checks;
-  authRequestId?: string;
+  requestId?: string;
   challenges?: RequestChallenges;
   lifetime?: Duration;
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  let {
-    loginName,
-    sessionId,
-    organization,
-    checks,
-    authRequestId,
-    challenges,
-  } = options;
+  let { loginName, sessionId, organization, checks, requestId, challenges } =
+    options;
   const recentSession = sessionId
     ? await getSessionCookieById({ sessionId })
     : loginName
@@ -111,7 +105,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     recentSession,
     checks,
     challenges,
-    authRequestId,
+    requestId,
     lifetime,
   );
 

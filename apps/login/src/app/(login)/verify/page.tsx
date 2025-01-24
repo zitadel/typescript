@@ -20,7 +20,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, code, organization, authRequestId, invite } =
+  const { userId, loginName, code, organization, requestId, invite } =
     searchParams;
 
   const branding = await getBrandingSettings(organization);
@@ -41,7 +41,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     if (doSend && sessionFactors?.factors?.user?.id) {
       await sendEmailCode({
         userId: sessionFactors?.factors?.user?.id,
-        authRequestId,
+        requestId,
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
@@ -51,7 +51,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     if (doSend) {
       await sendEmailCode({
         userId,
-        authRequestId,
+        requestId,
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
@@ -90,8 +90,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     params.set("organization", organization);
   }
 
-  if (authRequestId) {
-    params.set("authRequestId", authRequestId);
+  if (requestId) {
+    params.set("requestId", requestId);
   }
 
   return (
@@ -135,7 +135,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               userId={id}
               loginName={loginName}
               organization={organization}
-              authRequestId={authRequestId}
+              requestId={requestId}
               authMethods={authMethods}
             />
           ) : (
@@ -146,7 +146,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               userId={id}
               code={code}
               isInvite={invite === "true"}
-              authRequestId={authRequestId}
+              requestId={requestId}
             />
           ))}
       </div>

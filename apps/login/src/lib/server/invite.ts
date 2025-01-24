@@ -10,7 +10,7 @@ type InviteUserCommand = {
   lastName: string;
   password?: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export type RegisterUserResponse = {

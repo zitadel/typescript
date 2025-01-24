@@ -17,7 +17,7 @@ type RegisterUserCommand = {
   lastName: string;
   password?: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export type RegisterUserResponse = {
@@ -56,7 +56,7 @@ export async function registerUser(command: RegisterUserCommand) {
   const session = await createSessionAndUpdateCookie(
     checks,
     undefined,
-    command.authRequestId,
+    command.requestId,
     command.password ? loginSettings?.passwordCheckLifetime : undefined,
   );
 
@@ -70,8 +70,8 @@ export async function registerUser(command: RegisterUserCommand) {
       organization: session.factors.user.organizationId,
     });
 
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
+    if (command.requestId) {
+      params.append("requestId", command.requestId);
     }
 
     return { redirect: "/passkey/set?" + params };
@@ -91,7 +91,7 @@ export async function registerUser(command: RegisterUserCommand) {
       session,
       humanUser,
       session.factors.user.organizationId,
-      command.authRequestId,
+      command.requestId,
     );
 
     if (emailVerificationCheck?.redirect) {
@@ -99,10 +99,10 @@ export async function registerUser(command: RegisterUserCommand) {
     }
 
     const url = await getNextUrl(
-      command.authRequestId && session.id
+      command.requestId && session.id
         ? {
             sessionId: session.id,
-            authRequestId: command.authRequestId,
+            requestId: command.requestId,
             organization: session.factors.user.organizationId,
           }
         : {

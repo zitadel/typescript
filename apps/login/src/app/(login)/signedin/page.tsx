@@ -18,13 +18,13 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-async function loadSession(loginName: string, authRequestId?: string) {
+async function loadSession(loginName: string, requestId?: string) {
   const recent = await getMostRecentCookieWithLoginname({ loginName });
 
-  if (authRequestId) {
+  if (requestId) {
     return createCallback(
       create(CreateCallbackRequestSchema, {
-        authRequestId,
+        requestId,
         callbackKind: {
           case: "session",
           value: create(SessionSchema, {
@@ -51,13 +51,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "signedin" });
 
-  const { loginName, authRequestId, organization } = searchParams;
-  const sessionFactors = await loadSession(loginName, authRequestId);
+  const { loginName, requestId, organization } = searchParams;
+  const sessionFactors = await loadSession(loginName, requestId);
 
   const branding = await getBrandingSettings(organization);
 
   let loginSettings;
-  if (!authRequestId) {
+  if (!requestId) {
     loginSettings = await getLoginSettings(organization);
   }
 

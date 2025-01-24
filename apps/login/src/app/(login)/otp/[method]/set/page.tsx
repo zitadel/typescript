@@ -27,8 +27,13 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "otp" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, sessionId, authRequestId, checkAfter } =
-    searchParams;
+  const {
+    loginName,
+    organization,
+    sessionId,
+    requestId: requestId,
+    checkAfter,
+  } = searchParams;
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
@@ -82,22 +87,22 @@ export default async function Page(props: {
   }
 
   if (checkAfter) {
-    if (authRequestId) {
-      paramsToContinue.append("authRequestId", authRequestId);
+    if (requestId) {
+      paramsToContinue.append("requestId", requestId);
     }
     urlToContinue = `/otp/${method}?` + paramsToContinue;
     // immediately check the OTP on the next page if sms or email was set up
     if (["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
     }
-  } else if (authRequestId && sessionId) {
-    if (authRequestId) {
-      paramsToContinue.append("authRequest", authRequestId);
+  } else if (requestId && sessionId) {
+    if (requestId) {
+      paramsToContinue.append("authRequest", requestId);
     }
     urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {
-    if (authRequestId) {
-      paramsToContinue.append("authRequestId", authRequestId);
+    if (requestId) {
+      paramsToContinue.append("requestId", requestId);
     }
     urlToContinue = `/signedin?` + paramsToContinue;
   }
@@ -136,7 +141,7 @@ export default async function Page(props: {
                 secret={totpResponse.secret as string}
                 loginName={loginName}
                 sessionId={sessionId}
-                authRequestId={authRequestId}
+                requestId={requestId}
                 organization={organization}
                 checkAfter={checkAfter === "true"}
                 loginSettings={loginSettings}

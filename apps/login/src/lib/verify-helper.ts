@@ -7,7 +7,7 @@ export function checkPasswordChangeRequired(
   session: Session,
   humanUser: HumanUser | undefined,
   organization?: string,
-  authRequestId?: string,
+  requestId?: string,
 ) {
   if (humanUser?.passwordChangeRequired) {
     const params = new URLSearchParams({
@@ -21,8 +21,8 @@ export function checkPasswordChangeRequired(
       );
     }
 
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
+    if (requestId) {
+      params.append("requestId", requestId);
     }
 
     return { redirect: "/password/change?" + params };
@@ -33,7 +33,7 @@ export function checkInvite(
   session: Session,
   humanUser?: HumanUser,
   organization?: string,
-  authRequestId?: string,
+  requestId?: string,
 ) {
   if (!humanUser?.email?.isVerified) {
     const paramsVerify = new URLSearchParams({
@@ -49,8 +49,8 @@ export function checkInvite(
       );
     }
 
-    if (authRequestId) {
-      paramsVerify.append("authRequestId", authRequestId);
+    if (requestId) {
+      paramsVerify.append("requestId", requestId);
     }
 
     return { redirect: "/verify?" + paramsVerify };
@@ -61,7 +61,7 @@ export function checkEmailVerification(
   session: Session,
   humanUser?: HumanUser,
   organization?: string,
-  authRequestId?: string,
+  requestId?: string,
 ) {
   if (
     !humanUser?.email?.isVerified &&
@@ -71,8 +71,8 @@ export function checkEmailVerification(
       loginName: session.factors?.user?.loginName as string,
     });
 
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
+    if (requestId) {
+      params.append("requestId", requestId);
     }
 
     if (organization || session.factors?.user?.organizationId) {
@@ -91,7 +91,7 @@ export function checkMFAFactors(
   loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[],
   organization?: string,
-  authRequestId?: string,
+  requestId?: string,
 ) {
   const availableMultiFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
@@ -114,8 +114,8 @@ export function checkMFAFactors(
       loginName: session.factors?.user?.loginName as string,
     });
 
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
+    if (requestId) {
+      params.append("requestId", requestId);
     }
 
     if (organization || session.factors?.user?.organizationId) {
@@ -141,8 +141,8 @@ export function checkMFAFactors(
       loginName: session.factors?.user?.loginName as string,
     });
 
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
+    if (requestId) {
+      params.append("requestId", requestId);
     }
 
     if (organization || session.factors?.user?.organizationId) {
@@ -163,8 +163,8 @@ export function checkMFAFactors(
       checkAfter: "true", // this defines if the check is directly made after the setup
     });
 
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
+    if (requestId) {
+      params.append("requestId", requestId);
     }
 
     if (organization || session.factors?.user?.organizationId) {
@@ -191,8 +191,8 @@ export function checkMFAFactors(
   //     prompt: "true",
   //   });
 
-  //   if (authRequestId) {
-  //     params.append("authRequestId", authRequestId);
+  //   if (requestId) {
+  //     params.append("requestId", requestId);
   //   }
 
   //   if (organization) {

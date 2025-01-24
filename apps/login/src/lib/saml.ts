@@ -41,7 +41,7 @@ export async function loginWithSAMLandSession({
       const command: SendLoginnameCommand = {
         loginName: selectedSession.factors.user?.loginName,
         organization: selectedSession.factors?.user?.organizationId,
-        authRequestId: samlRequest,
+        requestId: samlRequest,
       };
 
       const res = await sendLoginname(command);
@@ -82,7 +82,7 @@ export async function loginWithSAMLandSession({
           );
         }
       } catch (error: unknown) {
-        // handle already handled gracefully as these could come up if old emails with authRequestId are used (reset password, register emails etc.)
+        // handle already handled gracefully as these could come up if old emails with requestId are used (reset password, register emails etc.)
         console.error(error);
         if (
           error &&
