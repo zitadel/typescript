@@ -32,7 +32,7 @@ export function SignInWithIdp({
 }: Readonly<SignInWithIDPProps>) {
   const [state, action, _isPending] = useActionState(redictToIdp, {});
 
-  const renderIDPButton = (idp: IdentityProvider) => {
+  const renderIDPButton = (idp: IdentityProvider, index: number) => {
     const { id, name, type } = idp;
 
     const components: Partial<
@@ -56,7 +56,7 @@ export function SignInWithIdp({
 
     const Component = components[type];
     return Component ? (
-      <form action={action} className="flex">
+      <form action={action} className="flex" key={`idp-${index}`}>
         <input type="hidden" name="id" value={id} />
         <input type="hidden" name="provider" value={idpTypeToSlug(type)} />
         <input type="hidden" name="authRequestId" value={authRequestId} />
