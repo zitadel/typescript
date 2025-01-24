@@ -1,17 +1,18 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
+import { loginWithOIDCandSession } from "@/lib/oidc";
+import { loginWithSAMLandSession } from "@/lib/saml";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
+import { findValidSession } from "@/lib/session";
 import {
   createCallback,
   getActiveIdentityProviders,
-  getAuthRequest,
-  getLoginSettings,
+  getOIDCAuthRequest,
   getOrgsByDomain,
-  listAuthenticationMethodTypes,
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { create, timestampDate } from "@zitadel/client";
+import { create } from "@zitadel/client";
 import {
   AuthRequest,
   Prompt,
@@ -21,12 +22,31 @@ import {
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
+
+const gotoAccounts = ({
+  request,
+  authRequest,
+  organization,
+}: {
+  request: NextRequest;
+  authRequest: AuthRequest;
+  organization: string;
+}): NextResponse<unknown> => {
+  const accountsUrl = new URL("/accounts", request.url);
+  if (authRequest?.id) {
+    accountsUrl.searchParams.set("authRequestId", authRequest?.id);
+  }
+  if (organization) {
+    accountsUrl.searchParams.set("organization", organization);
+  }
+
+  return NextResponse.redirect(accountsUrl);
+};
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
@@ -40,147 +60,10 @@ const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
-/**
- * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
- * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
- **/
-async function isSessionValid(session: Session): Promise<boolean> {
-  // session can't be checked without user
-  if (!session.factors?.user) {
-    console.warn("Session has no user");
-    return false;
-  }
-
-  let mfaValid = true;
-
-  const authMethodTypes = await listAuthenticationMethodTypes(
-    session.factors.user.id,
-  );
-
-  const authMethods = authMethodTypes.authMethodTypes;
-  if (authMethods && authMethods.includes(AuthenticationMethodType.TOTP)) {
-    mfaValid = !!session.factors.totp?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid totpEmail factor",
-        session.factors.totp?.verifiedAt,
-      );
-    }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.OTP_EMAIL)
-  ) {
-    mfaValid = !!session.factors.otpEmail?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid otpEmail factor",
-        session.factors.otpEmail?.verifiedAt,
-      );
-    }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.OTP_SMS)
-  ) {
-    mfaValid = !!session.factors.otpSms?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid otpSms factor",
-        session.factors.otpSms?.verifiedAt,
-      );
-    }
-  } else if (
-    authMethods &&
-    authMethods.includes(AuthenticationMethodType.U2F)
-  ) {
-    mfaValid = !!session.factors.webAuthN?.verifiedAt;
-    if (!mfaValid) {
-      console.warn(
-        "Session has no valid u2f factor",
-        session.factors.webAuthN?.verifiedAt,
-      );
-    }
-  } else {
-    // only check settings if no auth methods are available, as this would require a setup
-    const loginSettings = await getLoginSettings(
-      session.factors?.user?.organizationId,
-    );
-    if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
-      const otpEmail = session.factors.otpEmail?.verifiedAt;
-      const otpSms = session.factors.otpSms?.verifiedAt;
-      const totp = session.factors.totp?.verifiedAt;
-      const webAuthN = session.factors.webAuthN?.verifiedAt;
-      const idp = session.factors.intent?.verifiedAt; // TODO: forceMFA should not consider this as valid factor
-
-      // must have one single check
-      mfaValid = !!(otpEmail || otpSms || totp || webAuthN || idp);
-      if (!mfaValid) {
-        console.warn("Session has no valid multifactor", session.factors);
-      }
-    } else {
-      mfaValid = true;
-    }
-  }
-
-  const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const validIDP = session?.factors?.intent?.verifiedAt;
-
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate).getTime() > new Date().getTime()
-    : true;
-
-  if (!stillValid) {
-    console.warn(
-      "Session is expired",
-      session.expirationDate
-        ? timestampDate(session.expirationDate).toDateString()
-        : "no expiration date",
-    );
-  }
-
-  const validChecks = !!(validPassword || validPasskey || validIDP);
-
-  return stillValid && validChecks && mfaValid;
-}
-
-async function findValidSession(
-  sessions: Session[],
-  authRequest: AuthRequest,
-): Promise<Session | undefined> {
-  const sessionsWithHint = sessions.filter((s) => {
-    if (authRequest.hintUserId) {
-      return s.factors?.user?.id === authRequest.hintUserId;
-    }
-    if (authRequest.loginHint) {
-      return s.factors?.user?.loginName === authRequest.loginHint;
-    }
-    return true;
-  });
-
-  if (sessionsWithHint.length === 0) {
-    return undefined;
-  }
-
-  // sort by change date descending
-  sessionsWithHint.sort((a, b) => {
-    const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
-    const dateB = b.changeDate ? timestampDate(b.changeDate).getTime() : 0;
-    return dateB - dateA;
-  });
-
-  // return the first valid session according to settings
-  for (const session of sessionsWithHint) {
-    if (await isSessionValid(session)) {
-      return session;
-    }
-  }
-
-  return undefined;
-}
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const authRequestId = searchParams.get("authRequest");
+  const samlRequestId = searchParams.get("samlRequest");
   const sessionId = searchParams.get("sessionId");
 
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
@@ -196,108 +79,30 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions(ids);
   }
 
+  // this finishes the login process for OIDC
   if (authRequestId && sessionId) {
-    console.log(
-      `Login with session: ${sessionId} and authRequest: ${authRequestId}`,
-    );
+    await loginWithOIDCandSession({
+      authRequestId,
+      sessionId,
+      sessions,
+      sessionCookies,
+      request,
+    });
+  }
 
-    const selectedSession = sessions.find((s) => s.id === sessionId);
-
-    if (selectedSession && selectedSession.id) {
-      console.log(`Found session ${selectedSession.id}`);
-
-      const isValid = await isSessionValid(selectedSession);
-
-      console.log("Session is valid:", isValid);
-
-      if (!isValid && selectedSession.factors?.user) {
-        // if the session is not valid anymore, we need to redirect the user to re-authenticate /
-        // TODO: handle IDP intent direcly if available
-        const command: SendLoginnameCommand = {
-          loginName: selectedSession.factors.user?.loginName,
-          organization: selectedSession.factors?.user?.organizationId,
-          authRequestId: authRequestId,
-        };
-
-        const res = await sendLoginname(command);
-
-        if (res && "redirect" in res && res?.redirect) {
-          const absoluteUrl = new URL(res.redirect, request.url);
-          return NextResponse.redirect(absoluteUrl.toString());
-        }
-      }
-
-      const cookie = sessionCookies.find(
-        (cookie) => cookie.id === selectedSession?.id,
-      );
-
-      if (cookie && cookie.id && cookie.token) {
-        const session = {
-          sessionId: cookie?.id,
-          sessionToken: cookie?.token,
-        };
-
-        // works not with _rsc request
-        try {
-          const { callbackUrl } = await createCallback(
-            create(CreateCallbackRequestSchema, {
-              authRequestId,
-              callbackKind: {
-                case: "session",
-                value: create(SessionSchema, session),
-              },
-            }),
-          );
-          if (callbackUrl) {
-            return NextResponse.redirect(callbackUrl);
-          } else {
-            return NextResponse.json(
-              { error: "An error occurred!" },
-              { status: 500 },
-            );
-          }
-        } catch (error: unknown) {
-          // handle already handled gracefully as these could come up if old emails with authRequestId are used (reset password, register emails etc.)
-          console.error(error);
-          if (
-            error &&
-            typeof error === "object" &&
-            "code" in error &&
-            error?.code === 9
-          ) {
-            const loginSettings = await getLoginSettings(
-              selectedSession.factors?.user?.organizationId,
-            );
-
-            if (loginSettings?.defaultRedirectUri) {
-              return NextResponse.redirect(loginSettings.defaultRedirectUri);
-            }
-
-            const signedinUrl = new URL("/signedin", request.url);
-
-            if (selectedSession.factors?.user?.loginName) {
-              signedinUrl.searchParams.set(
-                "loginName",
-                selectedSession.factors?.user?.loginName,
-              );
-            }
-            if (selectedSession.factors?.user?.organizationId) {
-              signedinUrl.searchParams.set(
-                "organization",
-                selectedSession.factors?.user?.organizationId,
-              );
-            }
-            return NextResponse.redirect(signedinUrl);
-          } else {
-            return NextResponse.json({ error }, { status: 500 });
-          }
-        }
-      }
-    }
+  // this finishes the login process for SAML
+  if (samlRequestId && sessionId) {
+    await loginWithSAMLandSession({
+      samlRequest: samlRequestId,
+      sessionId,
+      sessions,
+      sessionCookies,
+      request,
+    });
   }
 
   if (authRequestId) {
-    const { authRequest } = await getAuthRequest({ authRequestId });
+    const { authRequest } = await getOIDCAuthRequest({ authRequestId });
 
     let organization = "";
     let suffix = "";
@@ -383,18 +188,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const gotoAccounts = (): NextResponse<unknown> => {
-      const accountsUrl = new URL("/accounts", request.url);
-      if (authRequest?.id) {
-        accountsUrl.searchParams.set("authRequestId", authRequest?.id);
-      }
-      if (organization) {
-        accountsUrl.searchParams.set("organization", organization);
-      }
-
-      return NextResponse.redirect(accountsUrl);
-    };
-
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
       const registerUrl = new URL("/register", request.url);
       if (authRequest.id) {
@@ -411,7 +204,7 @@ export async function GET(request: NextRequest) {
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
       if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
-        return gotoAccounts();
+        return gotoAccounts({ request, authRequest, organization });
       } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
         /**
          * The login prompt instructs the authentication server to prompt the user for re-authentication, regardless of whether the user is already authenticated
@@ -500,7 +293,7 @@ export async function GET(request: NextRequest) {
         let selectedSession = await findValidSession(sessions, authRequest);
 
         if (!selectedSession || !selectedSession.id) {
-          return gotoAccounts();
+          return gotoAccounts({ request, authRequest, organization });
         }
 
         const cookie = sessionCookies.find(
@@ -508,7 +301,7 @@ export async function GET(request: NextRequest) {
         );
 
         if (!cookie || !cookie.id || !cookie.token) {
-          return gotoAccounts();
+          return gotoAccounts({ request, authRequest, organization });
         }
 
         const session = {
@@ -532,11 +325,11 @@ export async function GET(request: NextRequest) {
             console.log(
               "could not create callback, redirect user to choose other account",
             );
-            return gotoAccounts();
+            return gotoAccounts({ request, authRequest, organization });
           }
         } catch (error) {
           console.error(error);
-          return gotoAccounts();
+          return gotoAccounts({ request, authRequest, organization });
         }
       }
     } else {
@@ -556,7 +349,7 @@ export async function GET(request: NextRequest) {
     }
   } else {
     return NextResponse.json(
-      { error: "No authRequestId provided" },
+      { error: "No authRequest nor samlRequest provided" },
       { status: 500 },
     );
   }

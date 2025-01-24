@@ -3,6 +3,7 @@ import {
   createIdpServiceClient,
   createOIDCServiceClient,
   createOrganizationServiceClient,
+  createSAMLServiceClient,
   createSessionServiceClient,
   createSettingsServiceClient,
   createUserServiceClient,
@@ -26,6 +27,7 @@ import { create, Duration } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { CreateResponseRequest } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
@@ -52,6 +54,7 @@ const transport = createServerTransport(
 export const sessionService = createSessionServiceClient(transport);
 export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
+export const samlService = createSAMLServiceClient(transport);
 export const idpService = createIdpServiceClient(transport);
 export const orgService = createOrganizationServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);
@@ -643,7 +646,7 @@ export async function retrieveIdentityProviderInformation({
   });
 }
 
-export async function getAuthRequest({
+export async function getOIDCAuthRequest({
   authRequestId,
 }: {
   authRequestId: string;
@@ -653,8 +656,22 @@ export async function getAuthRequest({
   });
 }
 
+export async function getSAMLAuthRequest({
+  samlRequestId,
+}: {
+  samlRequestId: string;
+}) {
+  return samlService.getSAMLRequest({
+    samlRequestId,
+  });
+}
+
 export async function createCallback(req: CreateCallbackRequest) {
   return oidcService.createCallback(req);
+}
+
+export async function createResponse(req: CreateResponseRequest) {
+  return samlService.createResponse(req);
 }
 
 export async function verifyEmail(userId: string, verificationCode: string) {
