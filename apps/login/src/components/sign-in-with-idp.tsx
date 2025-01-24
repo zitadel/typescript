@@ -1,7 +1,7 @@
 "use client";
 
 import { idpTypeToSlug } from "@/lib/idp";
-import { redictToIdp } from "@/lib/server/idp";
+import { redirectToIdp } from "@/lib/server/idp";
 import {
   IdentityProvider,
   IdentityProviderType,
@@ -30,7 +30,7 @@ export function SignInWithIdp({
   organization,
   linkOnly,
 }: Readonly<SignInWithIDPProps>) {
-  const [state, action, _isPending] = useActionState(redictToIdp, {});
+  const [state, action, _isPending] = useActionState(redirectToIdp, {});
 
   const renderIDPButton = (idp: IdentityProvider, index: number) => {
     const { id, name, type } = idp;

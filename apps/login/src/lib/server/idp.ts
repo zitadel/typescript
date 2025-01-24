@@ -11,12 +11,12 @@ import { getNextUrl } from "../client";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 
-export type RedictToIdpState = { error?: string | null } | undefined;
+export type RedirectToIdpState = { error?: string | null } | undefined;
 
-export async function redictToIdp(
-  prevState: RedictToIdpState,
+export async function redirectToIdp(
+  prevState: RedirectToIdpState,
   formData: FormData,
-): Promise<RedictToIdpState> {
+): Promise<RedirectToIdpState> {
   const params = new URLSearchParams();
 
   const linkOnly = formData.get("linkOnly") === "true";
