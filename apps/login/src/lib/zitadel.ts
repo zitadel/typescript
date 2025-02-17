@@ -7,7 +7,7 @@ import {
   OIDCService,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
+import { AddOrganizationRequest, AddOrganizationRequest_Admin, OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import {
   Checks,
@@ -396,6 +396,86 @@ export async function listSessions({
     },
     {},
   );
+}
+
+export type AddOrganizationData = {
+  serviceUrl: string;
+
+  organizationName: string;
+
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string | undefined;
+  ereAccount: string | undefined;
+};
+
+export async function addOrganization({
+  serviceUrl,
+  organizationName,
+  firstName,
+  lastName,
+  email,
+  password,
+  ereAccount
+}: AddOrganizationData) {
+  const orgService: Client<typeof OrganizationService> = await createServiceForHost(
+    OrganizationService,
+    serviceUrl,
+  );
+
+  const encoder = new TextEncoder();
+  
+  if (ereAccount) {
+    ereAccount += ":unverified";
+  }
+  
+  console.log("Org name:" + organizationName);
+  return orgService.addOrganization({
+    name: organizationName,
+    admins: [
+      {
+        userType: {
+          case: "human",
+          value: {
+            email: {
+              email,
+              verification: {
+                case: "isVerified",
+                value: false,
+              },
+            },
+            username: email,
+            profile: { givenName: firstName, familyName: lastName },
+            passwordType: password
+              ? { case: "password", value: { password } }
+              : undefined,
+            metadata: [
+                { key: "ereAccounts", value: encoder.encode(ereAccount) }
+              ],
+          },
+        },
+        roles: ["ORG_OWNER"], // Ensure roles are specified if needed
+      },
+    ],
+  });
+}
+
+export async function addOrganizationByRequest({
+  serviceUrl,
+
+  request,
+}: {
+  serviceUrl: string;
+
+  request: AddOrganizationRequest;
+}) {
+  const orgService: Client<typeof OrganizationService> = await createServiceForHost(
+    OrganizationService,
+    serviceUrl,
+  );
+
+  return orgService.addOrganization(request);
 }
 
 export type AddHumanUserData = {

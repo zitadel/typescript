@@ -24,9 +24,11 @@ import { Spinner } from "./spinner";
 
 type Inputs =
   | {
+      organizationName: string;
       firstname: string;
       lastname: string;
       email: string;
+      ereAccount: string;
     }
   | FieldValues;
 
@@ -35,7 +37,8 @@ type Props = {
   firstname?: string;
   lastname?: string;
   email?: string;
-  organization?: string;
+  ereAccount?: string;
+  organizationName?: string;
   authRequestId?: string;
   loginSettings?: LoginSettings;
 };
@@ -43,9 +46,10 @@ type Props = {
 export function RegisterForm({
   legal,
   email,
+  ereAccount,
   firstname,
   lastname,
-  organization,
+  organizationName,
   authRequestId,
   loginSettings,
 }: Props) {
@@ -55,6 +59,8 @@ export function RegisterForm({
     mode: "onBlur",
     defaultValues: {
       email: email ?? "",
+      ereAccount: ereAccount ?? "",
+      organizationName: organizationName ?? "",
       firstName: firstname ?? "",
       lastname: lastname ?? "",
     },
@@ -68,11 +74,14 @@ export function RegisterForm({
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
+    console.log("Values are: " + values);
+
     const response = await registerUser({
       email: values.email,
+      ereAccount: values.ereAccount,
       firstName: values.firstname,
       lastName: values.lastname,
-      organization: organization,
+      organizationName: values.organizationName,
       authRequestId: authRequestId,
     })
       .catch(() => {
@@ -101,9 +110,13 @@ export function RegisterForm({
   ) {
     const registerParams: any = value;
 
-    if (organization) {
-      registerParams.organization = organization;
-    }
+    console.log("Values are: " + value);
+
+
+    /*
+    if (organizationName) {
+      registerParams.organizationName = organizationName;
+    }*/
 
     if (authRequestId) {
       registerParams.authRequestId = authRequestId;
@@ -124,6 +137,17 @@ export function RegisterForm({
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
   return (
     <form className="w-full">
+        <div className="col-span-2">
+          <TextInput
+            type="organizationName"
+            autoComplete="organizationName"
+            required
+            {...register("organizationName", { required: "This field is required" })}
+            label="Organization"
+            error={errors.organizationName?.message as string}
+            data-testid="organization-text-input"
+          />
+          </div>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="">
           <TextInput
@@ -153,11 +177,22 @@ export function RegisterForm({
             autoComplete="email"
             required
             {...register("email", { required: "This field is required" })}
-            label="E-mail"
+            label="Email"
             error={errors.email?.message as string}
             data-testid="email-text-input"
           />
         </div>
+        <div className="col-span-2">
+          <TextInput
+            type="ereAccount"
+            autoComplete="ereAccount"
+            required
+            {...register("ereAccount", { required: "This field is required" })}
+            label="EREAccount"
+            error={errors.ereAccount?.message as string}
+            data-testid="ereAccount-text-input"
+          />
+          </div>
       </div>
       {legal && (
         <PrivacyPolicyCheckboxes

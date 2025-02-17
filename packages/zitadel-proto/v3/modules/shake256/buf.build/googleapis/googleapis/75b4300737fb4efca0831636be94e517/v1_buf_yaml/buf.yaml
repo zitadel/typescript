@@ -1,0 +1,5 @@
+version: v1
+name: buf.build/googleapis/googleapis
+lint:
+  use:
+    - MINIMAL

@@ -9,9 +9,9 @@
     "noResults": "No accounts found"
   },
   "loginname": {
-    "title": "Welcome back!",
-    "description": "Enter your login data.",
-    "register": "Register new user"
+    "title": "Welcome to EREGo",
+    "description": "Enter your email address.",
+    "register": "Register new account"
   },
   "password": {
     "verify": {

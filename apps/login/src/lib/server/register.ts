@@ -1,7 +1,7 @@
 "use server";
 
 import { createSessionAndUpdateCookie } from "@/lib/server/cookie";
-import { addHumanUser, getLoginSettings, getUserByID } from "@/lib/zitadel";
+import { addHumanUser, addOrganization, getLoginSettings, getUserByID } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -15,10 +15,11 @@ import { checkEmailVerification } from "../verify-helper";
 
 type RegisterUserCommand = {
   email: string;
+  ereAccount: string;
   firstName: string;
   lastName: string;
   password?: string;
-  organization?: string;
+  organizationName: string;
   authRequestId?: string;
 };
 
@@ -36,14 +37,16 @@ export async function registerUser(command: RegisterUserCommand) {
     throw new Error("No host found");
   }
 
-  const addResponse = await addHumanUser({
-    serviceUrl,
+  console.log("Here ORg Name: " + command.organizationName);
 
+  const addResponse = await addOrganization({
+    serviceUrl,
+    organizationName: command.organizationName,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
     password: command.password ? command.password : undefined,
-    organization: command.organization,
+    ereAccount: command.ereAccount ? command.ereAccount : undefined
   });
 
   if (!addResponse) {
@@ -53,11 +56,13 @@ export async function registerUser(command: RegisterUserCommand) {
   const loginSettings = await getLoginSettings({
     serviceUrl,
 
-    organization: command.organization,
+    organization: command.organizationName,
   });
 
+  let userId = addResponse.createdAdmins[0].userId;
+
   let checkPayload: any = {
-    user: { search: { case: "userId", value: addResponse.userId } },
+    user: { search: { case: "userId", value: userId } },
   };
 
   if (command.password) {

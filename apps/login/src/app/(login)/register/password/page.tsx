@@ -19,7 +19,7 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
 
-  let { firstname, lastname, email, organization, authRequestId } =
+  let { firstname, lastname, email, organizationName, ereAccount, organization, authRequestId } =
     searchParams;
 
   const _headers = await headers();
@@ -34,7 +34,7 @@ export default async function Page(props: {
     }
   }
 
-  const missingData = !firstname || !lastname || !email;
+  const missingData = !firstname || !lastname || !email || !organizationName || !ereAccount;
 
   const legal = await getLegalAndSupportSettings({
     serviceUrl,
@@ -76,6 +76,8 @@ export default async function Page(props: {
           <SetRegisterPasswordForm
             passwordComplexitySettings={passwordComplexitySettings}
             email={email}
+            organizationName={organizationName}
+            ereAccount={ereAccount}
             firstname={firstname}
             lastname={lastname}
             organization={organization}

@@ -30,6 +30,8 @@ type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
   email: string;
   firstname: string;
+  organizationName: string;
+  ereAccount: string;
   lastname: string;
   organization?: string;
   authRequestId?: string;
@@ -38,6 +40,8 @@ type Props = {
 export function SetRegisterPasswordForm({
   passwordComplexitySettings,
   email,
+  organizationName,
+  ereAccount,
   firstname,
   lastname,
   organization,
@@ -50,6 +54,8 @@ export function SetRegisterPasswordForm({
     defaultValues: {
       email: email ?? "",
       firstname: firstname ?? "",
+      organizationName: organizationName ?? "",
+      ereAccount: ereAccount ?? "",
       lastname: lastname ?? "",
     },
   });
@@ -65,7 +71,9 @@ export function SetRegisterPasswordForm({
       email: email,
       firstName: firstname,
       lastName: lastname,
-      organization: organization,
+      organizationName: organizationName,
+      ereAccount: ereAccount,
+  //    organization: organization,
       authRequestId: authRequestId,
       password: values.password,
     })

@@ -19,7 +19,7 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
 
-  let { firstname, lastname, email, organization, authRequestId } =
+  let { firstname, lastname, email, organizationName, ereAccount, organization, authRequestId } =
     searchParams;
 
   const _headers = await headers();
@@ -77,10 +77,11 @@ export default async function Page(props: {
         {legal && passwordComplexitySettings && (
           <RegisterForm
             legal={legal}
-            organization={organization}
+            organizationName={organizationName}
             firstname={firstname}
             lastname={lastname}
             email={email}
+            ereAccount={ereAccount}
             authRequestId={authRequestId}
             loginSettings={loginSettings}
           ></RegisterForm>
