@@ -1,5 +1,8 @@
 {
-  "extends": "@zitadel/tsconfig/tsup.json",
-  "include": ["./src/**/*"],
+  "extends": "@zitadel/tsconfig/node20.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src", "tests"],
   "exclude": ["dist", "build", "node_modules"]
 }
