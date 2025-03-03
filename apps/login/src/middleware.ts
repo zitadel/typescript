@@ -12,15 +12,10 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  console.log("middleware request.url", request.url)
-  console.log("middleware request.nextUrl", request.nextUrl.toJSON())
-  request.headers.entries().forEach((entry)=> console.log("middleware header", entry[0], entry[1]))
-
   // escape proxy if the environment is setup for multitenancy
   if (!process.env.ZITADEL_API_URL || !process.env.ZITADEL_SERVICE_USER_TOKEN) {
     return NextResponse.next();
   }
-  console.log("middleware proxying request to zitadel")
 
   const _headers = await headers();
 

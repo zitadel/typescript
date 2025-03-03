@@ -72,7 +72,6 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 export async function GET(request: NextRequest) {
 
-  console.log("login route request", JSON.stringify(await request.json(), null, 2))
   request.headers.forEach((v, k, p)=> console.log("middleware header", k, v))
 
   const _headers = await headers();
@@ -402,9 +401,6 @@ export async function GET(request: NextRequest) {
         }
       }
     } else {
-      console.log("request.url", request.url)
-      console.log("request.nextUrl", request.nextUrl.toJSON())
-      request.headers.entries().forEach((entry)=> console.log("header", entry[0], entry[1]))
       const loginNameUrl = new URL("/loginname", request.url);
 
       loginNameUrl.searchParams.set("requestId", requestId);
