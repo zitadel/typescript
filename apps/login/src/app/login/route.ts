@@ -71,6 +71,11 @@ const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TOD
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 export async function GET(request: NextRequest) {
+
+  console.log("middleware request.url", request.url)
+  console.log("middleware request.nextUrl", request.nextUrl.toJSON())
+  request.headers.entries().forEach((entry)=> console.log("middleware header", entry[0], entry[1]))
+
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
