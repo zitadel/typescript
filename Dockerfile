@@ -13,6 +13,5 @@ COPY --chown=nextjs:nodejs ./docker/apps/login/.next/static ./apps/login/.next/s
 COPY --chown=nextjs:nodejs ./docker/apps/login/public ./apps/login/public
 
 USER nextjs
-ENV HOSTNAME="0.0.0.0"
 
-CMD ["/bin/sh", "-c", " set -o allexport && . /.env-file/.env && set +o allexport && node apps/login/server.js"]
+CMD ["/bin/sh", "-c", " set -o allexport && . /.env-file/.env && set +o allexport && HOSTNAME='0.0.0.0' node apps/login/server.js"]
