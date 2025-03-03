@@ -72,7 +72,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 export async function GET(request: NextRequest) {
 
-  console.log("login route request", await request.json())
+  console.log("login route request", JSON.stringify(await request.json(), null, 2))
   request.headers.forEach((v, k, p)=> console.log("middleware header", k, v))
 
   const _headers = await headers();
