@@ -48,6 +48,7 @@ const gotoAccounts = ({
     accountsUrl.searchParams.set("organization", organization);
   }
 
+  console.log("redirect to accountsUrl", accountsUrl);
   return NextResponse.redirect(accountsUrl);
 };
 
@@ -71,6 +72,9 @@ const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TOD
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 export async function GET(request: NextRequest) {
+
+  request.headers.forEach((v, k, p)=> console.log("login route header", k, v))
+
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
@@ -264,6 +268,7 @@ export async function GET(request: NextRequest) {
 
             if (res && "redirect" in res && res?.redirect) {
               const absoluteUrl = new URL(res.redirect, request.url);
+              console.log("redirect to absoluteUrl.toString() where absoluteUrl = new URL(res.redirect, request.url)", absoluteUrl.toString(), "res.redirect", res.redirect, "request.url", request.url, "request.nextUrl", request.nextUrl);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
@@ -284,6 +289,7 @@ export async function GET(request: NextRequest) {
         if (suffix) {
           loginNameUrl.searchParams.set("suffix", suffix);
         }
+        console.log("redirect to loginNameUrl", loginNameUrl, "request.url", request.url, "request.nextUrl", request.nextUrl);
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
