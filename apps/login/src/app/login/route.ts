@@ -73,7 +73,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 export async function GET(request: NextRequest) {
 
-  request.headers.forEach((v, k, p)=> console.log("middleware header", k, v))
+  request.headers.forEach((v, k, p)=> console.log("login route header", k, v))
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -289,7 +289,7 @@ export async function GET(request: NextRequest) {
         if (suffix) {
           loginNameUrl.searchParams.set("suffix", suffix);
         }
-        console.log("redirect to loginNameUrl", loginNameUrl);
+        console.log("redirect to loginNameUrl", loginNameUrl, "request.url", request.url, "request.nextUrl", request.nextUrl);
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
