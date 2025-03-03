@@ -268,7 +268,7 @@ export async function GET(request: NextRequest) {
 
             if (res && "redirect" in res && res?.redirect) {
               const absoluteUrl = new URL(res.redirect, request.url);
-              console.log("redirect to absoluteUrl.toString()", absoluteUrl.toString(), "request.url", request.url, "request.nextUrl", request.nextUrl);
+              console.log("redirect to absoluteUrl.toString() where absoluteUrl = new URL(res.redirect, request.url)", absoluteUrl.toString(), "res.redirect", res.redirect, "request.url", request.url, "request.nextUrl", request.nextUrl);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
