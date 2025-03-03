@@ -48,6 +48,7 @@ const gotoAccounts = ({
     accountsUrl.searchParams.set("organization", organization);
   }
 
+  console.log("redirect to accountsUrl", accountsUrl);
   return NextResponse.redirect(accountsUrl);
 };
 
@@ -267,6 +268,7 @@ export async function GET(request: NextRequest) {
 
             if (res && "redirect" in res && res?.redirect) {
               const absoluteUrl = new URL(res.redirect, request.url);
+              console.log("redirect to absoluteUrl.toString()", absoluteUrl.toString(), "request.url", request.url, "request.nextUrl", request.nextUrl);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
@@ -287,6 +289,7 @@ export async function GET(request: NextRequest) {
         if (suffix) {
           loginNameUrl.searchParams.set("suffix", suffix);
         }
+        console.log("redirect to loginNameUrl", loginNameUrl);
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
