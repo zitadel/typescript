@@ -398,6 +398,9 @@ export async function GET(request: NextRequest) {
         }
       }
     } else {
+      console.log("request.url", request.url)
+      console.log("request.nextUrl", request.nextUrl.toJSON())
+      request.headers.entries().forEach((entry)=> console.log("header", entry[0], entry[1]))
       const loginNameUrl = new URL("/loginname", request.url);
 
       loginNameUrl.searchParams.set("requestId", requestId);
