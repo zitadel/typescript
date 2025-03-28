@@ -97,6 +97,14 @@ jobs:
         run: ZITADEL_DEV_UID=root pnpm run-sink
         if: ${{ matrix.command == 'test:acceptance' }}
 
+      - name: Run SAML SP
+        run: ZITADEL_DEV_UID=root pnpm run-samlsp
+        if: ${{ matrix.command == 'test:acceptance' }}
+
+      - name: Run OIDC RP
+        run: ZITADEL_DEV_UID=root pnpm run-oidcrp
+        if: ${{ matrix.command == 'test:acceptance' }}
+
       - name: Create Cloud Env File
         run: |
           if [ "${{ matrix.command }}" == "test:acceptance:prod" ]; then
