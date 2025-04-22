@@ -1,8 +1,8 @@
 "use server";
 
+import { LANGUAGE_COOKIE_NAME } from "@/i18n/config";
 import { timestampDate, timestampFromMs } from "@zitadel/client";
 import { cookies } from "next/headers";
-import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 // TODO: improve this to handle overflow
 const MAX_COOKIE_SIZE = 2048;

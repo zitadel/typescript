@@ -1,7 +1,8 @@
 "use client";
 
+import { Lang, LANGS } from "@/i18n/config";
 import { setLanguageCookie } from "@/lib/cookies";
-import { Lang, LANGS } from "@/lib/i18n";
+import { getUserLocale } from "@/lib/server/locale";
 import {
   Listbox,
   ListboxButton,
@@ -10,16 +11,11 @@ import {
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function LanguageSwitcher() {
-  const currentLocale = useLocale();
-
-  const [selected, setSelected] = useState(
-    LANGS.find((l) => l.code === currentLocale) || LANGS[0],
-  );
+  const [selected, setSelected] = useState<Lang>(LANGS[0]);
 
   const router = useRouter();
 
@@ -31,6 +27,15 @@ export function LanguageSwitcher() {
 
     router.refresh();
   };
+
+  useEffect(() => {
+    getUserLocale().then((currentLocale) => {
+      const locale = LANGS.find((l) => l.code === currentLocale) || LANGS[0];
+      console.log(currentLocale);
+
+      setSelected(locale);
+    });
+  }, []);
 
   return (
     <div className="w-32">

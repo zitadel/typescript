@@ -6,7 +6,6 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
@@ -38,8 +37,8 @@ export function SessionItem({
   reload: () => void;
   requestId?: string;
 }) {
-  const currentLocale = useLocale();
-  moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
+  // const currentLocale = useLocale();
+  // moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
 
   const [loading, setLoading] = useState<boolean>(false);
 

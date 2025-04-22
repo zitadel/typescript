@@ -1,3 +1,7 @@
+export type Locale = (typeof locales)[number];
+
+export const defaultLocale: Locale = "en";
+
 export interface Lang {
   name: string;
   code: string;
@@ -33,6 +37,8 @@ export const LANGS: Lang[] = [
     code: "ru",
   },
 ];
+
+export const locales = LANGS.map((lang) => lang.code);
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
 export const LANGUAGE_HEADER_NAME = "accept-language";
