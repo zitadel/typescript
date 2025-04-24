@@ -29,7 +29,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "otp" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, sessionId, authRequestId, checkAfter } =
+  const { loginName, organization, sessionId, requestId, checkAfter } =
     searchParams;
   const { method } = params;
 
@@ -38,18 +38,15 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization,
   });
 
   const session = await loadMostRecentSession({
     serviceUrl,
-
     sessionParams: {
       loginName,
       organization,
@@ -61,7 +58,6 @@ export default async function Page(props: {
     if (method === "time-based") {
       await registerTOTP({
         serviceUrl,
-
         userId: session.factors.user.id,
       })
         .then((resp) => {
@@ -76,7 +72,6 @@ export default async function Page(props: {
       // does not work
       await addOTPSMS({
         serviceUrl,
-
         userId: session.factors.user.id,
       }).catch((error) => {
         error = new Error("Could not add OTP via SMS");
@@ -85,7 +80,6 @@ export default async function Page(props: {
       // works
       await addOTPEmail({
         serviceUrl,
-
         userId: session.factors.user.id,
       }).catch((error) => {
         error = new Error("Could not add OTP via Email");
@@ -111,22 +105,22 @@ export default async function Page(props: {
   }
 
   if (checkAfter) {
-    if (authRequestId) {
-      paramsToContinue.append("authRequestId", authRequestId);
+    if (requestId) {
+      paramsToContinue.append("requestId", requestId);
     }
     urlToContinue = `/otp/${method}?` + paramsToContinue;
     // immediately check the OTP on the next page if sms or email was set up
     if (["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
     }
-  } else if (authRequestId && sessionId) {
-    if (authRequestId) {
-      paramsToContinue.append("authRequest", authRequestId);
+  } else if (requestId && sessionId) {
+    if (requestId) {
+      paramsToContinue.append("authRequest", requestId);
     }
     urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {
-    if (authRequestId) {
-      paramsToContinue.append("authRequestId", authRequestId);
+    if (requestId) {
+      paramsToContinue.append("requestId", requestId);
     }
     urlToContinue = `/signedin?` + paramsToContinue;
   }
@@ -165,7 +159,7 @@ export default async function Page(props: {
                 secret={totpResponse.secret as string}
                 loginName={loginName}
                 sessionId={sessionId}
-                authRequestId={authRequestId}
+                requestId={requestId}
                 organization={organization}
                 checkAfter={checkAfter === "true"}
                 loginSettings={loginSettings}

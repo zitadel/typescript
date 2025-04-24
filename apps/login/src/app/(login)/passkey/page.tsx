@@ -17,7 +17,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "passkey" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, altPassword, authRequestId, organization, sessionId } =
+  const { loginName, altPassword, requestId, organization, sessionId } =
     searchParams;
 
   const _headers = await headers();
@@ -27,7 +27,6 @@ export default async function Page(props: {
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
-
         sessionParams: { loginName, organization },
       });
 
@@ -39,7 +38,6 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -51,7 +49,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -76,7 +73,7 @@ export default async function Page(props: {
           <LoginPasskey
             loginName={loginName}
             sessionId={sessionId}
-            authRequestId={authRequestId}
+            requestId={requestId}
             altPassword={altPassword === "true"}
             organization={organization}
           />

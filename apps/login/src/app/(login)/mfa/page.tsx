@@ -22,7 +22,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "mfa" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, authRequestId, organization, sessionId } = searchParams;
+  const { loginName, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -38,7 +38,6 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
-
       sessionParams: {
         loginName,
         organization,
@@ -47,7 +46,6 @@ export default async function Page(props: {
       if (session && session.factors?.user?.id) {
         return listAuthenticationMethodTypes({
           serviceUrl,
-
           userId: session.factors.user.id,
         }).then((methods) => {
           return {
@@ -67,14 +65,12 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes({
           serviceUrl,
-
           userId: response.session.factors.user.id,
         }).then((methods) => {
           return {
@@ -88,7 +84,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -114,7 +109,7 @@ export default async function Page(props: {
           <ChooseSecondFactor
             loginName={loginName}
             sessionId={sessionId}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={organization}
             userMethods={sessionFactors.authMethods ?? []}
           ></ChooseSecondFactor>

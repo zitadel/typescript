@@ -11,7 +11,7 @@ type InviteUserCommand = {
   lastName: string;
   password?: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export type RegisterUserResponse = {
@@ -31,7 +31,6 @@ export async function inviteUser(command: InviteUserCommand) {
 
   const human = await addHumanUser({
     serviceUrl,
-
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -43,10 +42,11 @@ export async function inviteUser(command: InviteUserCommand) {
     return { error: "Could not create user" };
   }
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   const codeResponse = await createInviteCode({
     serviceUrl,
-
-    urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+    urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
     userId: human.userId,
   });
 

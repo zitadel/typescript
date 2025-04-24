@@ -16,14 +16,13 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "u2f" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, authRequestId, checkAfter } = searchParams;
+  const { loginName, organization, requestId, checkAfter } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionFactors = await loadMostRecentSession({
     serviceUrl,
-
     sessionParams: {
       loginName,
       organization,
@@ -32,7 +31,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -62,7 +60,7 @@ export default async function Page(props: {
             loginName={loginName}
             sessionId={sessionFactors.id}
             organization={organization}
-            authRequestId={authRequestId}
+            requestId={requestId}
             checkAfter={checkAfter === "true"}
           />
         )}

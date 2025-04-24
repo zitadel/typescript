@@ -17,15 +17,39 @@ if [ -z "${PAT}" ]; then
   PAT=$(cat ${PAT_FILE})
 fi
 
-if [ -z "${ZITADEL_SERVICE_USER_ID}" ]; then
-  echo "Reading ZITADEL_SERVICE_USER_ID from userinfo endpoint"
-  USERINFO_RESPONSE=$(curl -s --request POST \
-    --url "${ZITADEL_API_INTERNAL_URL}/oidc/v1/userinfo" \
-    --header "Authorization: Bearer ${PAT}" \
-    --header "Host: ${ZITADEL_API_DOMAIN}")
-  echo "Received userinfo response: ${USERINFO_RESPONSE}"
-  ZITADEL_SERVICE_USER_ID=$(echo "${USERINFO_RESPONSE}" | jq --raw-output '.sub')
-fi
+#################################################################
+# ServiceAccount as Login Client
+#################################################################
+
+SERVICEACCOUNT_RESPONSE=$(curl -s --request POST \
+      --url "${ZITADEL_API_INTERNAL_URL}/management/v1/users/machine" \
+      --header "Authorization: Bearer ${PAT}" \
+      --header "Host: ${ZITADEL_API_DOMAIN}" \
+      --header "Content-Type: application/json" \
+      -d "{\"userName\": \"login\",  \"name\": \"Login v2\",  \"description\": \"Serviceaccount for Login v2\", \"accessTokenType\": \"ACCESS_TOKEN_TYPE_BEARER\"}")
+echo "Received ServiceAccount response: ${SERVICEACCOUNT_RESPONSE}"
+
+SERVICEACCOUNT_ID=$(echo ${SERVICEACCOUNT_RESPONSE} | jq -r '. | .userId')
+echo "Received ServiceAccount ID: ${SERVICEACCOUNT_ID}"
+
+MEMBER_RESPONSE=$(curl -s --request POST \
+      --url "${ZITADEL_API_INTERNAL_URL}/admin/v1/members" \
+      --header "Authorization: Bearer ${PAT}" \
+      --header "Host: ${ZITADEL_API_DOMAIN}" \
+      --header "Content-Type: application/json" \
+      -d "{\"userId\": \"${SERVICEACCOUNT_ID}\",  \"roles\": [\"IAM_LOGIN_CLIENT\"]}")
+echo "Received Member response: ${MEMBER_RESPONSE}"
+
+SA_PAT_RESPONSE=$(curl -s --request POST \
+      --url "${ZITADEL_API_INTERNAL_URL}/management/v1/users/${SERVICEACCOUNT_ID}/pats" \
+      --header "Authorization: Bearer ${PAT}" \
+      --header "Host: ${ZITADEL_API_DOMAIN}" \
+      --header "Content-Type: application/json" \
+      -d "{\"expirationDate\": \"2519-04-01T08:45:00.000000Z\"}")
+echo "Received Member response: ${MEMBER_RESPONSE}"
+
+SA_PAT=$(echo ${SA_PAT_RESPONSE} | jq -r '. | .token')
+echo "Received ServiceAccount Token: ${SA_PAT}"
 
 #################################################################
 # Environment files
@@ -37,8 +61,8 @@ WRITE_TEST_ENVIRONMENT_FILE=${WRITE_TEST_ENVIRONMENT_FILE:-$(dirname "$0")/../ac
 echo "Writing environment file to ${WRITE_TEST_ENVIRONMENT_FILE} when done."
 
 echo "ZITADEL_API_URL=${ZITADEL_API_URL}
-ZITADEL_SERVICE_USER_ID=${ZITADEL_SERVICE_USER_ID}
-ZITADEL_SERVICE_USER_TOKEN=${PAT}
+ZITADEL_SERVICE_USER_TOKEN=${SA_PAT}
+ZITADEL_ADMIN_TOKEN=${PAT}
 SINK_NOTIFICATION_URL=${SINK_NOTIFICATION_URL}
 EMAIL_VERIFICATION=true
 DEBUG=true"| tee "${WRITE_ENVIRONMENT_FILE}" "${WRITE_TEST_ENVIRONMENT_FILE}" > /dev/null

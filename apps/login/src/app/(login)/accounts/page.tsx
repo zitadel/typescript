@@ -19,7 +19,6 @@ async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   if (ids && ids.length) {
     const response = await listSessions({
       serviceUrl,
-
       ids: ids.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
@@ -36,7 +35,7 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "accounts" });
 
-  const authRequestId = searchParams?.authRequestId;
+  const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
 
   const _headers = await headers();
@@ -56,14 +55,13 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization: organization ?? defaultOrganization,
   });
 
   const params = new URLSearchParams();
 
-  if (authRequestId) {
-    params.append("authRequestId", authRequestId);
+  if (requestId) {
+    params.append("requestId", requestId);
   }
 
   if (organization) {
@@ -77,7 +75,7 @@ export default async function Page(props: {
         <p className="ztdl-p mb-6 block">{t("description")}</p>
 
         <div className="flex flex-col w-full space-y-2">
-          <SessionsList sessions={sessions} authRequestId={authRequestId} />
+          <SessionsList sessions={sessions} requestId={requestId} />
           <Link href={`/loginname?` + params}>
             <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-all">
               <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">

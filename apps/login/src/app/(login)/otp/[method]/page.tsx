@@ -34,7 +34,7 @@ export default async function Page(props: {
   const {
     loginName, // send from password page
     userId, // send from email link
-    authRequestId,
+    requestId,
     sessionId,
     organization,
     code,
@@ -47,7 +47,6 @@ export default async function Page(props: {
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
-
         sessionParams: { loginName, organization },
       });
 
@@ -59,7 +58,6 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -72,13 +70,11 @@ export default async function Page(props: {
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 
@@ -115,7 +111,7 @@ export default async function Page(props: {
           <LoginOTP
             loginName={loginName ?? session.factors?.user?.loginName}
             sessionId={sessionId}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={
               organization ?? session?.factors?.user?.organizationId
             }

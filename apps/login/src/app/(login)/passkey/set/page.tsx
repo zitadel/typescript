@@ -16,15 +16,13 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "passkey" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, prompt, organization, authRequestId, userId } =
-    searchParams;
+  const { loginName, prompt, organization, requestId, userId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const session = await loadMostRecentSession({
     serviceUrl,
-
     sessionParams: {
       loginName,
       organization,
@@ -33,7 +31,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -76,7 +73,7 @@ export default async function Page(props: {
             sessionId={session.id}
             isPrompt={!!prompt}
             organization={organization}
-            authRequestId={authRequestId}
+            requestId={requestId}
           />
         )}
       </div>

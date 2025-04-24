@@ -4,7 +4,7 @@ import { linkingFailed } from "@/components/idps/pages/linking-failed";
 import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
-import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
+import { idpTypeToIdentityProviderType } from "@/lib/idp";
 import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   addHuman,
@@ -19,10 +19,7 @@ import {
 import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  AddHumanUserRequest,
-  AddHumanUserRequestSchema,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { AddHumanUserRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -36,7 +33,7 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
-  const { id, token, authRequestId, organization, link } = searchParams;
+  const { id, token, requestId, organization, link } = searchParams;
   const { provider } = params;
 
   const _headers = await headers();
@@ -44,7 +41,6 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization,
   });
 
@@ -54,12 +50,12 @@ export default async function Page(props: {
 
   const intent = await retrieveIDPIntent({
     serviceUrl,
-
     id,
     token,
   });
 
   const { idpInformation, userId } = intent;
+  let { addHumanUser } = intent;
 
   // sign in user. If user should be linked continue
   if (userId && !link) {
@@ -68,7 +64,7 @@ export default async function Page(props: {
     return loginSuccess(
       userId,
       { idpIntentId: id, idpIntentToken: token },
-      authRequestId,
+      requestId,
       branding,
     );
   }
@@ -79,7 +75,6 @@ export default async function Page(props: {
 
   const idp = await getIDPByID({
     serviceUrl,
-
     id: idpInformation.idpId,
   });
   const options = idp?.config?.options;
@@ -100,7 +95,6 @@ export default async function Page(props: {
     try {
       idpLink = await addIDPLink({
         serviceUrl,
-
         idp: {
           id: idpInformation.idpId,
           userId: idpInformation.userId,
@@ -119,7 +113,7 @@ export default async function Page(props: {
       return linkingSuccess(
         userId,
         { idpIntentId: id, idpIntentToken: token },
-        authRequestId,
+        requestId,
         branding,
       );
     }
@@ -128,7 +122,7 @@ export default async function Page(props: {
   // search for potential user via username, then link
   if (options?.isLinkingAllowed) {
     let foundUser;
-    const email = PROVIDER_MAPPING[providerType](idpInformation).email?.email;
+    const email = addHumanUser?.email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
       foundUser = await listUsers({ serviceUrl, email }).then((response) => {
@@ -145,7 +139,6 @@ export default async function Page(props: {
     } else {
       foundUser = await listUsers({
         serviceUrl,
-
         userName: idpInformation.userName,
         email,
       }).then((response) => {
@@ -158,7 +151,6 @@ export default async function Page(props: {
       try {
         idpLink = await addIDPLink({
           serviceUrl,
-
           idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
@@ -177,7 +169,7 @@ export default async function Page(props: {
         return linkingSuccess(
           foundUser.userId,
           { idpIntentId: id, idpIntentToken: token },
-          authRequestId,
+          requestId,
           branding,
         );
       }
@@ -186,22 +178,19 @@ export default async function Page(props: {
 
   if (options?.isCreationAllowed && options.isAutoCreation) {
     let orgToRegisterOn: string | undefined = organization;
-
-    let userData: AddHumanUserRequest =
-      PROVIDER_MAPPING[providerType](idpInformation);
+    let newUser;
 
     if (
       !orgToRegisterOn &&
-      userData.username && // username or email?
-      ORG_SUFFIX_REGEX.test(userData.username)
+      addHumanUser?.username && // username or email?
+      ORG_SUFFIX_REGEX.test(addHumanUser.username)
     ) {
-      const matched = ORG_SUFFIX_REGEX.exec(userData.username);
+      const matched = ORG_SUFFIX_REGEX.exec(addHumanUser.username);
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
       const orgs = await getOrgsByDomain({
         serviceUrl,
-
         domain: suffix,
       });
       const orgToCheckForDiscovery =
@@ -209,7 +198,6 @@ export default async function Page(props: {
 
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
-
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
@@ -217,22 +205,21 @@ export default async function Page(props: {
       }
     }
 
-    if (orgToRegisterOn) {
+    if (addHumanUser && orgToRegisterOn) {
       const organizationSchema = create(OrganizationSchema, {
         org: { case: "orgId", value: orgToRegisterOn },
       });
 
-      userData = create(AddHumanUserRequestSchema, {
-        ...userData,
+      const addHumanUserWithOrganization = create(AddHumanUserRequestSchema, {
+        ...addHumanUser,
         organization: organizationSchema,
       });
+
+      newUser = await addHuman({
+        serviceUrl,
+        request: addHumanUserWithOrganization,
+      });
     }
-
-    const newUser = await addHuman({
-      serviceUrl,
-
-      request: userData,
-    });
 
     if (newUser) {
       return (
@@ -243,7 +230,7 @@ export default async function Page(props: {
             <IdpSignin
               userId={newUser.userId}
               idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-              authRequestId={authRequestId}
+              requestId={requestId}
             />
           </div>
         </DynamicTheme>

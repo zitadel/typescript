@@ -27,7 +27,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "authenticator" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, authRequestId, organization, sessionId } = searchParams;
+  const { loginName, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -49,7 +49,6 @@ export default async function Page(props: {
 
     return listAuthenticationMethodTypes({
       serviceUrl,
-
       userId,
     }).then((methods) => {
       return getUserByID({ serviceUrl, userId }).then((user) => {
@@ -74,7 +73,6 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
-
       sessionParams: {
         loginName,
         organization,
@@ -92,15 +90,10 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(
-        serviceUrl,
-
-        sessionResponse.session,
-      );
+      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
     });
   }
 
@@ -110,19 +103,16 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
-
     orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
   }).then((resp) => {
@@ -141,8 +131,8 @@ export default async function Page(props: {
     params.set("organization", sessionWithData.factors?.user?.organizationId);
   }
 
-  if (authRequestId) {
-    params.set("authRequestId", authRequestId);
+  if (requestId) {
+    params.set("requestId", requestId);
   }
 
   return (
@@ -167,17 +157,20 @@ export default async function Page(props: {
           ></ChooseAuthenticatorToSetup>
         )}
 
-        <div className="py-3 flex flex-col">
-          <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
-        </div>
-
         {loginSettings?.allowExternalIdp && identityProviders && (
-          <SignInWithIdp
-            identityProviders={identityProviders}
-            authRequestId={authRequestId}
-            organization={sessionWithData.factors?.user?.organizationId}
-            linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
-          ></SignInWithIdp>
+          <>
+            {identityProviders.length && (
+              <div className="py-3 flex flex-col">
+                <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
+              </div>
+            )}
+            <SignInWithIdp
+              identityProviders={identityProviders}
+              requestId={requestId}
+              organization={sessionWithData.factors?.user?.organizationId}
+              linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
+            ></SignInWithIdp>
+          </>
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">

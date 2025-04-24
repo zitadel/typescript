@@ -8,16 +8,13 @@ export const config = {
     "/oauth/:path*",
     "/oidc/:path*",
     "/idps/callback/:path*",
+    "/saml/:path*",
   ],
 };
 
 export async function middleware(request: NextRequest) {
   // escape proxy if the environment is setup for multitenancy
-  if (
-    !process.env.ZITADEL_API_URL ||
-    !process.env.ZITADEL_SERVICE_USER_ID ||
-    !process.env.ZITADEL_SERVICE_USER_TOKEN
-  ) {
+  if (!process.env.ZITADEL_API_URL || !process.env.ZITADEL_SERVICE_USER_TOKEN) {
     return NextResponse.next();
   }
 
@@ -25,13 +22,11 @@ export async function middleware(request: NextRequest) {
 
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
-  const instanceHost = `${serviceUrl}`.replace("https://", "");
+  const instanceHost = `${serviceUrl}`
+    .replace("https://", "")
+    .replace("http://", "");
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set(
-    "x-zitadel-login-client",
-    process.env.ZITADEL_SERVICE_USER_ID,
-  );
 
   // this is a workaround for the next.js server not forwarding the host header
   // requestHeaders.set("x-zitadel-forwarded", `host="${request.nextUrl.host}"`);

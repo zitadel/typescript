@@ -25,7 +25,7 @@ import { createSessionAndUpdateCookie } from "./cookie";
 
 export type SendLoginnameCommand = {
   loginName: string;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
   suffix?: string;
 };
@@ -43,7 +43,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const loginSettingsByContext = await getLoginSettings({
     serviceUrl,
-
     organization: command.organization,
   });
 
@@ -53,7 +52,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   let searchUsersRequest: SearchUsersCommand = {
     serviceUrl,
-
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
@@ -75,7 +73,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders({
       serviceUrl,
-
       orgId: command.organization,
     }).then((resp) => {
       return resp.identityProviders;
@@ -96,24 +93,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const params = new URLSearchParams();
 
-      if (command.authRequestId) {
-        params.set("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        params.set("requestId", command.requestId);
       }
 
       if (command.organization) {
         params.set("organization", command.organization);
       }
 
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
       const resp = await startIdentityProviderFlow({
         serviceUrl,
-
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
             new URLSearchParams(params),
           failureUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
             new URLSearchParams(params),
         },
       });
@@ -127,7 +125,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const redirectUserToIDP = async (userId: string) => {
     const identityProviders = await listIDPLinks({
       serviceUrl,
-
       userId,
     }).then((resp) => {
       return resp.result;
@@ -146,7 +143,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const idp = await getIDPByID({
         serviceUrl,
-
         id: identityProviderId,
       });
 
@@ -161,24 +157,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const params = new URLSearchParams({ userId });
 
-      if (command.authRequestId) {
-        params.set("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        params.set("requestId", command.requestId);
       }
 
       if (command.organization) {
         params.set("organization", command.organization);
       }
 
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
       const resp = await startIdentityProviderFlow({
         serviceUrl,
-
         idpId: idp.id,
         urls: {
           successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/success?` +
             new URLSearchParams(params),
           failureUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
+            `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/idp/${provider}/failure?` +
             new URLSearchParams(params),
         },
       });
@@ -197,7 +194,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const userLoginSettings = await getLoginSettings({
       serviceUrl,
-
       organization: user.details?.resourceOwner,
     });
 
@@ -239,11 +235,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       user: { search: { case: "userId", value: userId } },
     });
 
-    const session = await createSessionAndUpdateCookie(
+    const session = await createSessionAndUpdateCookie({
       checks,
-      undefined,
-      command.authRequestId,
-    );
+      requestId: command.requestId,
+    });
 
     if (!session.factors?.user?.id) {
       return { error: "Could not create session for user" };
@@ -256,7 +251,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const methods = await listAuthenticationMethodTypes({
       serviceUrl,
-
       userId: session.factors?.user?.id,
     });
 
@@ -267,7 +261,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         session,
         humanUser,
         session.factors.user.organizationId,
-        command.authRequestId,
+        command.requestId,
       );
 
       if (inviteCheck?.redirect) {
@@ -286,8 +280,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         );
       }
 
-      if (command.authRequestId) {
-        paramsAuthenticatorSetup.append("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        paramsAuthenticatorSetup.append("requestId", command.requestId);
       }
 
       return { redirect: "/authenticator/set?" + paramsAuthenticatorSetup };
@@ -315,8 +309,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               command.organization ?? session.factors?.user?.organizationId;
           }
 
-          if (command.authRequestId) {
-            paramsPassword.authRequestId = command.authRequestId;
+          if (command.requestId) {
+            paramsPassword.requestId = command.requestId;
           }
 
           return {
@@ -332,8 +326,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           }
 
           const paramsPasskey: any = { loginName: command.loginName };
-          if (command.authRequestId) {
-            paramsPasskey.authRequestId = command.authRequestId;
+          if (command.requestId) {
+            paramsPasskey.requestId = command.requestId;
           }
 
           if (command.organization || session.factors?.user?.organizationId) {
@@ -351,8 +345,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           altPassword: `${methods.authMethodTypes.includes(1)}`, // show alternative password option
         };
 
-        if (command.authRequestId) {
-          passkeyParams.authRequestId = command.authRequestId;
+        if (command.requestId) {
+          passkeyParams.requestId = command.requestId;
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
@@ -371,8 +365,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         // user has no passkey setup and login settings allow passkeys
         const paramsPasswordDefault: any = { loginName: command.loginName };
 
-        if (command.authRequestId) {
-          paramsPasswordDefault.authRequestId = command.authRequestId;
+        if (command.requestId) {
+          paramsPasswordDefault.requestId = command.requestId;
         }
 
         if (command.organization || session.factors?.user?.organizationId) {
@@ -415,7 +409,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       // this just returns orgs where the suffix is set as primary domain
       const orgs = await getOrgsByDomain({
         serviceUrl,
-
         domain: suffix,
       });
       const orgToCheckForDiscovery =
@@ -423,7 +416,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
-
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
@@ -435,8 +427,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (orgToRegisterOn && !loginSettingsByContext?.ignoreUnknownUsernames) {
       const params = new URLSearchParams({ organization: orgToRegisterOn });
 
-      if (command.authRequestId) {
-        params.set("authRequestId", command.authRequestId);
+      if (command.requestId) {
+        params.set("requestId", command.requestId);
       }
 
       if (command.loginName) {
@@ -452,8 +444,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       loginName: command.loginName,
     });
 
-    if (command.authRequestId) {
-      paramsPasswordDefault.append("authRequestId", command.authRequestId);
+    if (command.requestId) {
+      paramsPasswordDefault.append("requestId", command.requestId);
     }
 
     if (command.organization) {

@@ -6,10 +6,44 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
+
+export type RedirectToIdpState = { error?: string | null } | undefined;
+
+export async function redirectToIdp(
+  prevState: RedirectToIdpState,
+  formData: FormData,
+): Promise<RedirectToIdpState> {
+  const params = new URLSearchParams();
+
+  const linkOnly = formData.get("linkOnly") === "true";
+  const requestId = formData.get("requestId") as string;
+  const organization = formData.get("organization") as string;
+  const idpId = formData.get("id") as string;
+  const provider = formData.get("provider") as string;
+
+  if (linkOnly) params.set("link", "true");
+  if (requestId) params.set("requestId", requestId);
+  if (organization) params.set("organization", organization);
+
+  const response = await startIDPFlow({
+    idpId,
+    successUrl: `/idp/${provider}/success?` + params.toString(),
+    failureUrl: `/idp/${provider}/failure?` + params.toString(),
+  });
+
+  if (response && "error" in response && response?.error) {
+    return { error: response.error };
+  }
+
+  if (response && "redirect" in response && response?.redirect) {
+    redirect(response.redirect);
+  }
+}
 
 export type StartIDPFlowCommand = {
   idpId: string;
@@ -26,13 +60,14 @@ export async function startIDPFlow(command: StartIDPFlowCommand) {
     return { error: "Could not get host" };
   }
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   return startIdentityProviderFlow({
     serviceUrl,
-
     idpId: command.idpId,
     urls: {
-      successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.successUrl}`,
-      failureUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.failureUrl}`,
+      successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}${command.successUrl}`,
+      failureUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}${command.failureUrl}`,
     },
   }).then((response) => {
     if (
@@ -54,13 +89,14 @@ type CreateNewSessionCommand = {
   loginName?: string;
   password?: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function createNewSessionFromIdpIntent(
   command: CreateNewSessionCommand,
 ) {
   const _headers = await headers();
+
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
@@ -74,7 +110,6 @@ export async function createNewSessionFromIdpIntent(
 
   const userResponse = await getUserByID({
     serviceUrl,
-
     userId: command.userId,
   });
 
@@ -84,14 +119,13 @@ export async function createNewSessionFromIdpIntent(
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: userResponse.user.details?.resourceOwner,
   });
 
   const session = await createSessionForIdpAndUpdateCookie(
     command.userId,
     command.idpIntent,
-    command.authRequestId,
+    command.requestId,
     loginSettings?.externalLoginCheckLifetime,
   );
 
@@ -109,7 +143,7 @@ export async function createNewSessionFromIdpIntent(
     session,
     humanUser,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (emailVerificationCheck?.redirect) {
@@ -117,16 +151,16 @@ export async function createNewSessionFromIdpIntent(
   }
 
   // TODO: check if user has MFA methods
-  // const mfaFactorCheck = checkMFAFactors(session, loginSettings, authMethods, organization, authRequestId);
+  // const mfaFactorCheck = checkMFAFactors(session, loginSettings, authMethods, organization, requestId);
   // if (mfaFactorCheck?.redirect) {
   //   return mfaFactorCheck;
   // }
 
   const url = await getNextUrl(
-    command.authRequestId && session.id
+    command.requestId && session.id
       ? {
           sessionId: session.id,
-          authRequestId: command.authRequestId,
+          requestId: command.requestId,
           organization: session.factors.user.organizationId,
         }
       : {

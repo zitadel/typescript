@@ -6,6 +6,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
@@ -31,12 +32,15 @@ export function isSessionValid(session: Partial<Session>): {
 export function SessionItem({
   session,
   reload,
-  authRequestId,
+  requestId,
 }: {
   session: Session;
   reload: () => void;
-  authRequestId?: string;
+  requestId?: string;
 }) {
+  const currentLocale = useLocale();
+  moment.locale(currentLocale === "zh" ? "zh-cn" : currentLocale);
+
   const [loading, setLoading] = useState<boolean>(false);
 
   async function clearSession(id: string) {
@@ -67,7 +71,7 @@ export function SessionItem({
         if (valid && session?.factors?.user) {
           const resp = await continueWithSession({
             ...session,
-            authRequestId: authRequestId,
+            requestId: requestId,
           });
 
           if (resp?.redirect) {
@@ -78,7 +82,7 @@ export function SessionItem({
           const res = await sendLoginname({
             loginName: session.factors?.user?.loginName,
             organization: session.factors.user.organizationId,
-            authRequestId: authRequestId,
+            requestId: requestId,
           })
             .catch(() => {
               setError("An internal error occurred");

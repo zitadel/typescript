@@ -16,7 +16,7 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { ConnectError, create } from "@zitadel/client";
 import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import {
@@ -42,7 +42,7 @@ import {
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
@@ -56,7 +56,6 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   const users = await listUsers({
     serviceUrl,
-
     loginName: command.loginName,
     organizationId: command.organization,
   });
@@ -70,13 +69,14 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
   return passwordReset({
     serviceUrl,
-
     userId,
     urlTemplate:
-      `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-      (command.authRequestId ? `&authRequestId=${command.authRequestId}` : ""),
+      `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+      (command.requestId ? `&requestId=${command.requestId}` : ""),
   });
 }
 
@@ -84,7 +84,7 @@ export type UpdateSessionCommand = {
   loginName: string;
   organization?: string;
   checks: Checks;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function sendPassword(command: UpdateSessionCommand) {
@@ -105,7 +105,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (!sessionCookie) {
     const users = await listUsers({
       serviceUrl,
-
       loginName: command.loginName,
       organizationId: command.organization,
     });
@@ -120,22 +119,19 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
       loginSettings = await getLoginSettings({
         serviceUrl,
-
         organization: command.organization,
       });
 
       try {
-        session = await createSessionAndUpdateCookie(
+        session = await createSessionAndUpdateCookie({
           checks,
-          undefined,
-          command.authRequestId,
-          loginSettings?.passwordCheckLifetime,
-        );
+          requestId: command.requestId,
+          lifetime: loginSettings?.passwordCheckLifetime,
+        });
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
           const lockoutSettings = await getLockoutSettings({
             serviceUrl,
-
             orgId: command.organization,
           });
 
@@ -160,14 +156,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
         sessionCookie,
         command.checks,
         undefined,
-        command.authRequestId,
+        command.requestId,
         loginSettings?.passwordCheckLifetime,
       );
     } catch (error: any) {
       if ("failedAttempts" in error && error.failedAttempts) {
         const lockoutSettings = await getLockoutSettings({
           serviceUrl,
-
           orgId: command.organization,
         });
 
@@ -189,7 +184,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
     const userResponse = await getUserByID({
       serviceUrl,
-
       userId: session?.factors?.user?.id,
     });
 
@@ -203,7 +197,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
       serviceUrl,
-
       organization:
         command.organization ?? session.factors?.user?.organizationId,
     });
@@ -217,7 +210,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const expirySettings = await getPasswordExpirySettings({
     serviceUrl,
-
     orgId: command.organization ?? session.factors?.user?.organizationId,
   });
 
@@ -227,7 +219,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     session,
     humanUser,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (passwordChangedCheck?.redirect) {
@@ -244,7 +236,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     session,
     humanUser,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (emailVerificationCheck?.redirect) {
@@ -256,7 +248,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (command.checks && command.checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
       serviceUrl,
-
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -268,23 +259,24 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Could not verify password!" };
   }
 
-  const mfaFactorCheck = checkMFAFactors(
+  const mfaFactorCheck = await checkMFAFactors(
+    serviceUrl,
     session,
     loginSettings,
     authMethods,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (mfaFactorCheck?.redirect) {
     return mfaFactorCheck;
   }
 
-  if (command.authRequestId && session.id) {
+  if (command.requestId && session.id) {
     const nextUrl = await getNextUrl(
       {
         sessionId: session.id,
-        authRequestId: command.authRequestId,
+        requestId: command.requestId,
         organization:
           command.organization ?? session.factors?.user?.organizationId,
       },
@@ -316,7 +308,6 @@ export async function changePassword(command: {
   // check for init state
   const { user } = await getUserByID({
     serviceUrl,
-
     userId: command.userId,
   });
 
@@ -327,7 +318,6 @@ export async function changePassword(command: {
 
   return setUserPassword({
     serviceUrl,
-
     userId,
     password: command.password,
     user,
@@ -351,7 +341,6 @@ export async function checkSessionAndSetPassword({
 
   const { session } = await getSession({
     serviceUrl,
-
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -370,7 +359,6 @@ export async function checkSessionAndSetPassword({
   // check if the user has no password set in order to set a password
   const authmethods = await listAuthenticationMethodTypes({
     serviceUrl,
-
     userId: session.factors.user.id,
   });
 
@@ -391,7 +379,6 @@ export async function checkSessionAndSetPassword({
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-
     organization: session.factors.user.organizationId,
   });
 
@@ -434,7 +421,7 @@ export async function checkSessionAndSetPassword({
         },
         {},
       )
-      .catch((error) => {
+      .catch((error: ConnectError) => {
         console.log(error);
         if (error.code === 7) {
           return { error: "Session is not valid." };

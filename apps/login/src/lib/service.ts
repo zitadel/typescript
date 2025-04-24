@@ -3,10 +3,12 @@ import { createServerTransport } from "@zitadel/client/node";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { OIDCService } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
+import { SAMLService } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { SessionService } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { UserService } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
+import { NextRequest } from "next/server";
 import { systemAPIToken } from "./api";
 
 type ServiceClass =
@@ -15,7 +17,8 @@ type ServiceClass =
   | typeof OrganizationService
   | typeof SessionService
   | typeof OIDCService
-  | typeof SettingsService;
+  | typeof SettingsService
+  | typeof SAMLService;
 
 export async function createServiceForHost<T extends ServiceClass>(
   service: T,
@@ -105,4 +108,17 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   return {
     serviceUrl: instanceUrl,
   };
+}
+
+export function constructUrl(request: NextRequest, path: string) {
+  const forwardedProto = request.headers.get("x-forwarded-proto")
+    ? `${request.headers.get("x-forwarded-proto")}:`
+    : request.nextUrl.protocol;
+
+  const forwardedHost =
+    request.headers.get("x-zitadel-forward-host") ??
+    request.headers.get("x-forwarded-host") ??
+    request.headers.get("host");
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  return new URL(`${basePath}${path}`, `${forwardedProto}//${forwardedHost}`);
 }
