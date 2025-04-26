@@ -37,7 +37,7 @@ export const getButtonClasses = (
       true,
     "shadow hover:shadow-xl active:shadow-xl disabled:border-none disabled:bg-gray-300 disabled:text-gray-600 disabled:shadow-none disabled:cursor-not-allowed disabled:dark:bg-gray-800 disabled:dark:text-gray-900":
       variant === ButtonVariants.Primary,
-    "bg-primary-light-500 dark:bg-primary-dark-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-400 text-primary-light-contrast-500 dark:text-primary-dark-contrast-500":
+    "text-white font-medium":
       variant === ButtonVariants.Primary && color !== ButtonColors.Warn,
     "bg-warn-light-500 dark:bg-warn-dark-500 hover:bg-warn-light-400 hover:dark:bg-warn-dark-400 text-white dark:text-white":
       variant === ButtonVariants.Primary && color === ButtonColors.Warn,
@@ -66,6 +66,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       type="button"
       ref={ref}
       className={`${getButtonClasses(size, variant, color)} ${className}`}
+      style={
+        variant === ButtonVariants.Primary && color !== ButtonColors.Warn
+          ? { 
+              background: "linear-gradient(to right, var(--primary-color), var(--secondary-color))",
+              color: "white" // Explicitly set text color to white
+            }
+          : undefined
+      }
       {...props}
     >
       {children}

@@ -11,6 +11,7 @@ import {
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+import Image from "next/image";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -57,6 +58,14 @@ export default async function Page(props: {
   return missingData ? (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
+        <Image
+          className="w-28 h-28"
+          src="/logo-omniwot-compressed.png"
+          alt="logo"
+          width={128}
+          height={128}
+          priority
+        />
         <h1>{t("missingdata.title")}</h1>
         <p className="ztdl-p">{t("missingdata.description")}</p>
       </div>
@@ -64,6 +73,14 @@ export default async function Page(props: {
   ) : loginSettings?.allowRegister && loginSettings.allowUsernamePassword ? (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
+      <Image
+          className="w-28 h-28"
+          src="/logo-omniwot-compressed.png"
+          alt="logo"
+          width={128}
+          height={128}
+          priority
+        />
         <h1>{t("password.title")}</h1>
         <p className="ztdl-p">{t("description")}</p>
 

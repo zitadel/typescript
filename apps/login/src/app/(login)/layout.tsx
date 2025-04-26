@@ -9,11 +9,20 @@ import OmniWOTLogo from "@/components/omniwot-logo";
 import { Analytics } from "@vercel/analytics/react";
 import { Lato } from "next/font/google";
 import { ReactNode, Suspense } from "react";
+import { Metadata } from 'next';
 
 const lato = Lato({
   weight: ["400", "700", "900"],
   subsets: ["latin"],
 });
+
+export const metadata: Metadata = {
+  title: 'Omniwot Auth',
+  description: 'Authentication service for Omniwot',
+  icons: {
+    icon: '/favicon-omniwot.ico',
+  },
+};
 
 export default async function RootLayout({
   children,
