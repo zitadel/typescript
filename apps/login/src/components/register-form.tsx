@@ -24,10 +24,10 @@ import { Spinner } from "./spinner";
 
 type Inputs =
   | {
-      firstname: string;
-      lastname: string;
-      email: string;
-    }
+    firstname: string;
+    lastname: string;
+    email: string;
+  }
   | FieldValues;
 
 type Props = {
@@ -184,25 +184,29 @@ export function RegisterForm({
         </div>
       )}
       <div className="mt-8 flex w-full flex-row items-center justify-between">
+        <div className="scale-120 transform">
         <BackButton data-testid="back-button" />
-        <Button
-          type="submit"
-          variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
-          onClick={handleSubmit((values) => {
-            const usePasswordToContinue: boolean =
-              loginSettings?.allowUsernamePassword &&
-              loginSettings?.passkeysType == PasskeysType.ALLOWED
-                ? !!!(selected === methods[0]) // choose selection if both available
-                : !!loginSettings?.allowUsernamePassword; // if password is chosen
-            // set password as default if only password is allowed
-            return submitAndContinue(values, usePasswordToContinue);
-          })}
-          data-testid="submit-button"
-        >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
-        </Button>
+        </div>
+        <div className="scale-110 transform">
+          <Button
+            type="submit"
+            variant={ButtonVariants.Primary}
+            disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
+            onClick={handleSubmit((values) => {
+              const usePasswordToContinue: boolean =
+                loginSettings?.allowUsernamePassword &&
+                  loginSettings?.passkeysType == PasskeysType.ALLOWED
+                  ? !!!(selected === methods[0]) // choose selection if both available
+                  : !!loginSettings?.allowUsernamePassword; // if password is chosen
+              // set password as default if only password is allowed
+              return submitAndContinue(values, usePasswordToContinue);
+            })}
+            data-testid="submit-button"
+          >
+            {loading && <Spinner className="h-5 w-5 mr-2" />}
+            {t("submit")}
+          </Button>
+        </div>
       </div>
     </form>
   );
