@@ -29,7 +29,7 @@ export function Theme() {
         }`}
         onClick={() => setTheme("dark")}
       >
-        <MoonIcon className="h-4 w-4 flex-shrink-0 text-xl rounded-full" />
+        <MoonIcon className="h-4 w-4 shrink-0 text-xl rounded-full" />
       </button>
       <button
         className={`h-8 w-8 rounded-full flex flex-row items-center justify-center hover:opacity-100 transition-all ${
@@ -37,7 +37,7 @@ export function Theme() {
         }`}
         onClick={() => setTheme("light")}
       >
-        <SunIcon className="h-6 w-6 flex-shrink-0 text-xl rounded-full" />
+        <SunIcon className="h-6 w-6 shrink-0 text-xl rounded-full" />
       </button>
     </div>
   );

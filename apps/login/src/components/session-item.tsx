@@ -132,7 +132,7 @@ export function SessionItem({
         )}
       </div>
 
-      <span className="flex-grow"></span>
+      <span className="grow"></span>
       <div className="relative flex flex-row items-center">
         {valid ? (
           <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>

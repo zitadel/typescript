@@ -72,7 +72,7 @@ export function VerifyRedirectButton({
 
       <div className="mt-8 flex w-full flex-row items-center">
         <BackButton />
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
         {authMethods?.length === 0 && (
           <Button
             onClick={() => submitAndContinue()}

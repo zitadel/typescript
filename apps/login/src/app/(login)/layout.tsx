@@ -1,4 +1,4 @@
-import "@/styles/globals.scss";
+import "@/styles/globals.css";
 
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";

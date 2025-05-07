@@ -88,7 +88,7 @@ export function ConsentScreen({
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("device.request.deny")}
         </Button>
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
 
         <Link href={nextUrl}>
           <Button

@@ -45,7 +45,7 @@ export function UserAvatar({
       <span className="ml-4 pr-4 text-14px max-w-[250px] text-ellipsis overflow-hidden">
         {loginName}
       </span>
-      <span className="flex-grow"></span>
+      <span className="grow"></span>
       {showDropdown && (
         <Link
           href={"/accounts?" + params}
