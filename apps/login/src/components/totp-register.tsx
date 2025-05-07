@@ -138,7 +138,7 @@ export function TotpRegister({
             )}
 
             <div className="mt-8 flex w-full flex-row items-center">
-              <span className="flex-grow"></span>
+              <span className="grow"></span>
               <Button
                 type="submit"
                 className="self-end"
