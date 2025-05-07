@@ -8,6 +8,12 @@
     "addAnother": "Ein weiteres Konto hinzufügen",
     "noResults": "Keine Konten gefunden"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
+    "noResults": "Keine Konten gefunden",
+    "clear": "Entfernen"
+  },
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
