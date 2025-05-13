@@ -27,8 +27,8 @@ export function AppAvatar({ appName, imageUrl, shadow }: AvatarProps) {
 
   return (
     <div
-      className={`w-[100px] h-[100px] flex justify-center items-center cursor-default pointer-events-none group-focus:outline-none group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 hover:dark:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 dark:text-blue rounded-full ${
-        shadow ? "shadow" : ""
+      className={`w-[100px] h-[100px] flex justify-center items-center cursor-default pointer-events-none group-focus:outline-hidden group-focus:ring-2 transition-colors duration-200 dark:group-focus:ring-offset-blue bg-primary-light-500 text-primary-light-contrast-500 hover:bg-primary-light-400 dark:hover:bg-primary-dark-500 group-focus:ring-primary-light-200 dark:group-focus:ring-primary-dark-400 dark:bg-primary-dark-300 dark:text-primary-dark-contrast-300 dark:text-blue rounded-full ${
+        shadow ? "shadow-sm" : ""
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >

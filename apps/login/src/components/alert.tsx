@@ -34,10 +34,10 @@ export function Alert({ children, type = AlertType.ALERT }: Props) {
       )}
     >
       {type === AlertType.ALERT && (
-        <ExclamationTriangleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
+        <ExclamationTriangleIcon className="shrink-0 h-5 w-5 mr-2 ml-2" />
       )}
       {type === AlertType.INFO && (
-        <InformationCircleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
+        <InformationCircleIcon className="shrink-0 h-5 w-5 mr-2 ml-2" />
       )}
       <span className="text-sm w-full ">{children}</span>
     </div>
