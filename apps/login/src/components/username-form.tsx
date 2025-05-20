@@ -142,7 +142,7 @@ export function UsernameForm({
 
       <div className="mt-4 flex w-full flex-row items-center">
         <BackButton data-testid="back-button" />
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
         <Button
           data-testid="submit-button"
           type="submit"

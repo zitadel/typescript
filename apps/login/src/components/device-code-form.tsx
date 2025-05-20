@@ -78,7 +78,7 @@ export function DeviceCodeForm({ userCode }: { userCode?: string }) {
 
         <div className="mt-8 flex w-full flex-row items-center">
           <BackButton />
-          <span className="flex-grow"></span>
+          <span className="grow"></span>
           <Button
             type="submit"
             className="self-end"

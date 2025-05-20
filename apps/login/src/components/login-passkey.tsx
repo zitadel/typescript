@@ -240,7 +240,7 @@ export function LoginPasskey({
           <BackButton />
         )}
 
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
         <Button
           type="submit"
           className="self-end"
