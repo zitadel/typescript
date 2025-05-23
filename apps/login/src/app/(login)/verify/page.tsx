@@ -1,18 +1,12 @@
-import { Alert } from "@/components/alert";
+import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
-import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getUserByID,
-  listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -22,7 +16,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, code, organization, requestId, invite } =
+  const { userId, loginName, code, organization, requestId, invite, send } =
     searchParams;
 
   const _headers = await headers();
@@ -43,7 +37,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let human: HumanUser | undefined;
   let id: string | undefined;
 
-  const doSend = invite !== "true";
+  const doSend = send === "true";
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -61,7 +55,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         serviceUrl,
         userId: sessionFactors?.factors?.user?.id,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
@@ -74,7 +68,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         serviceUrl,
         userId,
         urlTemplate:
-          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          `${host.includes("localhost") ? "http://" : "https://"}${host}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (requestId ? `&requestId=${requestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
@@ -96,12 +90,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   id = userId ?? sessionFactors?.factors?.user?.id;
 
-  let authMethods: AuthenticationMethodType[] | null = null;
-  if (human?.email?.isVerified) {
-    const authMethodsResponse = await listAuthenticationMethodTypes(userId);
-    if (authMethodsResponse.authMethodTypes) {
-      authMethods = authMethodsResponse.authMethodTypes;
-    }
+  if (!id) {
+    throw Error("Failed to get user id");
   }
 
   const params = new URLSearchParams({
@@ -138,6 +128,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </>
         )}
 
+        {id && send && (
+          <div className="py-4 w-full">
+            <Alert type={AlertType.INFO}>{t("verify.codeSent")}</Alert>
+          </div>
+        )}
+
         {sessionFactors ? (
           <UserAvatar
             loginName={loginName ?? sessionFactors.factors?.user?.loginName}
@@ -155,27 +151,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           )
         )}
 
-        {id &&
-          (human?.email?.isVerified ? (
-            // show page for already verified users
-            <VerifyRedirectButton
-              userId={id}
-              loginName={loginName}
-              organization={organization}
-              requestId={requestId}
-              authMethods={authMethods}
-            />
-          ) : (
-            // check if auth methods are set
-            <VerifyForm
-              loginName={loginName}
-              organization={organization}
-              userId={id}
-              code={code}
-              isInvite={invite === "true"}
-              requestId={requestId}
-            />
-          ))}
+        {/* always show the code form / TODO improve UI for email links which were already used (currently we get an error code 3 due being reused) */}
+        <VerifyForm
+          loginName={loginName}
+          organization={organization}
+          userId={id}
+          code={code}
+          isInvite={invite === "true"}
+          requestId={requestId}
+        />
       </div>
     </DynamicTheme>
   );
