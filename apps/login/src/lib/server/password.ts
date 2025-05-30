@@ -133,7 +133,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
         if ("failedAttempts" in error && error.failedAttempts) {
           const lockoutSettings = await getLockoutSettings({
             serviceUrl,
-            orgId: command.organization,
+            organization: command.organization,
           });
 
           return {
@@ -164,7 +164,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       if ("failedAttempts" in error && error.failedAttempts) {
         const lockoutSettings = await getLockoutSettings({
           serviceUrl,
-          orgId: command.organization,
+          organization: command.organization,
         });
 
         return {
@@ -211,7 +211,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const expirySettings = await getPasswordExpirySettings({
     serviceUrl,
-    orgId: command.organization ?? session.factors?.user?.organizationId,
+    organization: command.organization ?? session.factors?.user?.organizationId,
   });
 
   // check if the user has to change password first
