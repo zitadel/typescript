@@ -45,14 +45,7 @@ import { getUserAgent } from "./fingerprint";
 import redis from "./redis";
 import { createServiceForHost } from "./service";
 
-const useCache = process.env.DEBUG !== "true";
-
-// async function cacheWrapper<T>(callback: Promise<T>) {
-//   "use cache";
-//   cacheLife("hours");
-
-//   return callback;
-// }
+const useCache = process.env.REDIS_HOST && process.env.REDIS_PORT;
 
 export async function getOrSetCache<T>(
   key: string,
