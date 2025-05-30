@@ -311,7 +311,9 @@ export async function GET(request: NextRequest) {
         );
 
         if (securitySettings?.embeddedIframe?.enabled) {
-          securitySettings.embeddedIframe.allowedOrigins;
+          console.log(
+            `Setting Content-Security-Policy for embedded iframe: frame-anchestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")}`,
+          );
           noSessionResponse.headers.set(
             "Content-Security-Policy",
             `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
@@ -350,7 +352,9 @@ export async function GET(request: NextRequest) {
         const callbackResponse = NextResponse.redirect(callbackUrl);
 
         if (securitySettings?.embeddedIframe?.enabled) {
-          securitySettings.embeddedIframe.allowedOrigins;
+          console.log(
+            `Setting Content-Security-Policy for embedded iframe: frame-anchestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")}`,
+          );
           callbackResponse.headers.set(
             "Content-Security-Policy",
             `${DEFAULT_CSP} frame-ancestors ${securitySettings.embeddedIframe.allowedOrigins.join(" ")};`,
