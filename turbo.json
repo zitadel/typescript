@@ -13,6 +13,8 @@
     "ZITADEL_SERVICE_USER_TOKEN",
     "NEXT_PUBLIC_BASE_PATH",
     "CUSTOM_REQUEST_HEADERS",
+    "REDIS_HOST",
+    "REDIS_PORT",
     "NODE_ENV"
   ],
   "tasks": {
