@@ -42,7 +42,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getUserAgent } from "./fingerprint";
-import redis from "./redis";
+import { getRedis } from "./redis";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.REDIS_HOST && process.env.REDIS_PORT;
@@ -52,6 +52,7 @@ export async function getOrSetCache<T>(
   fetcher: () => Promise<T>,
   ttlSeconds = 3600,
 ): Promise<T> {
+  const redis = getRedis();
   const cached = await redis.get(key);
   if (cached) {
     return JSON.parse(cached) as T;
