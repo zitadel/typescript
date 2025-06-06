@@ -53,6 +53,7 @@ export function SignInWithIdp({
       [IdentityProviderType.GITLAB]: SignInWithGitlab,
       [IdentityProviderType.GITLAB_SELF_HOSTED]: SignInWithGitlab,
       [IdentityProviderType.SAML]: SignInWithGeneric,
+      [IdentityProviderType.JWT]: SignInWithGeneric,
     };
 
     const Component = components[type];
@@ -74,7 +75,7 @@ export function SignInWithIdp({
 
   return (
     <div className="flex flex-col w-full space-y-2 text-sm">
-      {identityProviders?.map(renderIDPButton)}
+      {!!identityProviders.length && identityProviders?.map(renderIDPButton)}
       {state?.error && (
         <div className="py-4">
           <Alert>{state?.error}</Alert>

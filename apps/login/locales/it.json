@@ -8,6 +8,17 @@
     "addAnother": "Aggiungi un altro account",
     "noResults": "Nessun account trovato"
   },
+  "logout": {
+    "title": "Esci",
+    "description": "Seleziona l'account che desideri uscire",
+    "noResults": "Nessun account trovato",
+    "clear": "Elimina sessione",
+    "verifiedAt": "Ultima attività: {time}",
+    "success": {
+      "title": "Uscita riuscita",
+      "description": "Hai effettuato l'uscita con successo."
+    }
+  },
   "loginname": {
     "title": "Bentornato!",
     "description": "Inserisci i tuoi dati di accesso.",
@@ -174,13 +185,15 @@
   },
   "verify": {
     "userIdMissing": "Nessun userId fornito!",
-    "success": "Verifica effettuata con successo!",
+    "successTitle": "Utente verificato",
+    "successDescription": "L'utente è stato verificato con successo.",
     "setupAuthenticator": "Configura autenticatore",
     "verify": {
       "title": "Verifica utente",
       "description": "Inserisci il codice fornito nell'email di verifica.",
       "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
+      "codeSent": "Un codice è stato appena inviato al tuo indirizzo email.",
       "submit": "Continua"
     }
   },

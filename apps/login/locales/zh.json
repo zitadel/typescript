@@ -8,6 +8,17 @@
     "addAnother": "添加另一个账户",
     "noResults": "未找到账户"
   },
+  "logout": {
+    "title": "注销",
+    "description": "选择您想注销的账户",
+    "noResults": "未找到账户",
+    "clear": "注销会话",
+    "verifiedAt": "最后活动时间：{time}",
+    "success": {
+      "title": "注销成功",
+      "description": "您已成功注销。"
+    }
+  },
   "loginname": {
     "title": "欢迎回来！",
     "description": "请输入您的登录信息。",
@@ -174,13 +185,15 @@
   },
   "verify": {
     "userIdMissing": "未提供用户 ID！",
-    "success": "用户验证成功。",
+    "successTitle": "用户已验证",
+    "successDescription": "用户已成功验证。",
     "setupAuthenticator": "设置认证器",
     "verify": {
       "title": "验证用户",
       "description": "输入验证邮件中的验证码。",
       "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
+      "codeSent": "刚刚发送了一封包含验证码的电子邮件。",
       "submit": "继续"
     }
   },

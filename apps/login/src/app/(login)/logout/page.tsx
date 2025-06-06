@@ -1,41 +1,45 @@
-import { ConsentScreen } from "@/components/consent";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { SessionsClearList } from "@/components/sessions-clear-list";
+import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
   getBrandingSettings,
   getDefaultOrg,
-  getDeviceAuthorizationRequest,
+  listSessions,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
+
+async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
+  const ids: (string | undefined)[] = await getAllSessionCookieIds();
+
+  if (ids && ids.length) {
+    const response = await listSessions({
+      serviceUrl,
+      ids: ids.filter((id) => !!id) as string[],
+    });
+    return response?.sessions ?? [];
+  } else {
+    console.info("No session cookie found.");
+    return [];
+  }
+}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale });
+  const t = await getTranslations({ locale, namespace: "logout" });
 
-  const userCode = searchParams?.user_code;
-  const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
-
-  if (!userCode || !requestId) {
-    return <div>{t("error.noUserCode")}</div>;
-  }
+  const postLogoutRedirectUri = searchParams?.post_logout_redirect_uri;
+  const logoutHint = searchParams?.logout_hint;
+  const UILocales = searchParams?.ui_locales; // TODO implement with new translation service
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
-
-  const { deviceAuthorizationRequest } = await getDeviceAuthorizationRequest({
-    serviceUrl,
-    userCode,
-  });
-
-  if (!deviceAuthorizationRequest) {
-    return <div>{t("error.noDeviceRequest")}</div>;
-  }
 
   let defaultOrganization;
   if (!organization) {
@@ -47,16 +51,14 @@ export default async function Page(props: {
     }
   }
 
+  let sessions = await loadSessions({ serviceUrl });
+
   const branding = await getBrandingSettings({
     serviceUrl,
     organization: organization ?? defaultOrganization,
   });
 
   const params = new URLSearchParams();
-
-  if (requestId) {
-    params.append("requestId", requestId);
-  }
 
   if (organization) {
     params.append("organization", organization);
@@ -65,24 +67,17 @@ export default async function Page(props: {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>
-          {t("device.request.title", {
-            appName: deviceAuthorizationRequest?.appName,
-          })}
-        </h1>
+        <h1>{t("title")}</h1>
+        <p className="ztdl-p mb-6 block">{t("description")}</p>
 
-        <p className="ztdl-p">
-          {t("device.request.description", {
-            appName: deviceAuthorizationRequest?.appName,
-          })}
-        </p>
-
-        <ConsentScreen
-          deviceAuthorizationRequestId={deviceAuthorizationRequest?.id}
-          scope={deviceAuthorizationRequest.scope}
-          appName={deviceAuthorizationRequest?.appName}
-          nextUrl={`/loginname?` + params}
-        />
+        <div className="flex flex-col w-full space-y-2">
+          <SessionsClearList
+            sessions={sessions}
+            logoutHint={logoutHint}
+            postLogoutRedirectUri={postLogoutRedirectUri}
+            organization={organization ?? defaultOrganization}
+          />
+        </div>
       </div>
     </DynamicTheme>
   );

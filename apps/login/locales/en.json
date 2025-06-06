@@ -8,6 +8,17 @@
     "addAnother": "Add another account",
     "noResults": "No accounts found"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Click an account to end the session",
+    "noResults": "No accounts found",
+    "clear": "End Session",
+    "verifiedAt": "Last active: {time}",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
+    }
+  },
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login data.",
@@ -174,13 +185,15 @@
   },
   "verify": {
     "userIdMissing": "No userId provided!",
-    "success": "The user has been verified successfully.",
+    "successTitle": "User verified",
+    "successDescription": "The user has been verified successfully.",
     "setupAuthenticator": "Setup authenticator",
     "verify": {
       "title": "Verify user",
       "description": "Enter the Code provided in the verification email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
+      "codeSent": "A code has just been sent to your email address.",
       "submit": "Continue"
     }
   },
