@@ -1,25 +1,15 @@
 "use client";
 
-import { registerUser } from "@/lib/server/register";
-import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
-import {
-  LoginSettings,
-  PasskeysType,
-} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { Alert, AlertType } from "./alert";
-import {
-  AuthenticationMethod,
-  AuthenticationMethodRadio,
-  methods,
-} from "./authentication-method-radio";
+import { Alert } from "./alert";
+import { AuthenticationMethod, methods } from "./authentication-method-radio";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
-import { PrivacyPolicyCheckboxes } from "./privacy-policy-checkboxes";
 import { Spinner } from "./spinner";
 
 type Inputs =
@@ -31,34 +21,24 @@ type Inputs =
   | FieldValues;
 
 type Props = {
-  legal: LegalAndSupportSettings;
-  firstname?: string;
-  lastname?: string;
-  email?: string;
   organization?: string;
   requestId?: string;
-  loginSettings?: LoginSettings;
-  idpCount: number;
+  idpInformation?: IDPInformation;
 };
 
-export function RegisterForm({
-  legal,
-  email,
-  firstname,
-  lastname,
+export function RegisterFormIDPIncomplete({
   organization,
   requestId,
-  loginSettings,
-  idpCount = 0,
+  idpInformation,
 }: Props) {
   const t = useTranslations("register");
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
-      email: email ?? "",
-      firstName: firstname ?? "",
-      lastname: lastname ?? "",
+      email: idpInformation?.rawInformation?.email ?? "",
+      firstName: idpInformation?.rawInformation?.firstname ?? "",
+      lastname: idpInformation?.rawInformation?.lastname ?? "",
     },
   });
 
@@ -70,7 +50,7 @@ export function RegisterForm({
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
-    const response = await registerUser({
+    const response = await registerUserAndLinkToIDP({
       email: values.email,
       firstName: values.firstname,
       lastName: values.lastname,
@@ -97,33 +77,8 @@ export function RegisterForm({
     return response;
   }
 
-  async function submitAndContinue(
-    value: Inputs,
-    withPassword: boolean = false,
-  ) {
-    const registerParams: any = value;
-
-    if (organization) {
-      registerParams.organization = organization;
-    }
-
-    if (requestId) {
-      registerParams.requestId = requestId;
-    }
-
-    // redirect user to /register/password if password is chosen
-    if (withPassword) {
-      return router.push(
-        `/register/password?` + new URLSearchParams(registerParams),
-      );
-    } else {
-      return submitAndRegister(value);
-    }
-  }
-
   const { errors } = formState;
 
-  const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
   return (
     <form className="w-full">
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -161,30 +116,8 @@ export function RegisterForm({
           />
         </div>
       </div>
-      {legal && (
-        <PrivacyPolicyCheckboxes
-          legal={legal}
-          onChange={setTosAndPolicyAccepted}
-        />
-      )}
-      <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
-      {/* show chooser if both methods are allowed */}
-      {loginSettings &&
-        loginSettings.allowUsernamePassword &&
-        loginSettings.passkeysType == PasskeysType.ALLOWED && (
-          <div className="pb-4">
-            <AuthenticationMethodRadio
-              selected={selected}
-              selectionChanged={setSelected}
-            />
-          </div>
-        )}
 
-      {(!loginSettings?.allowUsernamePassword ||
-        loginSettings?.passkeysType != PasskeysType.ALLOWED) &&
-        !idpCount && (
-          <Alert type={AlertType.INFO}>{t("noMethodAvailableWarning")}</Alert>
-        )}
+      <p className="mt-4 ztdl-p mb-6 block text-left">{t("completeData")}</p>
 
       {error && (
         <div className="py-4">
@@ -198,15 +131,7 @@ export function RegisterForm({
           type="submit"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
-          onClick={handleSubmit((values) => {
-            const usePasswordToContinue: boolean =
-              loginSettings?.allowUsernamePassword &&
-              loginSettings?.passkeysType == PasskeysType.ALLOWED
-                ? !!!(selected === methods[0]) // choose selection if both available
-                : !!loginSettings?.allowUsernamePassword; // if password is chosen
-            // set password as default if only password is allowed
-            return submitAndContinue(values, usePasswordToContinue);
-          })}
+          onClick={handleSubmit(submitAndRegister)}
           data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}

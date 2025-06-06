@@ -1,12 +1,15 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
+import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import {
+  getActiveIdentityProviders,
   getBrandingSettings,
   getDefaultOrg,
   getLegalAndSupportSettings,
   getLoginSettings,
   getPasswordComplexitySettings,
+  retrieveIDPIntent,
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -19,7 +22,15 @@ export default async function Page(props: {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
 
-  let { firstname, lastname, email, organization, requestId } = searchParams;
+  let {
+    firstname,
+    lastname,
+    email,
+    organization,
+    requestId,
+    idpIntentId,
+    idpIntentToken,
+  } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
@@ -31,6 +42,17 @@ export default async function Page(props: {
     if (org) {
       organization = org.id;
     }
+  }
+
+  let idpIntent;
+  if (idpIntentId && idpIntentToken) {
+    idpIntent = await retrieveIDPIntent({
+      serviceUrl,
+      id: idpIntentId,
+      token: idpIntentToken,
+    });
+
+    const { idpInformation, userId } = idpIntent;
   }
 
   const legal = await getLegalAndSupportSettings({
@@ -52,6 +74,15 @@ export default async function Page(props: {
     organization,
   });
 
+  const identityProviders = await getActiveIdentityProviders({
+    serviceUrl,
+    orgId: organization,
+  }).then((resp) => {
+    return resp.identityProviders.filter((idp) => {
+      return idp.options?.isAutoCreation || idp.options?.isCreationAllowed; // check if IDP allows to create account automatically or manual creation is allowed
+    });
+  });
+
   if (!loginSettings?.allowRegister) {
     return (
       <DynamicTheme branding={branding}>
@@ -71,6 +102,9 @@ export default async function Page(props: {
 
         {legal && passwordComplexitySettings && (
           <RegisterForm
+            idpCount={
+              !loginSettings?.allowExternalIdp ? 0 : identityProviders.length
+            }
             legal={legal}
             organization={organization}
             firstname={firstname}
@@ -79,6 +113,20 @@ export default async function Page(props: {
             requestId={requestId}
             loginSettings={loginSettings}
           ></RegisterForm>
+        )}
+
+        {loginSettings?.allowExternalIdp && !!identityProviders.length && (
+          <>
+            <div className="py-3 flex flex-col items-center">
+              <p className="ztdl-p text-center">{t("orUseIDP")}</p>
+            </div>
+
+            <SignInWithIdp
+              identityProviders={identityProviders}
+              requestId={requestId}
+              organization={organization}
+            ></SignInWithIdp>
+          </>
         )}
       </div>
     </DynamicTheme>
