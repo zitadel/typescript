@@ -8,6 +8,17 @@
     "addAnother": "Dodaj kolejne konto",
     "noResults": "Nie znaleziono kont"
   },
+  "logout": {
+    "title": "Wyloguj się",
+    "description": "Wybierz konto, które chcesz usunąć",
+    "noResults": "Nie znaleziono kont",
+    "clear": "Usuń sesję",
+    "verifiedAt": "Ostatnia aktywność: {time}",
+    "success": {
+      "title": "Wylogowanie udane",
+      "description": "Pomyślnie się wylogowałeś."
+    }
+  },
   "loginname": {
     "title": "Witamy ponownie!",
     "description": "Wprowadź dane logowania.",
@@ -61,6 +72,10 @@
     "linkingError": {
       "title": "Powiązanie konta nie powiodło się",
       "description": "Wystąpił błąd podczas próby powiązania konta."
+    },
+    "completeRegister": {
+      "title": "Ukończ rejestrację",
+      "description": "Ukończ rejestrację swojego konta."
     }
   },
   "mfa": {
@@ -138,11 +153,13 @@
     },
     "title": "Rejestracja",
     "description": "Utwórz konto ZITADEL.",
+    "noMethodAvailableWarning": "Brak dostępnych metod uwierzytelniania. Skontaktuj się z administratorem.",
     "selectMethod": "Wybierz metodę uwierzytelniania, której chcesz użyć",
     "agreeTo": "Aby się zarejestrować, musisz zaakceptować warunki korzystania",
     "termsOfService": "Regulamin",
     "privacyPolicy": "Polityka prywatności",
     "submit": "Kontynuuj",
+    "orUseIDP": "lub użyj dostawcy tożsamości",
     "password": {
       "title": "Ustaw hasło",
       "description": "Ustaw hasło dla swojego konta",
@@ -174,13 +191,15 @@
   },
   "verify": {
     "userIdMissing": "Nie podano identyfikatora użytkownika!",
-    "success": "Użytkownik został pomyślnie zweryfikowany.",
+    "successTitle": "Weryfikacja zakończona",
+    "successDescription": "Użytkownik został pomyślnie zweryfikowany.",
     "setupAuthenticator": "Skonfiguruj uwierzytelnianie",
     "verify": {
       "title": "Zweryfikuj użytkownika",
       "description": "Wprowadź kod z wiadomości weryfikacyjnej.",
       "noCodeReceived": "Nie otrzymałeś kodu?",
       "resendCode": "Wyślij kod ponownie",
+      "codeSent": "Kod został właśnie wysłany na twój adres e-mail.",
       "submit": "Kontynuuj"
     }
   },

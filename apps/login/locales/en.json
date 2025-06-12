@@ -8,6 +8,17 @@
     "addAnother": "Add another account",
     "noResults": "No accounts found"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Click an account to end the session",
+    "noResults": "No accounts found",
+    "clear": "End Session",
+    "verifiedAt": "Last active: {time}",
+    "success": {
+      "title": "Logout successful",
+      "description": "You have successfully logged out."
+    }
+  },
   "loginname": {
     "title": "Welcome back!",
     "description": "Enter your login data.",
@@ -61,6 +72,10 @@
     "linkingError": {
       "title": "Account linking failed",
       "description": "An error occurred while trying to link your account."
+    },
+    "completeRegister": {
+      "title": "Complete your data",
+      "description": "You need to complete your registration by providing your email address and name."
     }
   },
   "mfa": {
@@ -138,11 +153,13 @@
     },
     "title": "Register",
     "description": "Create your ZITADEL account.",
+    "noMethodAvailableWarning": "No authentication method available. Please contact your administrator.",
     "selectMethod": "Select the method you would like to authenticate",
     "agreeTo": "To register you must agree to the terms and conditions",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "submit": "Continue",
+    "orUseIDP": "or use an Identity Provider",
     "password": {
       "title": "Set Password",
       "description": "Set the password for your account",
@@ -174,13 +191,15 @@
   },
   "verify": {
     "userIdMissing": "No userId provided!",
-    "success": "The user has been verified successfully.",
+    "successTitle": "User verified",
+    "successDescription": "The user has been verified successfully.",
     "setupAuthenticator": "Setup authenticator",
     "verify": {
       "title": "Verify user",
       "description": "Enter the Code provided in the verification email.",
       "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
+      "codeSent": "A code has just been sent to your email address.",
       "submit": "Continue"
     }
   },

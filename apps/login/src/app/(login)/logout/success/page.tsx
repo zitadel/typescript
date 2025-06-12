@@ -1,4 +1,3 @@
-import { DeviceCodeForm } from "@/components/device-code-form";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { getServiceUrlFromHeaders } from "@/lib/service-url";
 import { getBrandingSettings, getDefaultOrg } from "@/lib/zitadel";
@@ -6,18 +5,15 @@ import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
-export default async function Page(props: {
-  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-}) {
+export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
   const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "device" });
-
-  const userCode = searchParams?.user_code;
-  const organization = searchParams?.organization;
+  const t = await getTranslations({ locale, namespace: "logout" });
 
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
+
+  const { login_hint, organization } = searchParams;
 
   let defaultOrganization;
   if (!organization) {
@@ -31,15 +27,14 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    organization: organization ?? defaultOrganization,
+    organization,
   });
 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("usercode.title")}</h1>
-        <p className="ztdl-p">{t("usercode.description")}</p>
-        <DeviceCodeForm userCode={userCode}></DeviceCodeForm>
+        <h1>{t("success.title")}</h1>
+        <p className="ztdl-p mb-6 block">{t("success.description")}</p>
       </div>
     </DynamicTheme>
   );

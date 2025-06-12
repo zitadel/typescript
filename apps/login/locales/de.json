@@ -8,6 +8,17 @@
     "addAnother": "Ein weiteres Konto hinzufügen",
     "noResults": "Keine Konten gefunden"
   },
+  "logout": {
+    "title": "Logout",
+    "description": "Wählen Sie den Account aus, das Sie entfernen möchten",
+    "noResults": "Keine Konten gefunden",
+    "clear": "Session beenden",
+    "verifiedAt": "Zuletzt aktiv: {time}",
+    "success": {
+      "title": "Logout erfolgreich",
+      "description": "Sie haben sich erfolgreich abgemeldet."
+    }
+  },
   "loginname": {
     "title": "Willkommen zurück!",
     "description": "Geben Sie Ihre Anmeldedaten ein.",
@@ -61,6 +72,10 @@
     "linkingError": {
       "title": "Konto-Verknüpfung fehlgeschlagen",
       "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
+    },
+    "completeRegister": {
+      "title": "Registrierung abschließen",
+      "description": "Bitte vervollständige die Registrierung, um dein Konto zu erstellen."
     }
   },
   "mfa": {
@@ -138,11 +153,13 @@
     },
     "title": "Registrieren",
     "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "noMethodAvailableWarning": "Keine Authentifizierungsmethode verfügbar. Bitte wenden Sie sich an den Administrator.",
     "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
     "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
     "termsOfService": "Nutzungsbedingungen",
     "privacyPolicy": "Datenschutzrichtlinie",
     "submit": "Weiter",
+    "orUseIDP": "oder verwenden Sie einen Identitätsanbieter",
     "password": {
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
@@ -174,13 +191,15 @@
   },
   "verify": {
     "userIdMissing": "Keine Benutzer-ID angegeben!",
-    "success": "Erfolgreich verifiziert",
+    "successTitle": "Benutzer verifiziert",
+    "successDescription": "Der Benutzer wurde erfolgreich verifiziert.",
     "setupAuthenticator": "Authentifikator einrichten",
     "verify": {
       "title": "Benutzer verifizieren",
       "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
       "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
+      "codeSent": "Ein Code wurde gerade an Ihre E-Mail-Adresse gesendet.",
       "submit": "Weiter"
     }
   },
