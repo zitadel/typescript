@@ -21,6 +21,7 @@ import {
   SessionService,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { TranslationLevelType } from "@zitadel/proto/zitadel/settings/v2/settings_pb";
 import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
@@ -56,6 +57,32 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   cacheLife("hours");
 
   return callback;
+}
+
+export async function getHostedLoginTranslation({
+  serviceUrl,
+  organization,
+  locale,
+}: {
+  serviceUrl: string;
+  organization?: string;
+  locale?: string;
+}) {
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, serviceUrl);
+
+  const callback = settingsService
+    .getHostedLoginTranslation(
+      {
+        level: TranslationLevelType.INSTANCE,
+        levelId: organization,
+        locale: locale,
+      },
+      {},
+    )
+    .then((resp) => (resp.translations ? resp.translations : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getBrandingSettings({
