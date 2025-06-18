@@ -114,7 +114,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
         {loginSettings?.defaultRedirectUri && (
           <div className="mt-8 flex w-full flex-row items-center">
-            <span className="flex-grow"></span>
+            <span className="grow"></span>
 
             <Link href={loginSettings?.defaultRedirectUri}>
               <Button

@@ -209,7 +209,7 @@ export function RegisterU2f({
       <div className="mt-8 flex w-full flex-row items-center">
         <BackButton data-testid="back-button" />
 
-        <span className="flex-grow"></span>
+        <span className="grow"></span>
         <Button
           type="submit"
           className="self-end"
