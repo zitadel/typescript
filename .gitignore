@@ -6,7 +6,6 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
 apps/login/.env.local
 apps/login/.env.acceptance
 .cache
