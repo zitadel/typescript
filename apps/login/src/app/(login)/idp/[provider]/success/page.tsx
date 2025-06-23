@@ -22,6 +22,7 @@ import { ConnectError, create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
@@ -32,6 +33,75 @@ import { headers } from "next/headers";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
+/**
+ * A type representing the user data structure commonly found in the `rawInformation`
+ * from an OIDC provider like Google.
+ */
+interface RawIdpUser {
+  sub: string;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+  email?: string;
+  email_verified?: boolean;
+}
+
+/**
+ * Maps the raw information from an Identity Provider (IdP) to a well-formed
+ * ZITADEL AddHumanUserRequest object.
+ * 
+ * This function provides robust fallbacks for missing profile data to ensure
+ * the resulting object is always valid for the ZITADEL API.
+ *
+ * @param idpInformation - The IDPInformation object received from the ZITADEL intent.
+ * @returns A valid AddHumanUserRequest object, or null if essential information (like email) is missing.
+ */
+export function mapIdpUserToAddHumanUserRequest(
+  idpInformation: IDPInformation,
+): AddHumanUserRequest | undefined {
+  // Use a type guard for safety, though we expect `User` to be there.
+  const rawUser = (idpInformation.rawInformation as any)?.User as RawIdpUser | undefined;
+
+  // CRITICAL CHECK: We cannot create a user without a valid email.
+  if (!rawUser?.email) {
+    console.error("IDP did not provide user email in rawInformation. Cannot construct user request.");
+    return undefined;
+  }
+  
+  // Construct the profile with safe fallbacks.
+  const profile = {
+    givenName: rawUser.given_name || rawUser.name || rawUser.email.split('@')[0],
+    familyName: rawUser.family_name || ' ', // A space is a safe, non-empty value.
+    displayName: rawUser.name,
+    preferredLanguage: 'en', // Set a sensible default.
+  };
+
+  // Construct the email object.
+  const email = {
+    email: rawUser.email,
+    verification: {
+      case: 'isVerified' as const, // Use 'as const' for strict typing
+      value: rawUser.email_verified === true,
+    },
+  };
+
+  // Construct the IDP link.
+  const idpLinks = [{
+    idpId: idpInformation.idpId,
+    userId: idpInformation.userId, // This is the user's ID *at the IDP*, not in Zitadel yet.
+    userName: idpInformation.userName,
+  }];
+  
+  // Use the official `create` function from protobuf to build the final, valid object.
+  const addHumanUser = create(AddHumanUserRequestSchema, {
+    profile,
+    email,
+    idpLinks,
+  });
+
+  return addHumanUser;
+}
 async function resolveOrganizationForUser({
   organization,
   addHumanUser,
@@ -106,11 +176,11 @@ export default async function Page(props: {
   });
 
   const { idpInformation, userId } = intent;
-  let { addHumanUser } = intent;
 
   if (!idpInformation) {
     return loginFailed(branding, "IDP information missing");
   }
+  const addHumanUser = mapIdpUserToAddHumanUserRequest(idpInformation);
 
   const idp = await getIDPByID({
     serviceUrl,
@@ -242,6 +312,8 @@ export default async function Page(props: {
     }
   }
 
+
+
   let newUser;
   // automatic creation of a user is allowed and data is complete
   if (options?.isAutoCreation && addHumanUser) {
@@ -336,3 +408,6 @@ export default async function Page(props: {
   // return login failed if no linking or creation is allowed and no user was found
   return loginFailed(branding, "No user found");
 }
+
+
+
