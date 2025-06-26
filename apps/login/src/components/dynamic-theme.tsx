@@ -1,5 +1,6 @@
 "use client";
 
+import configuration from "@/../login.configuration.json";
 import { Logo } from "@/components/logo";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { ReactNode } from "react";
@@ -15,9 +16,16 @@ export function DynamicTheme({
   branding?: BrandingSettings;
   appName?: string;
 }) {
+  const customStyles = {
+    background: `${configuration.background_style}`,
+  };
+
   return (
     <ThemeWrapper branding={branding}>
-      <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500 px-8 py-12">
+      <div
+        className="rounded-lg bg-background-light-400 dark:bg-background-dark-500 px-8 py-12"
+        style={customStyles}
+      >
         <div className="mx-auto flex flex-col items-center space-y-4">
           <div className="relative flex flex-row items-center justify-center gap-8">
             {branding && (
