@@ -1,6 +1,6 @@
 {
   "name": "@zitadel/proto",
-  "version": "1.2.0",
+  "version": "1.2.1-sha-cac7a4a",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -12,40 +12,20 @@
       "import": "./es/zitadel/*.js",
       "require": "./cjs/zitadel/*.cjs"
     },
-    "./zitadel/*.js": {
-      "types": "./types/zitadel/*.d.ts",
-      "import": "./es/zitadel/*.js",
-      "require": "./cjs/zitadel/*.js"
-    },
     "./validate/*": {
       "types": "./types/validate/*.d.ts",
       "import": "./es/validate/*.js",
       "require": "./cjs/validate/*.cjs"
-    },
-    "./validate/*.js": {
-      "types": "./types/validate/*.d.ts",
-      "import": "./es/validate/*.js",
-      "require": "./cjs/validate/*.js"
     },
     "./google/*": {
       "types": "./types/google/*.d.ts",
       "import": "./es/google/*.js",
       "require": "./cjs/google/*.cjs"
     },
-    "./google/*.js": {
-      "types": "./types/google/*.d.ts",
-      "import": "./es/google/*.js",
-      "require": "./cjs/google/*.js"
-    },
     "./protoc-gen-openapiv2/*": {
       "types": "./types/protoc-gen-openapiv2/*.d.ts",
       "import": "./es/protoc-gen-openapiv2/*.js",
       "require": "./cjs/protoc-gen-openapiv2/*.cjs"
-    },
-    "./protoc-gen-openapiv2/*.js": {
-      "types": "./types/protoc-gen-openapiv2/*.d.ts",
-      "import": "./es/protoc-gen-openapiv2/*.js",
-      "require": "./cjs/protoc-gen-openapiv2/*.js"
     }
   },
   "sideEffects": false,
