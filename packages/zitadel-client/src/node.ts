@@ -19,7 +19,11 @@ export function createServerTransport(token: string, opts: GrpcTransportOptions)
               return (req: any) => {
                 process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach((header) => {
                   const kv = header.split(":");
-                  req.header.set(kv[0], kv[1]);
+                  if (kv.length === 2) {
+                    req.header.set(kv[0].trim(), kv[1].trim());
+                  } else {
+                    console.warn(`Skipping malformed header: ${header}`);
+                  }
                 });
                 return next(req);
               };
