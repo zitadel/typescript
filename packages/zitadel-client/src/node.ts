@@ -7,10 +7,29 @@ import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
  * @param token
  * @param opts
  */
+
 export function createServerTransport(token: string, opts: GrpcTransportOptions) {
-  return createGrpcTransport({
+    return createGrpcTransport({
     ...opts,
-    interceptors: [...(opts.interceptors || []), NewAuthorizationBearerInterceptor(token)],
+    interceptors: [
+        !process.env.CUSTOM_REQUEST_HEADERS
+            ? []
+            : [
+              (next: any) => {
+                return (req: any) => {
+                    process.env.CUSTOM_REQUEST_HEADERS!.split(",").forEach(
+                      (header) => {
+                        const kv = header.split(":");
+                        req.header.set(kv[0], kv[1]);
+                      },
+                  );
+                  return next(req);
+                };
+              },
+            ],
+      opts.interceptors || [],
+      [NewAuthorizationBearerInterceptor(token)],
+      ].flat()
   });
 }
 

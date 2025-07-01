@@ -1,5 +1,8 @@
 {
   "extends": "@zitadel/tsconfig/tsup.json",
-  "include": ["./src/**/*"],
+  "include": [
+    "./src/**/*",
+    "env-vars.d.ts"
+  ],
   "exclude": ["dist", "build", "node_modules"]
 }

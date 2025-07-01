@@ -1318,7 +1318,6 @@ export async function setPassword({
     UserService,
     serviceUrl,
   );
-
   return userService.setPassword(payload, {});
 }
 
