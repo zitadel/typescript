@@ -183,42 +183,52 @@ for more information about this automation
 
 To run the application make sure to install the dependencies with
 
+#### Preparing the app
+
 ```sh
 pnpm install
 ```
 
-then generate the GRPC stubs with
+then generate the GRPC stubs with (a [Buf](https://buf.build) account is required)
 
 ```sh
 pnpm generate
 ```
 
-To run the application against a local ZITADEL instance, run the following command:
+#### Running app against a local Instance of ZITADEL
+
+To run the application against a local ZITADEL instance, use the following command:
 
 ```sh
-pnpm run-zitadel
+docker compose up
 ```
 
-This sets up ZITADEL using docker compose and writes the configuration to the file `apps/login/.env.local`.
+- **ZITADEL Admin email**: `zitadel-admin@zitadel.localhost`
+- **ZITADEL Admin password**: `Password1!`
+  
+>[!NOTE]
+> When using Docker Compose, a local SMTP server can be configured for testing email functionality.
+>The SMTP provider UI is available at: `http://localhost:8025`
 
-<details>
-<summary>Alternatively, use another environment</summary>
-You can develop against any ZITADEL instance in which you have sufficient rights to execute the following steps.
-Just create or overwrite the file `apps/login/.env.local` yourself.
-Add your instances base URL to the file at the key `ZITADEL_API_URL`.
-Go to your instance and create a service user for the login application.
-The login application creates users on your primary organization and reads policy data.
-For the sake of simplicity, just make the service user an instance member with the role `IAM_OWNER`.
-Create a PAT and copy it to the file `apps/login/.env.local` using the key `ZITADEL_SERVICE_USER_TOKEN`.
+To configure the local SMTP provider:
 
-The file should look similar to this:
+1. Navigate to `http://localhost:8080/ui/console/instance?id=smtpprovider`
+2. Select Generic SMTP
+3. Set the Host and Port to `mailhog:1025`
+4. Fill in the remaining fields with any data (they won’t be validated)
+5. Click Test on step 3
+6. Finally, activate the SMTP provider
+
+#### Pointing app to a backend
+
+Update `apps/login/.env.local` with:
 
 ```env
-ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
-ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
+ZITADEL_API_URL=<http://localhost:8080 or Zitadel URL instance>
+ZITADEL_SERVICE_USER_TOKEN=<Personal Access Token from machine user with Org Owener and Iam Owener memberships>
 ```
 
-</details>
+#### Starting the app
 
 Start the login application in dev mode:
 
