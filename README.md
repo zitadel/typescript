@@ -3,12 +3,13 @@
 This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL
 Login UI.
 
-<img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
+<img src="./apps/login/screenshots/collage.png"alt="collage of login screens" width="1600px" />
 
 [![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)
 [![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client)
 
-**⚠️ This repo and packages are in beta state and subject to change ⚠️**
+> [!WARNING]
+> ⚠️ This repo and packages are in beta state and subject to change ⚠️
 
 The scope of functionality of this repo and packages is under active development.
 
@@ -141,7 +142,7 @@ You can already use the current state, and extend it with your needs.
     verify --> B[signedin]
 ```
 
-You can find a more detailed documentation of the different pages [here](./apps/login/readme.md).
+You can find a more detailed documentation of the different pages [on this link](./apps/login/readme.md).
 
 #### Custom translations
 
@@ -212,7 +213,7 @@ Create a PAT and copy it to the file `apps/login/.env.local` using the key `ZITA
 
 The file should look similar to this:
 
-```
+```env
 ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
 ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
 ```
