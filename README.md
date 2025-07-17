@@ -247,6 +247,39 @@ pnpm test
 
 To satisfy your unique workflow requirements, check out the package.json in the root directory for more detailed scripts.
 
+### Run Production UI Locally
+
+To run the production build of the Login UI locally, follow these steps:
+
+1. **Build the production Docker image:**
+
+   ```sh
+   make login_standalone_build
+   ```
+
+   This command will build the Docker image for the production-ready Login UI.
+
+2. **Prepare your environment file:**
+
+   Create or update your environment file (e.g., `.env.production`) with the necessary environment variables. At a minimum, you will need:
+
+   ```env
+   ZITADEL_API_URL=<your-zitadel-instance-url>
+   ZITADEL_SERVICE_USER_TOKEN=<your-service-user-token>
+   ```
+
+3. **Run the Docker image:**
+
+   ```sh
+   docker run --env-file <env file path> -p 3000:3000 zitadel-login:local
+   ```
+
+   Replace `<env file path>` with the path to your environment file (e.g., `.env.production`).
+
+4. **Access the UI:**
+
+   Open your browser and navigate to [localhost:3000/ui/v2/login/register](localhost:3000/ui/v2/login/register) to view the production registration component running locally as example.
+
 ### Run Login UI Acceptance tests
 
 To run the acceptance tests you need a running ZITADEL environment and a component which receives HTTP requests for the emails and sms's.
