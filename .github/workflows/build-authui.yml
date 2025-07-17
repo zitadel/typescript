@@ -1,0 +1,60 @@
+name: Build and Publish Docker Image
+
+on:
+  push:
+  release:
+    types: ["published"]
+
+jobs:
+  build-and-push:
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3.4.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/datum-cloud/auth-ui
+        tags: |
+          type=schedule
+          type=ref,event=branch
+          type=ref,event=pr
+          type=ref,event=branch,suffix=-{{commit_date 'YYYYMMDD-HHmmss'}}
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}
+          type=sha
+
+    - name: Build Auth UI Docker image
+      run: make login_standalone_build
+
+    - name: Tag and push image to GHCR
+      env:
+        TAGS: ${{ steps.meta.outputs.tags }}
+        LABELS: ${{ steps.meta.outputs.labels }}
+      run: |
+        IMAGE=zitadel-login:local
+        echo "Pushing $IMAGE with tags: $TAGS"
+        # Convert tags (newline or comma separated) into space-separated list
+        for TAG in $(echo "$TAGS" | tr '\n' ' '); do
+          echo "Tagging $IMAGE as $TAG"
+          docker tag "$IMAGE" "$TAG"
+          echo "Pushing $TAG"
+          docker push "$TAG"
+        done
