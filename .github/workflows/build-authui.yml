@@ -48,8 +48,9 @@ jobs:
       env:
         TAGS: ${{ steps.meta.outputs.tags }}
         LABELS: ${{ steps.meta.outputs.labels }}
+        IMAGE_VERSION: ${{ steps.meta.outputs.version }}
       run: |
-        IMAGE=zitadel-login:local
+        IMAGE="zitadel-login:${IMAGE_VERSION}"
         echo "Pushing $IMAGE with tags: $TAGS"
         # Convert tags (newline or comma separated) into space-separated list
         for TAG in $(echo "$TAGS" | tr '\n' ' '); do
