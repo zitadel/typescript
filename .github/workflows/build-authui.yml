@@ -40,6 +40,8 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{major}}
           type=sha
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=latest,enable=${{ github.event_name == 'release' }}
 
     - name: Build Auth UI Docker image
       run: make login_standalone_build
@@ -59,3 +61,14 @@ jobs:
           echo "Pushing $TAG"
           docker push "$TAG"
         done
+  
+  publish-kustomize-bundles:
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
+    uses: datum-cloud/actions/.github/workflows/publish-kustomize-bundle.yaml@v1.5.1
+    with:
+      bundle-name: ghcr.io/datum-cloud/auth-ui-kustomize
+      bundle-path: config
+    secrets: inherit 
