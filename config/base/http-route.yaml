@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: auth-ui
+spec:
+  parentRefs:
+    # This should be overridden at the environment level if needed to configure
+    # which gateway should be used to expose the portal outside of the cluster.
+    - name: external
+      namespace: gateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: auth-ui
+          kind: Service
+          group: ''
+          port: 3000
