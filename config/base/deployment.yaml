@@ -30,7 +30,7 @@ spec:
       containers:
         - name: auth-ui
           image: ghcr.io/datum-cloud/auth-ui:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
               name: http
