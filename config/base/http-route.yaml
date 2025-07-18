@@ -6,8 +6,8 @@ spec:
   parentRefs:
     # This should be overridden at the environment level if needed to configure
     # which gateway should be used to expose the portal outside of the cluster.
-    - name: external
-      namespace: gateway-system
+    - name: external-gateway
+      namespace: envoy-gateway-system
   rules:
     - matches:
         - path:
