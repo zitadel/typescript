@@ -3,12 +3,13 @@
 This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL
 Login UI.
 
-<img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
+<img src="./apps/login/screenshots/collage.png"alt="collage of login screens" width="1600px" />
 
 [![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)
 [![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client)
 
-**⚠️ This repo and packages are in beta state and subject to change ⚠️**
+> [!WARNING]
+> ⚠️ This repo and packages are in beta state and subject to change ⚠️
 
 The scope of functionality of this repo and packages is under active development.
 
@@ -141,7 +142,7 @@ You can already use the current state, and extend it with your needs.
     verify --> B[signedin]
 ```
 
-You can find a more detailed documentation of the different pages [here](./apps/login/readme.md).
+You can find a more detailed documentation of the different pages [on this link](./apps/login/readme.md).
 
 #### Custom translations
 
@@ -182,42 +183,52 @@ for more information about this automation
 
 To run the application make sure to install the dependencies with
 
+#### Preparing the app
+
 ```sh
 pnpm install
 ```
 
-then generate the GRPC stubs with
+then generate the GRPC stubs with (a [Buf](https://buf.build) account is required)
 
 ```sh
 pnpm generate
 ```
 
-To run the application against a local ZITADEL instance, run the following command:
+#### Running app against a local Instance of ZITADEL
+
+To run the application against a local ZITADEL instance, use the following command:
 
 ```sh
-pnpm run-zitadel
+docker compose up
 ```
 
-This sets up ZITADEL using docker compose and writes the configuration to the file `apps/login/.env.local`.
+- **ZITADEL Admin email**: `zitadel-admin@zitadel.localhost`
+- **ZITADEL Admin password**: `Password1!`
+  
+>[!NOTE]
+> When using Docker Compose, a local SMTP server can be configured for testing email functionality.
+>The SMTP provider UI is available at: `http://localhost:8025`
 
-<details>
-<summary>Alternatively, use another environment</summary>
-You can develop against any ZITADEL instance in which you have sufficient rights to execute the following steps.
-Just create or overwrite the file `apps/login/.env.local` yourself.
-Add your instances base URL to the file at the key `ZITADEL_API_URL`.
-Go to your instance and create a service user for the login application.
-The login application creates users on your primary organization and reads policy data.
-For the sake of simplicity, just make the service user an instance member with the role `IAM_OWNER`.
-Create a PAT and copy it to the file `apps/login/.env.local` using the key `ZITADEL_SERVICE_USER_TOKEN`.
+To configure the local SMTP provider:
 
-The file should look similar to this:
+1. Navigate to `http://localhost:8080/ui/console/instance?id=smtpprovider`
+2. Select Generic SMTP
+3. Set the Host and Port to `mailhog:1025`
+4. Fill in the remaining fields with any data (they won’t be validated)
+5. Click Test on step 3
+6. Finally, activate the SMTP provider
 
+#### Pointing app to a backend
+
+Update `apps/login/.env.local` with:
+
+```env
+ZITADEL_API_URL=<http://localhost:8080 or Zitadel URL instance>
+ZITADEL_SERVICE_USER_TOKEN=<Personal Access Token from machine user with Org Owener and Iam Owener memberships>
 ```
-ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
-ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
-```
 
-</details>
+#### Starting the app
 
 Start the login application in dev mode:
 
@@ -235,6 +246,39 @@ pnpm test
 ```
 
 To satisfy your unique workflow requirements, check out the package.json in the root directory for more detailed scripts.
+
+### Run Production UI Locally
+
+To run the production build of the Login UI locally, follow these steps:
+
+1. **Build the production Docker image:**
+
+   ```sh
+   make login_standalone_build
+   ```
+
+   This command will build the Docker image for the production-ready Login UI.
+
+2. **Prepare your environment file:**
+
+   Create or update your environment file (e.g., `.env.production`) with the necessary environment variables. At a minimum, you will need:
+
+   ```env
+   ZITADEL_API_URL=<your-zitadel-instance-url>
+   ZITADEL_SERVICE_USER_TOKEN=<your-service-user-token>
+   ```
+
+3. **Run the Docker image:**
+
+   ```sh
+   docker run --env-file <env file path> -p 3000:3000 zitadel-login:local
+   ```
+
+   Replace `<env file path>` with the path to your environment file (e.g., `.env.production`).
+
+4. **Access the UI:**
+
+   Open your browser and navigate to [localhost:3000/ui/v2/login/register](localhost:3000/ui/v2/login/register) to view the production registration component running locally as example.
 
 ### Run Login UI Acceptance tests
 
