@@ -37,7 +37,7 @@ spec:
               protocol: TCP
           env:
             - name: ZITADEL_API_URL
-              value: https://auth.staging.env.datum.net
+              value: https://auth.datum.net
           envFrom:
             # Add secret for ZITADEL_SERVICE_USER_TOKEN
             - secretRef:
