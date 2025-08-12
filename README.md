@@ -226,6 +226,7 @@ Update `apps/login/.env.local` with:
 ```env
 ZITADEL_API_URL=<http://localhost:8080 or Zitadel URL instance>
 ZITADEL_SERVICE_USER_TOKEN=<Personal Access Token from machine user with Org Owener and Iam Owener memberships>
+CUSTOM_REQUEST_HEADERS=x-zitadel-public-host:auth.staging.env.datum.net,x-zitadel-public-proto:https
 ```
 
 #### Starting the app
@@ -266,6 +267,8 @@ To run the production build of the Login UI locally, follow these steps:
    ```env
    ZITADEL_API_URL=<your-zitadel-instance-url>
    ZITADEL_SERVICE_USER_TOKEN=<your-service-user-token>
+   CUSTOM_REQUEST_HEADERS=x-zitadel-public-host:auth.staging.env.datum.net,x-zitadel-public-proto:https
+
    ```
 
 3. **Run the Docker image:**
