@@ -879,7 +879,7 @@ export async function searchUsers({
   }
 
   if (organizationId) {
-    queries.push(
+    emailAndPhoneQueries.push(
       create(SearchQuerySchema, {
         query: {
           case: "organizationIdQuery",
