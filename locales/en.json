@@ -66,7 +66,13 @@
         "code": "This field is required",
         "newPassword": "You have to provide a password!",
         "confirmPassword": "This field is required"
-      }
+      },
+      "minLength": "Minimum",
+      "symbol": "A symbol",
+      "number": "A number",
+      "uppercase": "An uppercase letter",
+      "lowercase": "A lowercase letter",
+      "equals": "Match"
     },
     "change": {
       "title": "Change Password",
@@ -235,6 +241,7 @@
         "confirmPassword": "This field is required"
       }
     },
+    "orUseIDP": "or use an identity provider",
     "labels": {
       "firstname": "First name",
       "lastname": "Last name",
@@ -329,5 +336,102 @@
     "sessionExpired": "Your current session has expired. Please login again.",
     "failedLoading": "Failed to load data. Please try again.",
     "tryagain": "Try Again"
+  },
+  "server": {
+    "common": {
+      "errors": {
+        "couldNotGetHost": "Could not get host",
+        "couldNotGetDomain": "Could not get domain",
+        "couldNotGetHostname": "Could not get hostname",
+        "couldNotGetSession": "Could not get session",
+        "couldNotCreateSession": "Could not create session",
+        "noHostFound": "No host found",
+        "couldNotLoadLoginSettings": "Could not load login settings",
+        "failedToAuthenticate": "Failed to authenticate. You have had {failedAttempts} attempts out of {maxAttempts} for the password.",
+        "userNotFoundInSystem": "User not found in system",
+        "userVerificationCheckRequired": "User verification check required",
+        "couldNotFindSession": "Could not find session",
+        "couldNotUpdateSession": "Could not update session",
+        "couldNotVerify": "Could not verify",
+        "couldNotStartIdpFlow": "Could not start IDP flow",
+        "initialUserNotSupported": "Initial user not supported",
+        "couldNotSetPassword": "Could not set password"
+      }
+    },
+    "password": {
+      "errors": {
+        "couldNotSendPasswordResetLink": "Could not send password reset link",
+        "couldNotCreateSessionForUser": "Could not create session for user",
+        "couldNotVerifyPassword": "Could not verify password",
+        "noPasswordLifetimeProvided": "No password lifetime provided, defaulting to 24 hours",
+        "contactAdministratorToUnlock": "Contact your administrator to unlock your account",
+        "couldNotVerifyPasswordExclamation": "Could not verify password!",
+        "userInitialStateNotSupported": "User initial state not supported",
+        "provideCodeOrValidVerification": "You must provide a code or have a valid user verification",
+        "couldNotLoadSession": "Could not load session",
+        "couldNotLoadAuthMethods": "Could not load authentication methods",
+        "failedPrecondition": "Failed precondition"
+      }
+    },
+    "session": {
+      "errors": {
+        "sessionNotValid": "Session is not valid.",
+        "noLifetimeProvidedForSession": "No lifetime provided for session, defaulting to 24 hours",
+        "couldNotDeleteSession": "Could not delete session"
+      }
+    },
+    "passkeys": {
+      "errors": {
+        "couldNotDetermineUserFromSession": "Could not determine user from session",
+        "authenticateOrValidVerification": "You must authenticate or have a valid user verification",
+        "missingCodeInResponse": "Missing code in response",
+        "noPasskeyLifetimeProvided": "No passkey lifetime provided, defaulting to 24 hours",
+        "noUserIdFoundInSession": "No user ID found in session.",
+        "couldNotCreateRegistrationLink": "Could not create registration link"
+      }
+    },
+    "verify": {
+      "errors": {
+        "couldNotVerifyInvite": "Could not verify invite",
+        "couldNotVerifyEmail": "Could not verify email",
+        "couldNotLoadUser": "Could not load user",
+        "couldNotLoadPossibleAuthenticators": "Could not load possible authenticators",
+        "userAlreadyVerified": "User already verified!",
+        "couldNotResendInvite": "Could not resend invite"
+      }
+    },
+    "register": {
+      "errors": {
+        "couldNotCreateUser": "Could not create user",
+        "couldNotLinkIdpToUser": "Could not link IDP to user"
+      }
+    },
+    "loginname": {
+      "errors": {
+        "couldNotSearchUsers": "Could not search users",
+        "couldNotFindIdentityProvider": "Could not find identity provider",
+        "moreThanOneUserFound": "More than one user found. Provide a unique identifier.",
+        "usernamePasswordNotAllowed": "Username and password not allowed! Contact your administrator for more information.",
+        "passkeysNotAllowed": "Passkeys not allowed! Contact your administrator for more information."
+      }
+    },
+    "idp": {
+      "errors": {
+        "unexpectedResponseFromIdpFlow": "Unexpected response from IDP flow",
+        "noUsernameOrPasswordProvided": "No username or password provided",
+        "couldNotStartLdapIdpFlow": "Could not start LDAP identity provider flow"
+      }
+    },
+    "cookie": {
+      "errors": {
+        "noSessionLifetimeProvided": "No session lifetime provided, using default 24 hours.",
+        "noIdpSessionLifetimeProvided": "No IDP session lifetime provided, using default 24 hours.",
+        "couldNotGetSessionOrLoginName": "Could not get session or session has no login name",
+        "couldNotRetrieveSession": "Could not retrieve session",
+        "sessionCouldNotBeSet": "Session could not be set",
+        "failedToAuthenticateAttempts": "Failed to authenticate: You have had {failedAttempts} password attempts.",
+        "failedToAuthenticateIdpAttempts": "Failed to authenticate: You have had {failedAttempts} password attempts."
+      }
+    }
   }
 }

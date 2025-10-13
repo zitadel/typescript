@@ -9,6 +9,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getServerTranslation } from "../server-translations";
 import {
   getActiveIdentityProviders,
   getIDPByID,
@@ -42,7 +43,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   });
 
   if (!loginSettingsByContext) {
-    return { error: "Could not get login settings" };
+    return { error: await getServerTranslation("common.errors", "couldNotLoadLoginSettings") };
   }
 
   let searchUsersRequest: SearchUsersCommand = {
@@ -60,7 +61,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   if (!("result" in searchResult)) {
-    return { error: "Could not search users" };
+    return { error: await getServerTranslation("loginname.errors", "couldNotSearchUsers") };
   }
 
   const { result: potentialUsers } = searchResult;
@@ -108,7 +109,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (!url) {
-        return { error: "Could not start IDP flow" };
+        return { error: await getServerTranslation("common.errors", "couldNotStartIdpFlow") };
       }
 
       return { redirect: url };
@@ -138,7 +139,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const idpType = idp?.type;
 
       if (!idp || !idpType) {
-        throw new Error("Could not find identity provider");
+        throw new Error(await getServerTranslation("loginname.errors", "couldNotFindIdentityProvider"));
       }
 
       const identityProviderType = idpTypeToIdentityProviderType(idpType);
@@ -170,7 +171,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (!url) {
-        return { error: "Could not start IDP flow" };
+        return { error: await getServerTranslation("common.errors", "couldNotStartIdpFlow") };
       }
 
       return { redirect: url };
@@ -178,7 +179,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   if (potentialUsers.length > 1) {
-    return { error: "More than one user found. Provide a unique identifier." };
+    return { error: await getServerTranslation("loginname.errors", "moreThanOneUserFound") };
   } else if (potentialUsers.length == 1 && potentialUsers[0].userId) {
     const user = potentialUsers[0];
     const userId = potentialUsers[0].userId;
@@ -196,15 +197,21 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (userLoginSettings?.disableLoginWithEmail && userLoginSettings?.disableLoginWithPhone) {
       if (user.preferredLoginName !== concatLoginname) {
-        return { error: "User not found in the system!" };
+        return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.phone?.phone !== command.loginName) {
-        return { error: "User not found in the system!" };
+      if (
+        user.preferredLoginName !== concatLoginname ||
+        humanUser?.phone?.phone !== command.loginName
+      ) {
+        return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      if (user.preferredLoginName !== concatLoginname || humanUser?.email?.email !== command.loginName) {
-        return { error: "User not found in the system!" };
+      if (
+        user.preferredLoginName !== concatLoginname ||
+        humanUser?.email?.email !== command.loginName
+      ) {
+        return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
       }
     }
 
@@ -218,12 +225,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (!session.factors?.user?.id) {
-      return { error: "Could not create session for user" };
+      return { error: await getServerTranslation("common.errors", "couldNotCreateSession") };
     }
 
     // TODO: check if handling of userstate INITIAL is needed
     if (user.state === UserState.INITIAL) {
-      return { error: "Initial User not supported" };
+      return { error: await getServerTranslation("common.errors", "initialUserNotSupported") };
     }
 
     const methods = await listAuthenticationMethodTypes({
@@ -262,7 +269,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             }
 
             return {
-              error: "Username Password not allowed! Contact your administrator for more information.",
+              error: await getServerTranslation("loginname.errors", "usernamePasswordNotAllowed"),
             };
           }
 
@@ -287,7 +294,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
           if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
             return {
-              error: "Passkeys not allowed! Contact your administrator for more information.",
+              error: await getServerTranslation("loginname.errors", "passkeysNotAllowed"),
             };
           }
 
@@ -366,8 +373,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (resp) {
       return resp;
     }
-    return { error: "User not found in the system" };
-  } else if (loginSettingsByContext?.allowRegister && loginSettingsByContext?.allowUsernamePassword) {
+    return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
+  } else if (
+    loginSettingsByContext?.allowRegister &&
+    loginSettingsByContext?.allowUsernamePassword
+  ) {
     let orgToRegisterOn: string | undefined = command.organization;
 
     if (
@@ -429,5 +439,5 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // fallbackToPassword
 
-  return { error: "User not found in the system" };
+  return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
 }

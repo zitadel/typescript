@@ -24,6 +24,7 @@ import { checkEmailVerification, checkUserVerification } from "../verify-helper"
 import { createSessionAndUpdateCookie, setSessionAndUpdateCookie } from "./cookie";
 import { getOriginalHost } from "./host";
 import { completeFlowOrGetUrl } from "../client";
+import { getServerTranslation } from "../server-translations";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;
@@ -80,7 +81,7 @@ export async function registerPasskeyLink(
     });
 
     if (!session?.session?.factors?.user?.id) {
-      return { error: "Could not determine user from session" };
+      return { error: await getServerTranslation("passkeys.errors", "couldNotDetermineUserFromSession") };
     }
 
     currentUserId = session.session.factors.user.id;
@@ -96,16 +97,16 @@ export async function registerPasskeyLink(
       // if the user has no authmethods set, we need to check if the user was verified
       if (authmethods.authMethodTypes.length !== 0) {
         return {
-          error: "You have to authenticate or have a valid User Verification Check",
+          error:
+            await getServerTranslation("passkeys.errors","authenticateOrValidVerification"),
         };
       }
 
       // check if a verification was done earlier
       const hasValidUserVerificationCheck = await checkUserVerification(currentUserId);
 
-      console.log("hasValidUserVerificationCheck", hasValidUserVerificationCheck);
       if (!hasValidUserVerificationCheck) {
-        return { error: "User Verification Check has to be done" };
+        return { error: await getServerTranslation("common.errors", "userVerificationCheckRequired") };
       }
 
       if (!command.code) {
@@ -114,9 +115,9 @@ export async function registerPasskeyLink(
           serviceUrl,
           userId: currentUserId,
         });
-
+        
         if (!codeResponse?.code?.code) {
-          return { error: "Could not create registration link" };
+          return { error: await getServerTranslation("passkeys.errors", "couldNotCreateRegistrationLink") };
         }
 
         registerCode = codeResponse.code;
@@ -166,11 +167,11 @@ export async function registerPasskeyLink(
   const [hostname] = host.split(":");
 
   if (!hostname) {
-    throw new Error("Could not get hostname");
+    throw new Error(await getServerTranslation("common.errors", "couldNotGetHostname"));
   }
 
   if (!currentUserId) {
-    throw new Error("Could not determine user");
+    throw new Error(await getServerTranslation("passkeys.errors", "couldNotDetermineUserFromSession"));
   }
 
   return registerPasskey({
@@ -216,7 +217,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     const userId = session?.session?.factors?.user?.id;
 
     if (!userId) {
-      throw new Error("Could not get session");
+      throw new Error(await getServerTranslation("common.errors", "couldNotGetSession"));
     }
 
     currentUserId = userId;
@@ -231,7 +232,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     });
 
     if (!userResponse || !userResponse.user) {
-      throw new Error("User not found");
+      throw new Error(await getServerTranslation("common.errors", "userNotFoundInSystem"));
     }
   }
 
@@ -265,7 +266,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   if (!recentSession) {
     return {
-      error: "Could not find session",
+      error: await getServerTranslation("common.errors", "couldNotFindSession"),
     };
   }
 
@@ -284,7 +285,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       : undefined;
 
   if (!lifetime) {
-    console.warn("No passkey lifetime provided, defaulting to 24 hours");
+    console.warn(await getServerTranslation("passkeys.errors", "noPasskeyLifetimeProvided"));
 
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours
@@ -300,7 +301,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   });
 
   if (!session || !session?.factors?.user?.id) {
-    return { error: "Could not update session" };
+    return { error: await getServerTranslation("common.errors", "couldNotUpdateSession") };
   }
 
   const userResponse = await getUserByID({
@@ -309,7 +310,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   });
 
   if (!userResponse.user) {
-    return { error: "User not found in the system" };
+    return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
   }
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;

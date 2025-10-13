@@ -66,7 +66,13 @@
         "code": "To pole jest wymagane",
         "newPassword": "Musisz podać hasło!",
         "confirmPassword": "To pole jest wymagane"
-      }
+      },
+      "minLength": "Minimum",
+      "symbol": "Symbol",
+      "number": "Cyfra",
+      "uppercase": "Wielka litera",
+      "lowercase": "Mała litera",
+      "equals": "Pasują"
     },
     "change": {
       "title": "Zmień hasło",
@@ -244,7 +250,8 @@
       "firstname": "To pole jest wymagane",
       "lastname": "To pole jest wymagane",
       "email": "To pole jest wymagane"
-    }
+    },
+    "orUseIDP": "lub użyj dostawcy tożsamości"
   },
   "invite": {
     "title": "Zaproś użytkownika",
@@ -329,5 +336,102 @@
     "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
     "failedLoading": "Nie udało się załadować danych. Spróbuj ponownie.",
     "tryagain": "Spróbuj ponownie"
+  },
+  "server": {
+    "common": {
+      "errors": {
+        "couldNotGetHost": "Nie można pobrać hosta",
+        "couldNotGetDomain": "Nie można pobrać domeny",
+        "couldNotGetHostname": "Nie można pobrać nazwy hosta",
+        "couldNotGetSession": "Nie można pobrać sesji",
+        "couldNotCreateSession": "Nie można utworzyć sesji",
+        "noHostFound": "Nie znaleziono hosta",
+        "couldNotLoadLoginSettings": "Nie można załadować ustawień logowania",
+        "failedToAuthenticate": "Uwierzytelnianie nie powiodło się. Miałeś {failedAttempts} prób z {maxAttempts} dla hasła.",
+        "userNotFoundInSystem": "Użytkownik nie znaleziony w systemie",
+        "userVerificationCheckRequired": "Wymagana weryfikacja użytkownika",
+        "couldNotFindSession": "Nie można znaleźć sesji",
+        "couldNotUpdateSession": "Nie można zaktualizować sesji",
+        "couldNotVerify": "Nie można zweryfikować",
+        "couldNotStartIdpFlow": "Nie można uruchomić przepływu IDP",
+        "initialUserNotSupported": "Użytkownik początkowy nieobsługiwany",
+        "couldNotSetPassword": "Nie można ustawić hasła"
+      }
+    },
+    "password": {
+      "errors": {
+        "couldNotSendPasswordResetLink": "Nie można wysłać linku resetowania hasła",
+        "couldNotCreateSessionForUser": "Nie można utworzyć sesji dla użytkownika",
+        "couldNotVerifyPassword": "Nie można zweryfikować hasła",
+        "noPasswordLifetimeProvided": "Nie podano czasu życia hasła, domyślnie 24 godziny",
+        "contactAdministratorToUnlock": "Skontaktuj się z administratorem, aby odblokować konto",
+        "couldNotVerifyPasswordExclamation": "Nie można zweryfikować hasła!",
+        "userInitialStateNotSupported": "Stan początkowy użytkownika nieobsługiwany",
+        "provideCodeOrValidVerification": "Musisz podać kod lub mieć ważną weryfikację użytkownika",
+        "couldNotLoadSession": "Nie można załadować sesji",
+        "couldNotLoadAuthMethods": "Nie można załadować metod uwierzytelniania",
+        "failedPrecondition": "Warunek wstępny nie został spełniony"
+      }
+    },
+    "session": {
+      "errors": {
+        "sessionNotValid": "Sesja jest nieprawidłowa.",
+        "noLifetimeProvidedForSession": "Nie podano czasu życia sesji, domyślnie 24 godziny",
+        "couldNotDeleteSession": "Nie można usunąć sesji"
+      }
+    },
+    "passkeys": {
+      "errors": {
+        "couldNotDetermineUserFromSession": "Nie można określić użytkownika z sesji",
+        "authenticateOrValidVerification": "Musisz się uwierzytelnić lub mieć ważną weryfikację użytkownika",
+        "missingCodeInResponse": "Brakuje kodu w odpowiedzi",
+        "noPasskeyLifetimeProvided": "Nie podano czasu życia klucza dostępu, domyślnie 24 godziny",
+        "noUserIdFoundInSession": "Nie znaleziono ID użytkownika w sesji.",
+        "couldNotCreateRegistrationLink": "Nie można utworzyć linku rejestracji"
+      }
+    },
+    "verify": {
+      "errors": {
+        "couldNotVerifyInvite": "Nie można zweryfikować zaproszenia",
+        "couldNotVerifyEmail": "Nie można zweryfikować e-maila",
+        "couldNotLoadUser": "Nie można załadować użytkownika",
+        "couldNotLoadPossibleAuthenticators": "Nie można załadować możliwych autentykatorów",
+        "userAlreadyVerified": "Użytkownik już zweryfikowany!",
+        "couldNotResendInvite": "Nie można ponownie wysłać zaproszenia"
+      }
+    },
+    "register": {
+      "errors": {
+        "couldNotCreateUser": "Nie można utworzyć użytkownika",
+        "couldNotLinkIdpToUser": "Nie można połączyć IDP z użytkownikiem"
+      }
+    },
+    "loginname": {
+      "errors": {
+        "couldNotSearchUsers": "Nie można wyszukać użytkowników",
+        "couldNotFindIdentityProvider": "Nie można znaleźć dostawcy tożsamości",
+        "moreThanOneUserFound": "Znaleziono więcej niż jednego użytkownika. Podaj unikalny identyfikator.",
+        "usernamePasswordNotAllowed": "Nazwa użytkownika i hasło niedozwolone! Skontaktuj się z administratorem po więcej informacji.",
+        "passkeysNotAllowed": "Klucze dostępu niedozwolone! Skontaktuj się z administratorem po więcej informacji."
+      }
+    },
+    "idp": {
+      "errors": {
+        "unexpectedResponseFromIdpFlow": "Nieoczekiwana odpowiedź z przepływu IDP",
+        "noUsernameOrPasswordProvided": "Nie podano nazwy użytkownika lub hasła",
+        "couldNotStartLdapIdpFlow": "Nie można uruchomić przepływu dostawcy tożsamości LDAP"
+      }
+    },
+    "cookie": {
+      "errors": {
+        "noSessionLifetimeProvided": "Nie podano czasu życia sesji, używam domyślnych 24 godzin.",
+        "noIdpSessionLifetimeProvided": "Nie podano czasu życia sesji IDP, używam domyślnych 24 godzin.",
+        "couldNotGetSessionOrLoginName": "Nie można pobrać sesji lub sesja nie ma nazwy logowania",
+        "couldNotRetrieveSession": "Nie można pobrać sesji",
+        "sessionCouldNotBeSet": "Nie można ustawić sesji",
+        "failedToAuthenticateAttempts": "Uwierzytelnianie nie powiodło się: Miałeś {failedAttempts} prób hasła.",
+        "failedToAuthenticateIdpAttempts": "Uwierzytelnianie nie powiodło się: Miałeś {failedAttempts} prób hasła."
+      }
+    }
   }
 }

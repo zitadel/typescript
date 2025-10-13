@@ -66,7 +66,13 @@
         "code": "Questo campo è obbligatorio",
         "newPassword": "Devi fornire una password!",
         "confirmPassword": "Questo campo è obbligatorio"
-      }
+      },
+      "minLength": "Minimo",
+      "symbol": "Un simbolo",
+      "number": "Un numero",
+      "uppercase": "Una lettera maiuscola",
+      "lowercase": "Una lettera minuscola",
+      "equals": "Corrispondenza"
     },
     "change": {
       "title": "Cambia Password",
@@ -244,7 +250,8 @@
       "firstname": "Questo campo è obbligatorio",
       "lastname": "Questo campo è obbligatorio",
       "email": "Questo campo è obbligatorio"
-    }
+    },
+    "orUseIDP": "o usa un provider di identità"
   },
   "invite": {
     "title": "Invita Utente",
@@ -329,5 +336,100 @@
     "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
     "failedLoading": "Impossibile caricare i dati. Riprova.",
     "tryagain": "Riprova"
+  },
+  "server": {
+    "common": {
+      "errors": {
+        "couldNotGetHost": "Impossibile ottenere l'host",
+        "couldNotGetDomain": "Impossibile ottenere il dominio",
+        "couldNotGetHostname": "Impossibile ottenere l'hostname",
+        "couldNotGetSession": "Impossibile ottenere la sessione",
+        "couldNotCreateSession": "Impossibile creare la sessione",
+        "noHostFound": "Nessun host trovato",
+        "couldNotLoadLoginSettings": "Impossibile caricare le impostazioni di accesso",
+        "failedToAuthenticate": "Autenticazione fallita. Hai avuto {failedAttempts} tentativi su {maxAttempts} per la password.",
+        "userNotFoundInSystem": "Utente non trovato nel sistema",
+        "userVerificationCheckRequired": "Verifica utente richiesta",
+        "couldNotFindSession": "Impossibile trovare la sessione",
+        "couldNotUpdateSession": "Impossibile aggiornare la sessione",
+        "couldNotVerify": "Impossibile verificare",
+        "couldNotStartIdpFlow": "Impossibile avviare il flusso IDP",
+        "initialUserNotSupported": "Utente iniziale non supportato"
+      }
+    },
+    "password": {
+      "errors": {
+        "couldNotSendPasswordResetLink": "Impossibile inviare il link di reset della password",
+        "couldNotCreateSessionForUser": "Impossibile creare una sessione per l'utente",
+        "couldNotVerifyPassword": "Impossibile verificare la password",
+        "noPasswordLifetimeProvided": "Nessuna durata della password fornita, default 24 ore",
+        "contactAdministratorToUnlock": "Contatta il tuo amministratore per sbloccare il tuo account",
+        "couldNotVerifyPasswordExclamation": "Impossibile verificare la password!",
+        "userInitialStateNotSupported": "Stato iniziale utente non supportato",
+        "provideCodeOrValidVerification": "Devi fornire un codice o avere una verifica utente valida",
+        "couldNotLoadSession": "Impossibile caricare la sessione",
+        "couldNotLoadAuthMethods": "Impossibile caricare i metodi di autenticazione",
+        "failedPrecondition": "Precondizione fallita"
+      }
+    },
+    "session": {
+      "errors": {
+        "sessionNotValid": "La sessione non è valida.",
+        "noLifetimeProvidedForSession": "Nessuna durata fornita per la sessione, default 24 ore",
+        "couldNotDeleteSession": "Impossibile eliminare la sessione"
+      }
+    },
+    "passkeys": {
+      "errors": {
+        "couldNotDetermineUserFromSession": "Impossibile determinare l'utente dalla sessione",
+        "authenticateOrValidVerification": "Devi autenticarti o avere una verifica utente valida",
+        "missingCodeInResponse": "Codice mancante nella risposta",
+        "noPasskeyLifetimeProvided": "Nessuna durata passkey fornita, default 24 ore",
+        "noUserIdFoundInSession": "Nessun ID utente trovato nella sessione."
+      }
+    },
+    "verify": {
+      "errors": {
+        "couldNotVerifyInvite": "Impossibile verificare l'invito",
+        "couldNotVerifyEmail": "Impossibile verificare l'email",
+        "couldNotLoadUser": "Impossibile caricare l'utente",
+        "couldNotLoadPossibleAuthenticators": "Impossibile caricare gli autenticatori possibili",
+        "userAlreadyVerified": "Utente già verificato!",
+        "couldNotResendInvite": "Impossibile reinviare l'invito"
+      }
+    },
+    "register": {
+      "errors": {
+        "couldNotCreateUser": "Impossibile creare l'utente",
+        "couldNotLinkIdpToUser": "Impossibile collegare IDP all'utente"
+      }
+    },
+    "loginname": {
+      "errors": {
+        "couldNotSearchUsers": "Impossibile cercare utenti",
+        "couldNotFindIdentityProvider": "Impossibile trovare il provider di identità",
+        "moreThanOneUserFound": "Più di un utente trovato. Fornisci un identificatore univoco.",
+        "usernamePasswordNotAllowed": "Nome utente e password non consentiti! Contatta il tuo amministratore per maggiori informazioni.",
+        "passkeysNotAllowed": "Passkey non consentiti! Contatta il tuo amministratore per maggiori informazioni."
+      }
+    },
+    "idp": {
+      "errors": {
+        "unexpectedResponseFromIdpFlow": "Risposta inaspettata dal flusso IDP",
+        "noUsernameOrPasswordProvided": "Nessun nome utente o password forniti",
+        "couldNotStartLdapIdpFlow": "Impossibile avviare il flusso del provider di identità LDAP"
+      }
+    },
+    "cookie": {
+      "errors": {
+        "noSessionLifetimeProvided": "Nessuna durata di sessione fornita, usando default 24 ore.",
+        "noIdpSessionLifetimeProvided": "Nessuna durata di sessione IDP fornita, usando default 24 ore.",
+        "couldNotGetSessionOrLoginName": "Impossibile ottenere la sessione o la sessione non ha nome di accesso",
+        "couldNotRetrieveSession": "Impossibile recuperare la sessione",
+        "sessionCouldNotBeSet": "Impossibile impostare la sessione",
+        "failedToAuthenticateAttempts": "Autenticazione fallita: Hai avuto {failedAttempts} tentativi di password.",
+        "failedToAuthenticateIdpAttempts": "Autenticazione fallita: Hai avuto {failedAttempts} tentativi di password."
+      }
+    }
   }
 }

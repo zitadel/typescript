@@ -66,7 +66,13 @@
         "code": "Это поле обязательно для заполнения",
         "newPassword": "Вы должны указать пароль!",
         "confirmPassword": "Это поле обязательно для заполнения"
-      }
+      },
+      "minLength": "Минимум",
+      "symbol": "Символ",
+      "number": "Цифра",
+      "uppercase": "Заглавная буква",
+      "lowercase": "Строчная буква",
+      "equals": "Совпадение"
     },
     "change": {
       "title": "Изменить пароль",
@@ -244,7 +250,8 @@
       "firstname": "Это поле обязательно для заполнения",
       "lastname": "Это поле обязательно для заполнения",
       "email": "Это поле обязательно для заполнения"
-    }
+    },
+    "orUseIDP": "или использовать провайдера идентичности"
   },
   "invite": {
     "title": "Пригласить пользователя",
@@ -329,5 +336,102 @@
     "sessionExpired": "Ваша сессия истекла. Войдите снова.",
     "failedLoading": "Ошибка загрузки данных. Попробуйте ещё раз.",
     "tryagain": "Попробовать снова"
+  },
+  "server": {
+    "common": {
+      "errors": {
+        "couldNotGetHost": "Не удалось получить хост",
+        "couldNotGetDomain": "Не удалось получить домен",
+        "couldNotGetHostname": "Не удалось получить имя хоста",
+        "couldNotGetSession": "Не удалось получить сессию",
+        "couldNotCreateSession": "Не удалось создать сессию",
+        "noHostFound": "Хост не найден",
+        "couldNotLoadLoginSettings": "Не удалось загрузить настройки входа",
+        "failedToAuthenticate": "Ошибка аутентификации. У вас было {failedAttempts} попыток из {maxAttempts} для пароля.",
+        "userNotFoundInSystem": "Пользователь не найден в системе",
+        "userVerificationCheckRequired": "Требуется проверка пользователя",
+        "couldNotFindSession": "Не удалось найти сессию",
+        "couldNotUpdateSession": "Не удалось обновить сессию",
+        "couldNotVerify": "Не удалось проверить",
+        "couldNotStartIdpFlow": "Не удалось запустить поток IDP",
+        "initialUserNotSupported": "Начальный пользователь не поддерживается",
+        "couldNotSetPassword": "Не удалось установить пароль"
+      }
+    },
+    "password": {
+      "errors": {
+        "couldNotSendPasswordResetLink": "Не удалось отправить ссылку для сброса пароля",
+        "couldNotCreateSessionForUser": "Не удалось создать сессию для пользователя",
+        "couldNotVerifyPassword": "Не удалось проверить пароль",
+        "noPasswordLifetimeProvided": "Не указано время жизни пароля, по умолчанию 24 часа",
+        "contactAdministratorToUnlock": "Обратитесь к администратору для разблокировки учетной записи",
+        "couldNotVerifyPasswordExclamation": "Не удалось проверить пароль!",
+        "userInitialStateNotSupported": "Начальное состояние пользователя не поддерживается",
+        "provideCodeOrValidVerification": "Вы должны предоставить код или иметь действительную проверку пользователя",
+        "couldNotLoadSession": "Не удалось загрузить сессию",
+        "couldNotLoadAuthMethods": "Не удалось загрузить методы аутентификации",
+        "failedPrecondition": "Не выполнено предварительное условие"
+      }
+    },
+    "session": {
+      "errors": {
+        "sessionNotValid": "Сессия недействительна.",
+        "noLifetimeProvidedForSession": "Не указано время жизни сессии, по умолчанию 24 часа",
+        "couldNotDeleteSession": "Не удалось удалить сессию"
+      }
+    },
+    "passkeys": {
+      "errors": {
+        "couldNotDetermineUserFromSession": "Не удалось определить пользователя из сессии",
+        "authenticateOrValidVerification": "Вы должны аутентифицироваться или иметь действительную проверку пользователя",
+        "missingCodeInResponse": "Отсутствует код в ответе",
+        "noPasskeyLifetimeProvided": "Не указано время жизни ключа доступа, по умолчанию 24 часа",
+        "noUserIdFoundInSession": "ID пользователя не найден в сессии.",
+        "couldNotCreateRegistrationLink": "Не удалось создать ссылку для регистрации"
+      }
+    },
+    "verify": {
+      "errors": {
+        "couldNotVerifyInvite": "Не удалось проверить приглашение",
+        "couldNotVerifyEmail": "Не удалось проверить email",
+        "couldNotLoadUser": "Не удалось загрузить пользователя",
+        "couldNotLoadPossibleAuthenticators": "Не удалось загрузить возможные аутентификаторы",
+        "userAlreadyVerified": "Пользователь уже проверен!",
+        "couldNotResendInvite": "Не удалось повторно отправить приглашение"
+      }
+    },
+    "register": {
+      "errors": {
+        "couldNotCreateUser": "Не удалось создать пользователя",
+        "couldNotLinkIdpToUser": "Не удалось связать IDP с пользователем"
+      }
+    },
+    "loginname": {
+      "errors": {
+        "couldNotSearchUsers": "Не удалось найти пользователей",
+        "couldNotFindIdentityProvider": "Не удалось найти провайдера идентичности",
+        "moreThanOneUserFound": "Найдено более одного пользователя. Укажите уникальный идентификатор.",
+        "usernamePasswordNotAllowed": "Имя пользователя и пароль не разрешены! Обратитесь к администратору за дополнительной информацией.",
+        "passkeysNotAllowed": "Ключи доступа не разрешены! Обратитесь к администратору за дополнительной информацией."
+      }
+    },
+    "idp": {
+      "errors": {
+        "unexpectedResponseFromIdpFlow": "Неожиданный ответ от потока IDP",
+        "noUsernameOrPasswordProvided": "Не указано имя пользователя или пароль",
+        "couldNotStartLdapIdpFlow": "Не удалось запустить поток провайдера идентичности LDAP"
+      }
+    },
+    "cookie": {
+      "errors": {
+        "noSessionLifetimeProvided": "Не указано время жизни сессии, используется по умолчанию 24 часа.",
+        "noIdpSessionLifetimeProvided": "Не указано время жизни сессии IDP, используется по умолчанию 24 часа.",
+        "couldNotGetSessionOrLoginName": "Не удалось получить сессию или у сессии нет имени входа",
+        "couldNotRetrieveSession": "Не удалось получить сессию",
+        "sessionCouldNotBeSet": "Не удалось установить сессию",
+        "failedToAuthenticateAttempts": "Ошибка аутентификации: У вас было {failedAttempts} попыток пароля.",
+        "failedToAuthenticateIdpAttempts": "Ошибка аутентификации: У вас было {failedAttempts} попыток пароля."
+      }
+    }
   }
 }

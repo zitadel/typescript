@@ -8,6 +8,7 @@ import { userAgent } from "next/server";
 import { getSessionCookieById } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { getOriginalHost } from "./host";
+import { getServerTranslation } from "../server-translations";
 
 type RegisterU2FCommand = {
   sessionId: string;
@@ -30,7 +31,7 @@ export async function addU2F(command: RegisterU2FCommand) {
   });
 
   if (!sessionCookie) {
-    return { error: "Could not get session" };
+    return { error: await getServerTranslation("common.errors", "couldNotGetSession") };
   }
 
   const session = await getSession({
@@ -42,13 +43,13 @@ export async function addU2F(command: RegisterU2FCommand) {
   const [hostname] = host.split(":");
 
   if (!hostname) {
-    throw new Error("Could not get hostname");
+    throw new Error(await getServerTranslation("common.errors", "couldNotGetHostname"));
   }
 
   const userId = session?.session?.factors?.user?.id;
 
   if (!session || !userId) {
-    return { error: "Could not get session" };
+    return { error: await getServerTranslation("common.errors", "couldNotGetSession") };
   }
 
   return registerU2F({ serviceUrl, userId, domain: hostname });
@@ -80,7 +81,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   const userId = session?.session?.factors?.user?.id;
 
   if (!userId) {
-    return { error: "Could not get session" };
+    return { error: await getServerTranslation("common.errors", "couldNotGetSession") };
   }
 
   const request = create(VerifyU2FRegistrationRequestSchema, {

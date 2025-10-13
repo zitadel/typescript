@@ -12,8 +12,10 @@ import { redirect } from "next/navigation";
 import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import { getServerTranslation } from "../server-translations";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 import { getOriginalHost } from "./host";
+
 
 export type RedirectToIdpState = { error?: string | null } | undefined;
 
@@ -49,14 +51,14 @@ export async function redirectToIdp(prevState: RedirectToIdpState, formData: For
   });
 
   if (!response) {
-    return { error: "Could not start IDP flow" };
+    return { error: await getServerTranslation("idp.errors", "couldNotStartIdpFlow") };
   }
 
   if (response && "redirect" in response && response?.redirect) {
     redirect(response.redirect);
   }
 
-  return { error: "Unexpected response from IDP flow" };
+  return { error: await getServerTranslation("idp.errors","unexpectedResponseFromIdpFlow") };
 }
 
 export type StartIDPFlowCommand = {
@@ -80,7 +82,7 @@ async function startIDPFlow(command: StartIDPFlowCommand) {
   });
 
   if (!url) {
-    return { error: "Could not start IDP flow" };
+    return { error: await getServerTranslation("idp.errors","couldNotStartIdpFlow") };
   }
 
   return { redirect: url };
@@ -113,7 +115,7 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
   });
 
   if (!userResponse || !userResponse.user) {
-    return { error: "User not found in the system" };
+    return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -129,7 +131,7 @@ export async function createNewSessionFromIdpIntent(command: CreateNewSessionCom
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: await getServerTranslation("common.errors", "couldNotCreateSession") };
   }
 
   const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
@@ -194,7 +196,7 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   if (!command.username || !command.password) {
-    return { error: "No username or password provided" };
+    return { error: await getServerTranslation("idp.errors", "noUsernameOrPasswordProvided") };
   }
 
   const response = await startLDAPIdentityProviderFlow({
@@ -204,8 +206,12 @@ export async function createNewSessionForLDAP(command: createNewSessionForLDAPCo
     password: command.password,
   });
 
-  if (!response || response.nextStep.case !== "idpIntent" || !response.nextStep.value) {
-    return { error: "Could not start LDAP identity provider flow" };
+  if (
+    !response ||
+    response.nextStep.case !== "idpIntent" ||
+    !response.nextStep.value
+  ) {
+    return { error: await getServerTranslation("idp.errors", "couldNotStartLdapIdpFlow") };
   }
 
   const { userId, idpIntentId, idpIntentToken } = response.nextStep.value;

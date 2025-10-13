@@ -15,6 +15,7 @@ import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getServerTranslation } from "../server-translations";
 
 type CustomCookieData = {
   id: string;
@@ -27,13 +28,13 @@ type CustomCookieData = {
   requestId?: string; // if its linked to an OIDC flow
 };
 
-const passwordAttemptsHandler = (error: ConnectError) => {
+const passwordAttemptsHandler = async (error: ConnectError) => {
   const details = error.findDetails(CredentialsCheckErrorSchema);
 
   if (details[0] && "failedAttempts" in details[0]) {
     const failedAttempts = details[0].failedAttempts;
     throw {
-      error: `Failed to authenticate: You had ${failedAttempts} password attempts.`,
+      error: await getServerTranslation("cookie.errors", "failedToAuthenticateAttempts", { failedAttempts }),
       failedAttempts: failedAttempts,
     };
   }
@@ -51,7 +52,7 @@ export async function createSessionAndUpdateCookie(command: {
   let sessionLifetime = command.lifetime;
 
   if (!sessionLifetime) {
-    console.warn("No session lifetime provided, using default of 24 hours.");
+    console.warn(await getServerTranslation("cookie.errors","noSessionLifetimeProvided"));
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -96,11 +97,11 @@ export async function createSessionAndUpdateCookie(command: {
 
         return response.session as Session;
       } else {
-        throw "could not get session or session does not have loginName";
+        throw new Error(await getServerTranslation("cookie.errors", "couldNotGetSessionOrLoginName"));
       }
     });
   } else {
-    throw "Could not create session";
+    throw new Error(await getServerTranslation("common.errors", "couldNotCreateSession"));
   }
 }
 
@@ -124,7 +125,9 @@ export async function createSessionForIdpAndUpdateCookie({
   let sessionLifetime = lifetime;
 
   if (!sessionLifetime) {
-    console.warn("No IDP session lifetime provided, using default of 24 hours.");
+    console.warn(
+      await getServerTranslation("cookie.errors", "noIdpSessionLifetimeProvided"),
+    );
 
     sessionLifetime = {
       seconds: BigInt(24 * 60 * 60), // 24 hours
@@ -137,11 +140,11 @@ export async function createSessionForIdpAndUpdateCookie({
     userId,
     idpIntent,
     lifetime: sessionLifetime,
-  }).catch((error: ErrorDetail | CredentialsCheckError) => {
+  }).catch(async (error: ErrorDetail | CredentialsCheckError) => {
     console.error("Could not set session", error);
     if ("failedAttempts" in error && error.failedAttempts) {
       throw {
-        error: `Failed to authenticate: You had ${error.failedAttempts} password attempts.`,
+        error: await getServerTranslation("cookie.errors", "failedToAuthenticateIdpAttempts", { failedAttempts: error.failedAttempts }),
         failedAttempts: error.failedAttempts,
       };
     }
@@ -149,7 +152,7 @@ export async function createSessionForIdpAndUpdateCookie({
   });
 
   if (!createdSession) {
-    throw "Could not create session";
+    throw new Error(await getServerTranslation("common.errors", "couldNotCreateSession"));
   }
 
   const { session } = await getSession({
@@ -159,7 +162,7 @@ export async function createSessionForIdpAndUpdateCookie({
   });
 
   if (!session || !session.factors?.user?.loginName) {
-    throw "Could not retrieve session";
+    throw new Error(await getServerTranslation("cookie.errors", "couldNotRetrieveSession"));
   }
 
   const sessionCookie: CustomCookieData = {
@@ -210,7 +213,7 @@ export async function setSessionAndUpdateCookie(command: {
     checks: command.checks,
     lifetime: command.lifetime,
   })
-    .then((updatedSession) => {
+    .then(async (updatedSession) => {
       if (updatedSession) {
         const sessionCookie: CustomCookieData = {
           id: command.recentCookie.id,
@@ -232,8 +235,11 @@ export async function setSessionAndUpdateCookie(command: {
           sessionId: sessionCookie.id,
           sessionToken: sessionCookie.token,
         }).then(async (response) => {
-          if (!response?.session || !response.session.factors?.user?.loginName) {
-            throw "could not get session or session does not have loginName";
+          if (
+            !response?.session ||
+            !response.session.factors?.user?.loginName
+          ) {
+            throw new Error(await getServerTranslation("cookie.errors", "couldNotGetSessionOrLoginName"));
           }
 
           const { session } = response;
@@ -264,7 +270,7 @@ export async function setSessionAndUpdateCookie(command: {
           });
         });
       } else {
-        throw "Session not be set";
+        throw new Error(await getServerTranslation("cookie.errors", "sessionCouldNotBeSet"));
       }
     })
     .catch(passwordAttemptsHandler);
