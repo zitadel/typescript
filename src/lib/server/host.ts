@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { getServerTranslation } from "../server-translations";
 
 /**
  * Gets the original host that the user sees in their browser URL.
@@ -23,7 +24,7 @@ export async function getOriginalHost(): Promise<string> {
   const host = _headers.get("x-forwarded-host") || _headers.get("x-original-host") || _headers.get("host");
 
   if (!host || typeof host !== "string") {
-    throw new Error("No host found in headers");
+    throw new Error(await getServerTranslation("common.errors", "couldNotGetHost"));
   }
 
   return host;

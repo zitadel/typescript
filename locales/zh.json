@@ -66,7 +66,13 @@
         "code": "此字段为必填项",
         "newPassword": "必须提供密码！",
         "confirmPassword": "此字段为必填项"
-      }
+      },
+      "minLength": "最少",
+      "symbol": "符号",
+      "number": "数字",
+      "uppercase": "大写字母",
+      "lowercase": "小写字母",
+      "equals": "匹配"
     },
     "change": {
       "title": "更改密码",
@@ -244,7 +250,8 @@
       "firstname": "此字段为必填项",
       "lastname": "此字段为必填项",
       "email": "此字段为必填项"
-    }
+    },
+    "orUseIDP": "或使用身份提供商"
   },
   "invite": {
     "title": "邀请用户",
@@ -329,5 +336,102 @@
     "sessionExpired": "当前会话已过期，请重新登录。",
     "failedLoading": "加载数据失败，请再试一次。",
     "tryagain": "重试"
+  },
+  "server": {
+    "common": {
+      "errors": {
+        "couldNotGetHost": "无法获取主机",
+        "couldNotGetDomain": "无法获取域",
+        "couldNotGetHostname": "无法获取主机名",
+        "couldNotGetSession": "无法获取会话",
+        "couldNotCreateSession": "无法创建会话",
+        "noHostFound": "未找到主机",
+        "couldNotLoadLoginSettings": "无法加载登录设置",
+        "failedToAuthenticate": "身份验证失败。您已尝试密码 {failedAttempts} 次，共 {maxAttempts} 次。",
+        "userNotFoundInSystem": "系统中未找到用户",
+        "userVerificationCheckRequired": "需要用户验证检查",
+        "couldNotFindSession": "无法找到会话",
+        "couldNotUpdateSession": "无法更新会话",
+        "couldNotVerify": "无法验证",
+        "couldNotStartIdpFlow": "无法启动 IDP 流程",
+        "initialUserNotSupported": "不支持初始用户",
+        "couldNotSetPassword": "无法设置密码"
+      }
+    },
+    "password": {
+      "errors": {
+        "couldNotSendPasswordResetLink": "无法发送密码重置链接",
+        "couldNotCreateSessionForUser": "无法为用户创建会话",
+        "couldNotVerifyPassword": "无法验证密码",
+        "noPasswordLifetimeProvided": "未提供密码生命周期，默认为 24 小时",
+        "contactAdministratorToUnlock": "请联系您的管理员解锁您的账户",
+        "couldNotVerifyPasswordExclamation": "无法验证密码！",
+        "userInitialStateNotSupported": "不支持用户初始状态",
+        "provideCodeOrValidVerification": "您必须提供代码或具有有效的用户验证",
+        "couldNotLoadSession": "无法加载会话",
+        "couldNotLoadAuthMethods": "无法加载身份验证方法",
+        "failedPrecondition": "前提条件失败"
+      }
+    },
+    "session": {
+      "errors": {
+        "sessionNotValid": "会话无效。",
+        "noLifetimeProvidedForSession": "未提供会话生命周期，默认为 24 小时",
+        "couldNotDeleteSession": "无法删除会话"
+      }
+    },
+    "passkeys": {
+      "errors": {
+        "couldNotDetermineUserFromSession": "无法从会话中确定用户",
+        "authenticateOrValidVerification": "您必须进行身份验证或具有有效的用户验证",
+        "missingCodeInResponse": "响应中缺少代码",
+        "noPasskeyLifetimeProvided": "未提供密钥生命周期，默认为 24 小时",
+        "noUserIdFoundInSession": "会话中未找到用户 ID。",
+        "couldNotCreateRegistrationLink": "无法创建注册链接"
+      }
+    },
+    "verify": {
+      "errors": {
+        "couldNotVerifyInvite": "无法验证邀请",
+        "couldNotVerifyEmail": "无法验证邮箱",
+        "couldNotLoadUser": "无法加载用户",
+        "couldNotLoadPossibleAuthenticators": "无法加载可能的身份验证器",
+        "userAlreadyVerified": "用户已验证！",
+        "couldNotResendInvite": "无法重新发送邀请"
+      }
+    },
+    "register": {
+      "errors": {
+        "couldNotCreateUser": "无法创建用户",
+        "couldNotLinkIdpToUser": "无法将 IDP 链接到用户"
+      }
+    },
+    "loginname": {
+      "errors": {
+        "couldNotSearchUsers": "无法搜索用户",
+        "couldNotFindIdentityProvider": "无法找到身份提供者",
+        "moreThanOneUserFound": "找到多个用户。请提供唯一标识符。",
+        "usernamePasswordNotAllowed": "不允许使用用户名和密码！请联系您的管理员获取更多信息。",
+        "passkeysNotAllowed": "不允许使用密钥！请联系您的管理员获取更多信息。"
+      }
+    },
+    "idp": {
+      "errors": {
+        "unexpectedResponseFromIdpFlow": "IDP 流程的意外响应",
+        "noUsernameOrPasswordProvided": "未提供用户名或密码",
+        "couldNotStartLdapIdpFlow": "无法启动 LDAP 身份提供者流程"
+      }
+    },
+    "cookie": {
+      "errors": {
+        "noSessionLifetimeProvided": "未提供会话生命周期，使用默认的 24 小时。",
+        "noIdpSessionLifetimeProvided": "未提供 IDP 会话生命周期，使用默认的 24 小时。",
+        "couldNotGetSessionOrLoginName": "无法获取会话或会话没有登录名",
+        "couldNotRetrieveSession": "无法检索会话",
+        "sessionCouldNotBeSet": "无法设置会话",
+        "failedToAuthenticateAttempts": "身份验证失败：您已尝试密码 {failedAttempts} 次。",
+        "failedToAuthenticateIdpAttempts": "身份验证失败：您已尝试密码 {failedAttempts} 次。"
+      }
+    }
   }
 }

@@ -21,6 +21,7 @@ import { completeFlowOrGetUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 import { getOrSetFingerprintId } from "../fingerprint";
 import { getServiceUrlFromHeaders } from "../service-url";
+import { getServerTranslation } from "../server-translations";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
@@ -36,7 +37,7 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
       loginName,
       organization,
     },
-  }).then((session) => {
+  }).then(async (session) => {
     if (session?.factors?.user?.id) {
       return verifyTOTPRegistration({
         serviceUrl,
@@ -44,7 +45,7 @@ export async function verifyTOTP(code: string, loginName?: string, organization?
         userId: session.factors.user.id,
       });
     } else {
-      throw Error("No user id found in session.");
+      throw Error(await getServerTranslation("verify.errors", "noUserIdFoundInSession"));
     }
   });
 }
@@ -67,17 +68,17 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
-      }).catch((error) => {
+      }).catch(async (error) => {
         console.warn(error);
-        return { error: "Could not verify invite" };
+        return { error: await getServerTranslation("verify.errors", "couldNotVerifyInvite") };
       })
     : await verifyEmail({
         serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
-      }).catch((error) => {
+      }).catch(async (error) => {
         console.warn(error);
-        return { error: "Could not verify email" };
+        return { error: await getServerTranslation("verify.errors", "couldNotVerifyEmail") };
       });
 
   if ("error" in verifyResponse) {
@@ -85,7 +86,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   if (!verifyResponse) {
-    return { error: "Could not verify" };
+    return { error: await getServerTranslation("common.errors", "couldNotVerify") };
   }
 
   let session: Session | undefined;
@@ -95,7 +96,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   });
 
   if (!userResponse || !userResponse.user) {
-    return { error: "Could not load user" };
+    return { error: await getServerTranslation("verify.errors", "couldNotLoadUser") };
   }
 
   const user = userResponse.user;
@@ -126,7 +127,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   });
 
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
-    return { error: "Could not load possible authenticators" };
+    return { error: await getServerTranslation("verify.errors", "couldNotLoadPossibleAuthenticators") };
   }
 
   // if no authmethods are found on the user, redirect to set one up
@@ -148,7 +149,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     if (!session) {
-      return { error: "Could not create session" };
+      return { error: await getServerTranslation("common.errors", "couldNotCreateSession") };
     }
 
     const params = new URLSearchParams({
@@ -262,11 +263,11 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
         urlTemplate:
           `${hostWithProtocol}${basePath}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
-      }).catch((error) => {
+      }).catch(async (error) => {
         if (error.code === 9) {
-          return { error: "User is already verified!" };
+          return { error: await getServerTranslation("verify.errors", "userAlreadyVerified") };
         }
-        return { error: "Could not resend invite" };
+        return { error: await getServerTranslation("verify.errors", "couldNotResendInvite") };
       })
     : zitadelSendEmailCode({
         userId: command.userId,

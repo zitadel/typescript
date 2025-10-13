@@ -66,7 +66,13 @@
         "code": "Este campo es obligatorio",
         "newPassword": "¡Debes proporcionar una contraseña!",
         "confirmPassword": "Este campo es obligatorio"
-      }
+      },
+      "minLength": "Mínimo",
+      "symbol": "Un símbolo",
+      "number": "Un número",
+      "uppercase": "Una letra mayúscula",
+      "lowercase": "Una letra minúscula",
+      "equals": "Coinciden"
     },
     "change": {
       "title": "Cambiar Contraseña",
@@ -244,7 +250,8 @@
       "firstname": "Este campo es obligatorio",
       "lastname": "Este campo es obligatorio",
       "email": "Este campo es obligatorio"
-    }
+    },
+    "orUseIDP": "o usar un proveedor de identidad"
   },
   "invite": {
     "title": "Invitar usuario",
@@ -329,5 +336,102 @@
     "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
     "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo.",
     "tryagain": "Intentar de nuevo"
+  },
+  "server": {
+    "common": {
+      "errors": {
+        "couldNotGetHost": "No se pudo obtener el host",
+        "couldNotGetDomain": "No se pudo obtener el dominio",
+        "couldNotGetHostname": "No se pudo obtener el nombre del host",
+        "couldNotGetSession": "No se pudo obtener la sesión",
+        "couldNotCreateSession": "No se pudo crear la sesión",
+        "noHostFound": "No se encontró ningún host",
+        "couldNotLoadLoginSettings": "No se pudieron cargar las configuraciones de inicio de sesión",
+        "failedToAuthenticate": "Error de autenticación. Has tenido {failedAttempts} intentos de {maxAttempts} para la contraseña.",
+        "userNotFoundInSystem": "Usuario no encontrado en el sistema",
+        "userVerificationCheckRequired": "Se requiere verificación del usuario",
+        "couldNotFindSession": "No se pudo encontrar la sesión",
+        "couldNotUpdateSession": "No se pudo actualizar la sesión",
+        "couldNotVerify": "No se pudo verificar",
+        "couldNotStartIdpFlow": "No se pudo iniciar el flujo IDP",
+        "initialUserNotSupported": "Usuario inicial no compatible",
+        "couldNotSetPassword": "No se pudo establecer la contraseña"
+      }
+    },
+    "password": {
+      "errors": {
+        "couldNotSendPasswordResetLink": "No se pudo enviar el enlace de restablecimiento de contraseña",
+        "couldNotCreateSessionForUser": "No se pudo crear una sesión para el usuario",
+        "couldNotVerifyPassword": "No se pudo verificar la contraseña",
+        "noPasswordLifetimeProvided": "No se proporcionó vida útil de contraseña, por defecto 24 horas",
+        "contactAdministratorToUnlock": "Contacta a tu administrador para desbloquear tu cuenta",
+        "couldNotVerifyPasswordExclamation": "¡No se pudo verificar la contraseña!",
+        "userInitialStateNotSupported": "Estado inicial del usuario no compatible",
+        "provideCodeOrValidVerification": "Debes proporcionar un código o tener una verificación de usuario válida",
+        "couldNotLoadSession": "No se pudo cargar la sesión",
+        "couldNotLoadAuthMethods": "No se pudieron cargar los métodos de autenticación",
+        "failedPrecondition": "Precondición fallida"
+      }
+    },
+    "session": {
+      "errors": {
+        "sessionNotValid": "La sesión no es válida.",
+        "noLifetimeProvidedForSession": "No se proporcionó vida útil para la sesión, por defecto 24 horas",
+        "couldNotDeleteSession": "No se pudo eliminar la sesión"
+      }
+    },
+    "passkeys": {
+      "errors": {
+        "couldNotDetermineUserFromSession": "No se pudo determinar el usuario desde la sesión",
+        "authenticateOrValidVerification": "Debes autenticarte o tener una verificación de usuario válida",
+        "missingCodeInResponse": "Código faltante en la respuesta",
+        "noPasskeyLifetimeProvided": "No se proporcionó vida útil de passkey, por defecto 24 horas",
+        "noUserIdFoundInSession": "No se encontró ID de usuario en la sesión.",
+        "couldNotCreateRegistrationLink": "No se pudo crear el enlace de registro"
+      }
+    },
+    "verify": {
+      "errors": {
+        "couldNotVerifyInvite": "No se pudo verificar la invitación",
+        "couldNotVerifyEmail": "No se pudo verificar el correo electrónico",
+        "couldNotLoadUser": "No se pudo cargar el usuario",
+        "couldNotLoadPossibleAuthenticators": "No se pudieron cargar los autenticadores posibles",
+        "userAlreadyVerified": "¡Usuario ya verificado!",
+        "couldNotResendInvite": "No se pudo reenviar la invitación"
+      }
+    },
+    "register": {
+      "errors": {
+        "couldNotCreateUser": "No se pudo crear el usuario",
+        "couldNotLinkIdpToUser": "No se pudo vincular IDP al usuario"
+      }
+    },
+    "loginname": {
+      "errors": {
+        "couldNotSearchUsers": "No se pudieron buscar usuarios",
+        "couldNotFindIdentityProvider": "No se pudo encontrar el proveedor de identidad",
+        "moreThanOneUserFound": "Se encontró más de un usuario. Proporciona un identificador único.",
+        "usernamePasswordNotAllowed": "¡Nombre de usuario y contraseña no permitidos! Contacta a tu administrador para más información.",
+        "passkeysNotAllowed": "¡Passkeys no permitidos! Contacta a tu administrador para más información."
+      }
+    },
+    "idp": {
+      "errors": {
+        "unexpectedResponseFromIdpFlow": "Respuesta inesperada del flujo IDP",
+        "noUsernameOrPasswordProvided": "No se proporcionó nombre de usuario o contraseña",
+        "couldNotStartLdapIdpFlow": "No se pudo iniciar el flujo del proveedor de identidad LDAP"
+      }
+    },
+    "cookie": {
+      "errors": {
+        "noSessionLifetimeProvided": "No se proporcionó vida útil de sesión, usando por defecto 24 horas.",
+        "noIdpSessionLifetimeProvided": "No se proporcionó vida útil de sesión IDP, usando por defecto 24 horas.",
+        "couldNotGetSessionOrLoginName": "No se pudo obtener la sesión o la sesión no tiene nombre de inicio de sesión",
+        "couldNotRetrieveSession": "No se pudo recuperar la sesión",
+        "sessionCouldNotBeSet": "No se pudo establecer la sesión",
+        "failedToAuthenticateAttempts": "Error de autenticación: Has tenido {failedAttempts} intentos de contraseña.",
+        "failedToAuthenticateIdpAttempts": "Error de autenticación: Has tenido {failedAttempts} intentos de contraseña."
+      }
+    }
   }
 }

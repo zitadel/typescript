@@ -11,6 +11,7 @@ import { completeFlowOrGetUrl } from "../client";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 import { getOrSetFingerprintId } from "../fingerprint";
+import { getServerTranslation } from "../server-translations";
 
 type RegisterUserCommand = {
   email: string;
@@ -40,7 +41,7 @@ export async function registerUser(command: RegisterUserCommand) {
   });
 
   if (!addResponse) {
-    return { error: "Could not create user" };
+    return { error: await getServerTranslation("register.errors", "couldNotCreateUser") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -68,7 +69,7 @@ export async function registerUser(command: RegisterUserCommand) {
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: await getServerTranslation("common.errors", "couldNotCreateSession") };
   }
 
   if (!command.password) {
@@ -104,7 +105,7 @@ export async function registerUser(command: RegisterUserCommand) {
     });
 
     if (!userResponse.user) {
-      return { error: "User not found in the system" };
+      return { error: await getServerTranslation("common.errors", "userNotFoundInSystem") };
     }
 
     const humanUser = userResponse.user.type.case === "human" ? userResponse.user.type.value : undefined;
@@ -169,7 +170,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   });
 
   if (!addUserResponse) {
-    return { error: "Could not create user" };
+    return { error: await getServerTranslation("register.errors", "couldNotCreateUser") };
   }
 
   const loginSettings = await getLoginSettings({
@@ -188,7 +189,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   });
 
   if (!idpLink) {
-    return { error: "Could not link IDP to user" };
+    return { error: await getServerTranslation("register.errors", "couldNotLinkIdpToUser") };
   }
 
   const session = await createSessionForIdpAndUpdateCookie({
@@ -199,7 +200,7 @@ export async function registerUserAndLinkToIDP(command: RegisterUserAndLinkToIDP
   });
 
   if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
+    return { error: await getServerTranslation("common.errors", "couldNotCreateSession") };
   }
 
   // const userResponse = await getUserByID({

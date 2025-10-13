@@ -66,7 +66,13 @@
         "code": "Dieses Feld ist erforderlich",
         "newPassword": "Bitte geben Sie ein Passwort ein!",
         "confirmPassword": "Dieses Feld ist erforderlich"
-      }
+      },
+      "minLength": "Mindestens",
+      "symbol": "Ein Symbol",
+      "number": "Eine Zahl",
+      "uppercase": "Ein Großbuchstabe",
+      "lowercase": "Ein Kleinbuchstabe",
+      "equals": "Übereinstimmung"
     },
     "change": {
       "title": "Passwort ändern",
@@ -244,7 +250,8 @@
       "firstname": "Dieses Feld ist erforderlich",
       "lastname": "Dieses Feld ist erforderlich",
       "email": "Dieses Feld ist erforderlich"
-    }
+    },
+    "orUseIDP": "oder einen Identity Provider verwenden"
   },
   "invite": {
     "title": "Benutzer einladen",
@@ -329,5 +336,102 @@
     "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "tryagain": "Erneut versuchen"
+  },
+  "server": {
+    "common": {
+      "errors": {
+        "couldNotGetHost": "Host konnte nicht ermittelt werden",
+        "couldNotGetDomain": "Domain konnte nicht ermittelt werden",
+        "couldNotGetHostname": "Hostname konnte nicht ermittelt werden",
+        "couldNotGetSession": "Sitzung konnte nicht ermittelt werden",
+        "couldNotCreateSession": "Sitzung konnte nicht erstellt werden",
+        "noHostFound": "Kein Host gefunden",
+        "couldNotLoadLoginSettings": "Anmeldeeinstellungen konnten nicht geladen werden",
+        "failedToAuthenticate": "Authentifizierung fehlgeschlagen. Sie hatten {failedAttempts} Versuche von {maxAttempts} für das Passwort.",
+        "userNotFoundInSystem": "Benutzer im System nicht gefunden",
+        "userVerificationCheckRequired": "Benutzerverifizierung erforderlich",
+        "couldNotFindSession": "Sitzung konnte nicht gefunden werden",
+        "couldNotUpdateSession": "Sitzung konnte nicht aktualisiert werden",
+        "couldNotVerify": "Verifizierung nicht möglich",
+        "couldNotStartIdpFlow": "IDP-Flow konnte nicht gestartet werden",
+        "initialUserNotSupported": "Initialer Benutzer nicht unterstützt",
+        "couldNotSetPassword": "Passwort konnte nicht gesetzt werden"
+      }
+    },
+    "password": {
+      "errors": {
+        "couldNotSendPasswordResetLink": "Passwort-Reset-Link konnte nicht gesendet werden",
+        "couldNotCreateSessionForUser": "Sitzung für Benutzer konnte nicht erstellt werden",
+        "couldNotVerifyPassword": "Passwort konnte nicht verifiziert werden",
+        "noPasswordLifetimeProvided": "Keine Passwort-Lebensdauer angegeben, Standard 24 Stunden wird verwendet",
+        "contactAdministratorToUnlock": "Kontaktieren Sie Ihren Administrator, um Ihr Konto zu entsperren",
+        "couldNotVerifyPasswordExclamation": "Passwort konnte nicht verifiziert werden!",
+        "userInitialStateNotSupported": "Benutzer-Initialzustand nicht unterstützt",
+        "provideCodeOrValidVerification": "Sie müssen einen Code angeben oder eine gültige Benutzerverifizierung haben",
+        "couldNotLoadSession": "Sitzung konnte nicht geladen werden",
+        "couldNotLoadAuthMethods": "Authentifizierungsmethoden konnten nicht geladen werden",
+        "failedPrecondition": "Vorbedingung fehlgeschlagen"
+      }
+    },
+    "session": {
+      "errors": {
+        "sessionNotValid": "Sitzung ist nicht gültig.",
+        "noLifetimeProvidedForSession": "Keine Lebensdauer für Sitzung angegeben, Standard 24 Stunden wird verwendet",
+        "couldNotDeleteSession": "Sitzung konnte nicht gelöscht werden"
+      }
+    },
+    "passkeys": {
+      "errors": {
+        "couldNotDetermineUserFromSession": "Benutzer konnte nicht aus Sitzung ermittelt werden",
+        "authenticateOrValidVerification": "Sie müssen sich authentifizieren oder eine gültige Benutzerverifizierung haben",
+        "missingCodeInResponse": "Code in Antwort fehlt",
+        "noPasskeyLifetimeProvided": "Keine Passkey-Lebensdauer angegeben, Standard 24 Stunden wird verwendet",
+        "noUserIdFoundInSession": "Keine Benutzer-ID in Sitzung gefunden.",
+        "couldNotCreateRegistrationLink": "Registrierungslink konnte nicht erstellt werden"
+      }
+    },
+    "verify": {
+      "errors": {
+        "couldNotVerifyInvite": "Einladung konnte nicht verifiziert werden",
+        "couldNotVerifyEmail": "E-Mail konnte nicht verifiziert werden",
+        "couldNotLoadUser": "Benutzer konnte nicht geladen werden",
+        "couldNotLoadPossibleAuthenticators": "Mögliche Authentifikatoren konnten nicht geladen werden",
+        "userAlreadyVerified": "Benutzer bereits verifiziert!",
+        "couldNotResendInvite": "Einladung konnte nicht erneut gesendet werden"
+      }
+    },
+    "register": {
+      "errors": {
+        "couldNotCreateUser": "Benutzer konnte nicht erstellt werden",
+        "couldNotLinkIdpToUser": "IDP konnte nicht mit Benutzer verknüpft werden"
+      }
+    },
+    "loginname": {
+      "errors": {
+        "couldNotSearchUsers": "Benutzer konnten nicht gesucht werden",
+        "couldNotFindIdentityProvider": "Identity Provider konnte nicht gefunden werden",
+        "moreThanOneUserFound": "Mehr als ein Benutzer gefunden. Geben Sie eine eindeutige Kennung an.",
+        "usernamePasswordNotAllowed": "Benutzername und Passwort nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen.",
+        "passkeysNotAllowed": "Passkeys nicht erlaubt! Kontaktieren Sie Ihren Administrator für weitere Informationen."
+      }
+    },
+    "idp": {
+      "errors": {
+        "unexpectedResponseFromIdpFlow": "Unerwartete Antwort vom IDP-Flow",
+        "noUsernameOrPasswordProvided": "Kein Benutzername oder Passwort angegeben",
+        "couldNotStartLdapIdpFlow": "LDAP Identity Provider Flow konnte nicht gestartet werden"
+      }
+    },
+    "cookie": {
+      "errors": {
+        "noSessionLifetimeProvided": "Keine Sitzungslebensdauer angegeben, Standard 24 Stunden wird verwendet.",
+        "noIdpSessionLifetimeProvided": "Keine IDP-Sitzungslebensdauer angegeben, Standard 24 Stunden wird verwendet.",
+        "couldNotGetSessionOrLoginName": "Sitzung konnte nicht abgerufen werden oder Sitzung hat keinen Anmeldenamen",
+        "couldNotRetrieveSession": "Sitzung konnte nicht abgerufen werden",
+        "sessionCouldNotBeSet": "Sitzung konnte nicht gesetzt werden",
+        "failedToAuthenticateAttempts": "Authentifizierung fehlgeschlagen: Sie hatten {failedAttempts} Passwort-Versuche.",
+        "failedToAuthenticateIdpAttempts": "Authentifizierung fehlgeschlagen: Sie hatten {failedAttempts} Passwort-Versuche."
+      }
+    }
   }
 }

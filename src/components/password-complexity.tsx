@@ -5,6 +5,7 @@ import {
   upperCaseValidator,
 } from "@/helpers/validators";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { Translated } from "./translated";
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
@@ -68,7 +69,8 @@ export function PasswordComplexity({
         <div className="flex flex-row items-center" data-testid="length-check">
           {hasMinLength ? check : cross}
           <span className={desc}>
-            Password length {passwordComplexitySettings.minLength.toString()}
+            <Translated i18nKey="set.minLength" namespace="password" />{" "}
+            {passwordComplexitySettings.minLength.toString()}
           </span>
         </div>
       ) : (
@@ -76,23 +78,33 @@ export function PasswordComplexity({
       )}
       <div className="flex flex-row items-center" data-testid="symbol-check">
         {hasSymbol ? check : cross}
-        <span className={desc}>has Symbol</span>
+        <span className={desc}>
+          <Translated i18nKey="set.symbol" namespace="password" />
+        </span>
       </div>
       <div className="flex flex-row items-center" data-testid="number-check">
         {hasNumber ? check : cross}
-        <span className={desc}>has Number</span>
+        <span className={desc}>
+          <Translated i18nKey="set.number" namespace="password" />
+        </span>
       </div>
       <div className="flex flex-row items-center" data-testid="uppercase-check">
         {hasUppercase ? check : cross}
-        <span className={desc}>has uppercase</span>
+        <span className={desc}>
+          <Translated i18nKey="set.uppercase" namespace="password" />
+        </span>
       </div>
       <div className="flex flex-row items-center" data-testid="lowercase-check">
         {hasLowercase ? check : cross}
-        <span className={desc}>has lowercase</span>
+        <span className={desc}>
+          <Translated i18nKey="set.lowercase" namespace="password" />
+        </span>
       </div>
       <div className="flex flex-row items-center" data-testid="equal-check">
         {equals ? check : cross}
-        <span className={desc}>equals</span>
+        <span className={desc}>
+          <Translated i18nKey="set.equals" namespace="password" />
+        </span>
       </div>
     </div>
   );

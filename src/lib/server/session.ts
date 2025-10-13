@@ -22,6 +22,7 @@ import {
 } from "../cookies";
 import { getServiceUrlFromHeaders } from "../service-url";
 import { getOriginalHost } from "./host";
+import { getServerTranslation } from "../server-translations";
 
 export async function skipMFAAndContinueWithNextUrl({
   userId,
@@ -119,7 +120,7 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   if (!recentSession) {
     return {
-      error: "Could not find session",
+      error: await getServerTranslation("common.errors", "couldNotFindSession"),
     };
   }
 
@@ -128,7 +129,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   const host = await getOriginalHost();
 
   if (!host) {
-    return { error: "Could not get host" };
+    return { error: await getServerTranslation("common.errors", "couldNotGetHost") };
   }
 
   if (host && challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
@@ -149,7 +150,7 @@ export async function updateSession(options: UpdateSessionCommand) {
       : undefined;
 
   if (!lifetime) {
-    console.warn("No lifetime provided for session, defaulting to 24 hours");
+    console.warn(await getServerTranslation("session.errors", "noLifetimeProvidedForSession"));
     lifetime = {
       seconds: BigInt(60 * 60 * 24), // default to 24 hours
       nanos: 0,
@@ -165,7 +166,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   });
 
   if (!session) {
-    return { error: "Could not update session" };
+    return { error: await getServerTranslation("common.errors", "couldNotUpdateSession") };
   }
 
   // if password, check if user has MFA methods
@@ -210,7 +211,7 @@ export async function clearSession(options: ClearSessionOptions) {
   const iFrameEnabled = !!securitySettings?.embeddedIframe?.enabled;
 
   if (!deleteResponse) {
-    throw new Error("Could not delete session");
+    throw new Error(await getServerTranslation("session.errors", "couldNotDeleteSession"));
   }
 
   return removeSessionFromCookie({ session: sessionCookie, iFrameEnabled });
